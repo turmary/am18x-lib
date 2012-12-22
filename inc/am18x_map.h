@@ -8,6 +8,7 @@
 #endif
 
 #include "am18x_type.h"
+#include "am18x_conf.h"
 
 /*----------------------------------------------------------------------------*/
 // Peripheral register structures
