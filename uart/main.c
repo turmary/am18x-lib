@@ -11,6 +11,6 @@ int main(int argc, char* argv[]) {
 	printk(title);
 	printk("now press any key\n");
 	getchar();
-	printk("press complete now\n");
+	printk("press complete\n");
 	return 0;
 }

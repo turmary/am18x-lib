@@ -40,33 +40,118 @@ typedef struct {
 } MPU_con_t;
 
 typedef struct {
-	vuint32_t	REVID;
+	vcuint32_t	REVID;
 	uint32_t	RESERVED0[5];
 	vuint32_t	INTEVAL;
 	uint32_t	RESERVED1[9];
-	vuint32_t	MERRPR0;
+	vcuint32_t	MERRPR0;
 	uint32_t	RESERVED2[3];
 	vuint32_t	MERRCR0;
 	uint32_t	RESERVED3[3];
-	vuint32_t	PERRPR;
+	vcuint32_t	PERRPR;
 	uint32_t	RESERVED4;
 	vuint32_t	PERRCR;
 	uint32_t	RESERVED5[45];
+#define PTCMD_GO1			(0x1UL << 1)
+#define PTCMD_GO0			(0x1UL << 0)
 	vuint32_t	PTCMD;
 	uint32_t	RESERVED6;
-	vuint32_t	PTSTAT;
+#define PTSTAT_GO1_MASK			(0x1UL << 1)
+#define PTSTAT_GO1_no			(0x0UL << 1)
+#define PTSTAT_GO1_yes			(0x1UL << 1)
+#define PTSTAT_GO0_MASK			(0x1UL << 0)
+#define PTSTAT_GO0_no			(0x0UL << 0)
+#define PTSTAT_GO0_yes			(0x1UL << 0)
+	vcuint32_t	PTSTAT;
 	uint32_t	RESERVED7[53];
-	vuint32_t	PDSTAT0;
-	vuint32_t	PDSTAT1;
+#define PDSTATx_EMUIHB_MASK		(0x1UL << 11)
+#define PDSTATx_EMUIHB_unactive		(0x0UL << 11)
+#define PDSTATx_EMUIHB_active		(0x1UL << 11)
+#define PDSTATx_PORDONE_MASK		(0x1UL << 9)
+#define PDSTATx_PORDONE_no		(0x0UL << 9)
+#define PDSTATx_PORDONE_yes		(0x1UL << 9)
+#define PDSTATx_POR_MASK		(0x1UL << 8)
+#define PDSTATx_POR_asserted		(0x0UL << 8)
+#define PDSTATx_POR_deasserted		(0x1UL << 8)
+#define PDSTATx_STATE_MASK		(0x1FUL << 0)
+#define PDSTATx_STATE_off		(0x0UL << 0)
+#define PDSTATx_STATE_on		(0x1UL << 0)
+#define PDSTATx_STATE_in_transition(x)	(0x10UL <= (x) && (x) <= 0x1AUL)
+	vcuint32_t	PDSTAT0;
+	vcuint32_t	PDSTAT1;
 	uint32_t	RESERVED8[62];
+#define PDCTLx_WAKECNT_MASK		(0xFFUL << 16)
+#define PDCTLx_GOOD2ACCESS_MASK		(0xFUL << 20)
+#define PDCTLx_ON2GOOD_MASK		(0xFUL << 16)
+#define PDCTLx_PDMODE_MASK		(0xFUL << 12)
+#define PDCTLx_PDMODE_on		(0xFUL << 12)
+#define PDCTLx_EMUIHBIE_MASK		(0x1UL << 9)
+#define PDCTLx_EMUIHBIE_disable		(0x0UL << 9)
+#define PDCTLx_EMUIHBIE_enable		(0x1UL << 9)
+#define PDCTLx_NEXT_MASK		(0x1UL << 0)
+#define PDCTLx_NEXT_off			(0x0UL << 0)
+#define PDCTLx_NEXT_on			(0x1UL << 0)
 	vuint32_t	PDCTL0;
 	vuint32_t	PDCTL1;
 	uint32_t	RESERVED9[62];
-	vuint32_t	PDCFG0;
-	vuint32_t	PDCFG1;
+#define PDCFGx_PD_LOCK_MASK		(0x1UL << 3)
+#define PDCFGx_PD_LOCK_locked		(0x0UL << 3)
+#define PDCFGx_PD_LOCK_unlocked		(0x1UL << 3)
+#define PDCFGx_ICEPICK_MASK		(0x1UL << 2)
+#define PDCFGx_ICEPICK_unpresent	(0x0UL << 2)
+#define PDCFGx_ICEPICK_present		(0x1UL << 2)
+#define PDCFGx_RAM_PSM_MASK		(0x1UL << 1)
+#define PDCFGx_RAM_PSM_no		(0x0UL << 1)
+#define PDCFGx_RAM_PSM_yes		(0x1UL << 1)
+#define PDCFGx_ALWAYSON_MASK		(0x1UL << 0)
+#define PDCFGx_ALWAYSON_no		(0x0UL << 0)
+#define PDCFGx_ALWAYSON_yes		(0x1UL << 0)
+	vcuint32_t	PDCFG0;
+	vcuint32_t	PDCFG1;
 	uint32_t	RESERVED10[254];
-	vuint32_t	MDSTATx[32];
+#define MDSTATx_EMUIHB_MASK		(0x1UL << 17)
+#define MDSTATx_EMUIHB_no		(0x0UL << 17)
+#define MDSTATx_EMUIHB_yes		(0x1UL << 17)
+#define MDSTATx_EMURST_MASK		(0x1UL << 16)
+#define MDSTATx_EMURST_no		(0x0UL << 16)
+#define MDSTATx_EMURST_yes		(0x1UL << 16)
+#define MDSTATx_MCKOUT_MASK		(0x1UL << 12)
+#define MDSTATx_MCKOUT_off		(0x0UL << 12)
+#define MDSTATx_MCKOUT_on		(0x1UL << 12)
+#define MDSTATx_MRST_MASK		(0x1UL << 10)
+#define MDSTATx_MRST_asserted		(0x0UL << 10)
+#define MDSTATx_MRST_deasserted		(0x1UL << 10)
+#define MDSTATx_LRSTDONE_MASK		(0x1UL << 9)
+#define MDSTATx_LRSTDONE_yes		(0x0UL << 9)
+#define MDSTATx_LRSTDONE_no		(0x1UL << 9)
+#define MDSTATx_LRST_MASK		(0x1UL << 8)
+#define MDSTATx_LRST_asserted		(0x0UL << 8)
+#define MDSTATx_LRST_deasserted		(0x1UL << 8)
+#define MDSTATx_STATE_MASK		(0x3FUL << 0)
+#define MDSTATx_STATE_SwRstDisable	(0x0UL << 0)
+#define MDSTATx_STATE_SyncReset		(0x1UL << 0)
+#define MDSTATx_STATE_Disable		(0x2UL << 0)
+#define MDSTATx_STATE_Enable		(0x3UL << 0)
+#define MDSTATx_STATE_in_transition(x)	(0x4UL <= (x) && (x) <= 0x3FUL)
+	vcuint32_t	MDSTATx[32];
 	uint32_t	RESERVED11[96];
+#define MDCTLx_FORCE_MASK		(0x1UL << 31)
+#define MDCTLx_FORCE_disabled		(0x0UL << 31)
+#define MDCTLx_FORCE_enabled		(0x1UL << 31)
+#define MDCTLx_EMUIHBIE_MASK		(0x1UL << 10)
+#define MDCTLx_EMUIHBIE_disable		(0x0UL << 10)
+#define MDCTLx_EMUIHBIE_enable		(0x1UL << 10)
+#define MDCTLx_EMURSTIE_MASK		(0x1UL << 9)
+#define MDCTLx_EMURSTIE_disable		(0x0UL << 9)
+#define MDCTLx_EMURSTIE_enable		(0x1UL << 9)
+#define MDCTLx_LRST_MASK		(0x1UL << 8)
+#define MDCTLx_LRST_assert		(0x0UL << 8)
+#define MDCTLx_LRST_deassert		(0x1UL << 8)
+#define MDCTLx_STATE_MASK		(0x7UL << 0)
+#define MDCTLx_STATE_SwRstDisable	(0x0UL << 0)
+#define MDCTLx_STATE_SyncReset		(0x1UL << 0)
+#define MDCTLx_STATE_Disable		(0x2UL << 0)
+#define MDCTLx_STATE_Enable		(0x3UL << 0)
 	vuint32_t	MDCTLx[32];
 } PSC_con_t;
 
