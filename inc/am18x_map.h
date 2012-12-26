@@ -39,6 +39,59 @@ typedef struct {
 	vuint32_t	FLTCLR;
 } MPU_con_t;
 
+#define MODULE_NR_PER_PSC	32
+typedef enum {
+	PSC_EDMA3_0_C0 = MODULE_NR_PER_PSC * 0,
+	PSC_EDMA3_0_T0,
+	PSC_EDMA3_0_T1,
+	PSC_EMIFA,
+	PSC_SPI0,
+	PSC_MMC_SD0,
+	PSC_ARM_INTC,
+	PSC_ARM_RAM_ROM,
+	PSC_RESERVED0,
+	PSC_UART0,
+	PSC_SCR0,
+	PSC_SCR1,
+	PSC_SCR2,
+	PSC_PRU,
+	PSC_ARM,
+	PSC_RESERVED1,
+	PSC_EDMA3_1_C0 = MODULE_NR_PER_PSC * 1,
+	PSC_USB0,
+	PSC_USB1,
+	PSC_GPIO,
+	PSC_HPI,
+	PSC_EMAC,
+	PSC_DDR2,
+	PSC_MCASP0,
+	PSC_SATA,
+	PSC_VPIF,
+	PSC_SPI1,
+	PSC_I2C1,
+	PSC_UART1,
+	PSC_UART2,
+	PSC_MCBSP0,
+	PSC_MCBSP1,
+	PSC_LCDC,
+	PSC_EHRPWM,
+	PSC_MMC_SD1,
+	PSC_UPP,
+	PSC_ECAP,
+	PSC_EDMA3_1_T0,
+	PSC_RESERVED2,
+	PSC_RESERVED3,
+	PSC_SCR_F0,
+	PSC_SCR_F1,
+	PSC_SCR_F2,
+	PSC_SCR_F6,
+	PSC_SCR_F7,
+	PSC_SCR_F8,
+	PSC_BR_F7,
+	PSC_ON_CHIP_RAM,
+} psc_module_t;
+
+
 typedef struct {
 	vcuint32_t	REVID;
 	uint32_t	RESERVED0[5];
@@ -128,12 +181,12 @@ typedef struct {
 #define MDSTATx_LRST_asserted		(0x0UL << 8)
 #define MDSTATx_LRST_deasserted		(0x1UL << 8)
 #define MDSTATx_STATE_MASK		(0x3FUL << 0)
-#define MDSTATx_STATE_SwRstDisable	(0x0UL << 0)
-#define MDSTATx_STATE_SyncReset		(0x1UL << 0)
-#define MDSTATx_STATE_Disable		(0x2UL << 0)
-#define MDSTATx_STATE_Enable		(0x3UL << 0)
+#define MDSTATx_STATE_SwRstDisable	(0x0UL)
+#define MDSTATx_STATE_SyncReset		(0x1UL)
+#define MDSTATx_STATE_Disable		(0x2UL)
+#define MDSTATx_STATE_Enable		(0x3UL)
 #define MDSTATx_STATE_in_transition(x)	(0x4UL <= (x) && (x) <= 0x3FUL)
-	vcuint32_t	MDSTATx[32];
+	vcuint32_t	MDSTATx[MODULE_NR_PER_PSC];
 	uint32_t	RESERVED11[96];
 #define MDCTLx_FORCE_MASK		(0x1UL << 31)
 #define MDCTLx_FORCE_disabled		(0x0UL << 31)
@@ -152,7 +205,7 @@ typedef struct {
 #define MDCTLx_STATE_SyncReset		(0x1UL << 0)
 #define MDCTLx_STATE_Disable		(0x2UL << 0)
 #define MDCTLx_STATE_Enable		(0x3UL << 0)
-	vuint32_t	MDCTLx[32];
+	vuint32_t	MDCTLx[MODULE_NR_PER_PSC];
 } PSC_con_t;
 
 typedef struct {
@@ -307,6 +360,58 @@ typedef struct {
 #define MDR_OSM_SEL_13x			(0x1UL << 0)
 	vuint32_t	MDR;
 } UART_con_t;
+
+
+/*----------------------------------------------------------------------------*/
+// periheral addresses
+/*----------------------------------------------------------------------------*/
+// AM1808 ARM Microprocessor
+// 2.4 Memory Map Summary
+#define PSC0_BASE			0x01C10000UL
+#define UART0_BASE			0x01C42000UL
+#define UART1_BASE			0x01D0C000UL
+#define UART2_BASE			0x01D0D000UL
+#define PSC1_BASE			0x01E27000UL
+
+
+/*----------------------------------------------------------------------------*/
+// peripheral names
+/*----------------------------------------------------------------------------*/
+
+#ifndef __MEM_REMAP
+#ifdef _PSC0
+	#define PSC0			((PSC_con_t*)PSC0_BASE)
+#endif
+#ifdef _PSC1
+	#define PSC1			((PSC_con_t*)PSC1_BASE)
+#endif
+#ifdef _UART0
+	#define UART0			((UART_con_t*)UART0_BASE)
+#endif
+#ifdef _UART1
+	#define UART1			((UART_con_t*)UART1_BASE)
+#endif
+#ifdef _UART2
+	#define UART2			((UART_con_t*)UART2_BASE)
+#endif
+
+#else//__MEM_REMAP
+#ifdef _PSC0
+	_EXTERN PSC_con_t		*PSC0;
+#endif
+#ifdef _PSC1
+	_EXTERN PSC_con_t		*PSC1;
+#endif
+#ifdef _UART0
+	_EXTERN UART_con_t		*UART0;
+#endif
+#ifdef _UART1
+	_EXTERN UART_con_t		*UART1;
+#endif
+#ifdef _UART2
+	_EXTERN UART_con_t		*UART2;
+#endif
+#endif//__MEM_REMAP
 
 
 #endif//__AM18X_MAP_H__

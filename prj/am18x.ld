@@ -1,12 +1,11 @@
 /* tary, 1:09 2012/12/23 */
-OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm","elf32-littlearm")
+OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 ENTRY(_start)
 SEARCH_DIR("=/usr/local/lib");
 SEARCH_DIR("=/lib");
 SEARCH_DIR("=/usr/lib");
-SECTIONS
-{
+SECTIONS {
 	. = 0x00000000;
 	. = ALIGN(0x4);
 	PROVIDE (__text_start = .);
@@ -40,7 +39,7 @@ SECTIONS
 	. = ALIGN(0x4);
 	PROVIDE (__data_end = .);
 
-	PROVIDE (__bss_start = .);	
+	PROVIDE (__bss_start = .);
 	.bss : {
 		*(.bss)
 		*(COMMON)

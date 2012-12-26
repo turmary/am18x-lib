@@ -8,6 +8,10 @@
 
 #define F_OSC			24000000UL	//Hz
 
+#define _PSC
+#define _PSC0
+#define _PSC1
+
 #define _UART
 #define _UART0
 #define _UART1
