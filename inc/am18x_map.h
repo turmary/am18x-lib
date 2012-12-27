@@ -209,6 +209,80 @@ typedef struct {
 } PSC_con_t;
 
 typedef struct {
+	vcuint32_t	REVID;
+	uint32_t	RESERVED0;
+	vcuint32_t	DIEIDRx[4];
+	vcuint32_t	REVIDR0;
+	uint32_t	RESERVED1;
+	vcuint32_t	BOOTCFG;
+	uint32_t	RESERVED2[5];
+#define KICK0R_UNLOCK			0x83E70B13UL
+#define KICK0R_LOCK			0x00000000UL
+#define KICK1R_UNLOCK			0x95A4F1E0UL
+#define KICK1R_LOCK			0x00000000UL
+	vuint32_t	KICKxR[2];
+#define HOST0CFG_BOOTRDY_MASK		(0x1UL << 0)
+#define HOST0CFG_BOOTRDY_reset		(0x0UL << 0)
+#define HOST0CFG_BOOTRDY_released	(0x1UL << 0)
+	vuint32_t	HOST0CFG;
+	uint32_t	RESERVED3[39];
+#define IRAWSTAT_ADDRERR_MASK		(0x1UL << 1)
+#define IRAWSTAT_ADDRERR_unset		(0x0UL << 1)
+#define IRAWSTAT_ADDRERR_set		(0x1UL << 1)
+#define IRAWSTAT_PROTERR_MASK		(0x1UL << 0)
+#define IRAWSTAT_PROTERR_unset		(0x0UL << 0)
+#define IRAWSTAT_PROTERR_set		(0x1UL << 0)
+	vuint32_t	IRAWSTAT;
+#define IENSTAT_ADDRERR_MASK		(0x1UL << 1)
+#define IENSTAT_ADDRERR_unset		(0x0UL << 1)
+#define IENSTAT_ADDRERR_set		(0x1UL << 1)
+#define IENSTAT_PROTERR_MASK		(0x1UL << 0)
+#define IENSTAT_PROTERR_unset		(0x0UL << 0)
+#define IENSTAT_PROTERR_set		(0x1UL << 0)
+	vcuint32_t	IENSTAT;
+#define IENSET_ADDRERR_EN_enable	(0x1UL << 1)
+#define IENSET_PROTERR_EN_enable	(0x1UL << 0)
+	vuint32_t	IENSET;
+#define IENCLR_ADDRERR_EN_enable	(0x1UL << 1)
+#define IENCLR_PROTERR_EN_enable	(0x1UL << 0)
+	vuint32_t	IENCLR;
+#define EOI_EOIVECT_MASK		(0xFFUL << 0)
+	vuint32_t	EOI;
+	vcuint32_t	FLTADDRR;
+#define FLTSTAT_ID_MASK			(0xFFUL << 24)
+#define FLTSTAT_MSTID_MASK		(0xFFUL << 16)
+#define FLTSTAT_PRIVID_MASK		(0xFUL << 9)
+#define FLTSTAT_TYPE_MASK		(0x3FUL << 0)
+#define FLTSTAT_TYPE_None		0x0UL
+#define FLTSTAT_TYPE_UserExec		0x1UL
+#define FLTSTAT_TYPE_UserWrite		0x2UL
+#define FLTSTAT_TYPE_UserRead		0x4UL
+#define FLTSTAT_TYPE_SupervisorExec	0x8UL
+#define FLTSTAT_TYPE_SupervisorWrite	0x10UL
+#define FLTSTAT_TYPE_SupervisorRead	0x20UL
+	vcuint32_t	FLTSTAT;
+	uint32_t	RESERVED4[5];
+// TODO, Master Priority X
+	vuint32_t	MSTPRIx[3];
+	uint32_t	RESERVED5;
+	vuint32_t	PINMUXx[20];
+	vuint32_t	SUSPSRC;
+	vuint32_t	CHIPSIG;
+	vuint32_t	CHIPSIG_CLR;
+	vuint32_t	CFGCHIPx[5];
+} SYSCFG0_con_t;
+
+typedef struct {
+	vuint32_t	VTPIO_CTL;
+	vuint32_t	DDR_SLEW;
+	vuint32_t	DEEPSLEEP;
+	vuint32_t	PUPD_ENA;
+	vuint32_t	PUPD_SEL;
+	vuint32_t	RXACTIVE;
+	vuint32_t	PWRDN;
+} SYSCFG1_con_t;
+
+typedef struct {
 #define RBR_DATA_MASK			0xFFUL
 #define THRw				RBRr
 #define THR_DATA_MASK			0xFFUL
@@ -368,10 +442,12 @@ typedef struct {
 // AM1808 ARM Microprocessor
 // 2.4 Memory Map Summary
 #define PSC0_BASE			0x01C10000UL
+#define SYSCFG0_BASE			0x01C14000UL
 #define UART0_BASE			0x01C42000UL
 #define UART1_BASE			0x01D0C000UL
 #define UART2_BASE			0x01D0D000UL
 #define PSC1_BASE			0x01E27000UL
+#define SYSCFG1_BASE			0x01E2C000UL
 
 
 /*----------------------------------------------------------------------------*/
@@ -384,6 +460,12 @@ typedef struct {
 #endif
 #ifdef _PSC1
 	#define PSC1			((PSC_con_t*)PSC1_BASE)
+#endif
+#ifdef _SYSCFG0
+	#define SYSCFG0			((SYSCFG0_con_t*)SYSCFG0_BASE)
+#endif
+#ifdef _SYSCFG1
+	#define SYSCFG1			((SYSCFG1_con_t*)SYSCFG1_BASE)
 #endif
 #ifdef _UART0
 	#define UART0			((UART_con_t*)UART0_BASE)
@@ -401,6 +483,12 @@ typedef struct {
 #endif
 #ifdef _PSC1
 	_EXTERN PSC_con_t		*PSC1;
+#endif
+#ifdef _SYSCFG0
+	_EXTERN SYSCFG0_con_t		*SYSCFG0;
+#endif
+#ifdef _SYSCFG1
+	_EXTERN SYSCFG1_con_t		*SYSCFG1;
 #endif
 #ifdef _UART0
 	_EXTERN UART_con_t		*UART0;

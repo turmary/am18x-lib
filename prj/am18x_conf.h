@@ -12,6 +12,9 @@
 #define _PSC0
 #define _PSC1
 
+#define _SYSCFG0
+#define _SYSCFG1
+
 #define _UART
 #define _UART0
 #define _UART1
