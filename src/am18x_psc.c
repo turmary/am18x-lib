@@ -9,7 +9,7 @@ static PSC_con_t* module_to_psc(psc_module_t module) {
 }
 
 // 8.3.2 Module State Transitions
-am18x_rt psc_module_state_transition(psc_module_t module, uint32_t state) {
+am18x_rt psc_state_transition(psc_module_t module, psc_state_t state) {
 	PSC_con_t* psc;
 	uint32_t nr = module;
 	uint32_t reg, val;

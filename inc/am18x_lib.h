@@ -5,12 +5,12 @@
 
 #include "am18x_map.h"
 
-#ifdef _CLKCON
-#include "am18x_clk.h"
+#ifdef _SYSCFG
+#include "am18x_syscfg.h"
 #endif
 
-#ifdef _GPIOCON
-#include "am18x_gpio.h"
+#ifdef _PSC
+#include "am18x_psc.h"
 #endif
 
 #ifdef _UART

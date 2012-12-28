@@ -12,6 +12,7 @@
 #define _PSC0
 #define _PSC1
 
+#define _SYSCFG
 #define _SYSCFG0
 #define _SYSCFG1
 

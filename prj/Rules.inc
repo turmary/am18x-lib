@@ -3,28 +3,36 @@ TARGET = main
 
 MAKEFLAGS += 
 
-DEBUG = 
-
 DEFS = 
 
-CFLAGS += -std=gnu99
-CFLAGS += -mcpu=arm926ej-s
-CFLAGS += -g$(DEBUG)
-CFLAGS += -O1
+CINS = ../include
+
+DEBUG += -gdwarf-2
+
+ARCH = -mcpu=arm926ej-s
+
 CFLAGS += -mabi=aapcs
+CFLAGS += $(DEBUG)
+CFLAGS += -Os
 CFLAGS += -Wall
-CFLAGS += $(patsubst %,-I%,$(CINCS))
-CFLAGS += -Wa,-adhlns=$(subst $(suffix $<),.lst,$<)
-CFLAGS += $(DEFS)
+CFLAGS += -std=gnu99
 CFLAGS += -I.
+CFLAGS += $(patsubst %,-I%,$(CINCS))
+CFLAGS += -fpic -msingle-pic-base -mpic-register=r10
+CFLAGS += -Wa,--keep-locals
+CFLAGS += -Wa,-adhlns=$(subst $(suffix $<),.lst,$<)
 
-AFLAGS = -D__ASSEMBLY__
+ASFLAGS += -D__ASSEMBLY__
+ASFLAGS += $(DEBUG)
+ASFLAGS += -I.
+ASFLAGS += $(patsubst %,-I%,$(CINCS))
+ASFLAGS += -Wa,--keep-locals
+ASFLAGS += -Wa,-ahdlns=$(<:.S=.lst)
 
-LINKAGE = -static
-
-LDFLAGS = -Wl,-Map=$(TARGET).map
-LDFLAGS += $(LINKAGE) -nostdlib
-LDFLAGS += -T../prj/am18x.ld
+LDFLAGS += $(DEBUG)
+LDFLAGS += -nostdlib -lgcc
+LDFLAGS += -Wl,-Map=$(TARGET).map
+LDFLAGS += -Wl,-T../prj/am18x.ld
 
 COBJ = $(CSRC:.c=.o)
 AOBJ = $(ASRC:.S=.o)
@@ -36,8 +44,8 @@ LST	+= $(ASRC:.S=.lst)
 
 GENDEPFLAGS = -MD -MP -MF .dep/$(@F).d
 
-ALL_CFLAGS = $(CFLAGS) $(GENDEPFLAGS)
-ALL_AFLAGS = $(CFLAGS) -x assembler-with-cpp $(AFLAGS)
+ALL_CFLAGS = $(ARCH) $(DEFS) $(CFLAGS) $(GENDEPFLAGS)
+ALL_ASFLAGS = $(ARCH) $(DEFS) $(ASFLAGS) -x assembler-with-cpp
 
 CROSS_COMPILE := arm-none-linux-gnueabi-
 CC = $(CROSS_COMPILE)gcc
@@ -47,9 +55,6 @@ NM = $(CROSS_COMPILE)nm
 SIZE = $(CROSS_COMPILE)size
 REMOVE = rm -f
 COPY = cp
-
-OBJCOPYFLAGS = -R .comment -R .stab -R .stabstr
-
 
 
 all: build
@@ -65,20 +70,25 @@ sym: $(TARGET).sym
 size: $(TARGET).elf
 	$(SIZE) -B $(TARGET).elf
 
-%.hex: %.elf
-	$(OBJCOPY) $(OBJCOPYFLAGS) -O ihex $< $@
+AIS = $(TARGET).ais
+
+program: build ${AIS}
+	../tools/sfh_OMAP-L138 -p COM3 -flash_noubl -targetType AM1808 ${AIS}
+
+${AIS}: bin
+	../tools/AISgen_d800k008 -cfg="..\tools\am1808exp-spi.cfg"
 
 %.bin: %.elf
-	$(OBJCOPY) $(OBJCOPYFLAGS) -O binary $< $@
+	$(OBJCOPY) -O binary $< $@
 
 %.lss: %.elf
-	$(OBJDUMP) -h -S -C $< > $@
+	$(OBJDUMP) -x -d -S -z $< > $@
 
 %.sym: %.elf
 	$(NM) -n $< > $@
 
 %.elf: $(OBJS)
-	$(CC) $(OBJS) --output $@ $(LDFLAGS)
+	$(CC) $(ALL_CFLAGS) $(OBJS) --output $@ $(LDFLAGS)
 
 $(COBJ) : %.o : %.c
 	$(CC) -c $(ALL_CFLAGS) $< -o $@
@@ -89,23 +99,23 @@ $(COBJ) : %.o : %.c
 	@echo ""
 
 $(AOBJ) : %.o : %.S
-	$(CC) -c $(ALL_AFLAGS) $< -o $@
+	$(CC) -c $(ALL_ASFLAGS) $< -o $@
 	@echo ""
 
 %.i : %.S
-	$(CC) -E $(ALL_AFLAGS) $< -o $@
+	$(CC) -E $(ALL_ASFLAGS) $< -o $@
 	@echo ""
 
 clean:
-	$(REMOVE) $(TARGET).hex
 	$(REMOVE) $(TARGET).bin
 	$(REMOVE) $(TARGET).elf
 	$(REMOVE) $(TARGET).lss
 	$(REMOVE) $(TARGET).sym
 	$(REMOVE) $(TARGET).map
+	$(REMOVE) $(TARGET).ais
 	$(REMOVE) $(OBJS) $(LST)
 	$(REMOVE) -r .dep
 
 -include $(shell mkdir .dep 2>/dev/null) $(wildcard .dep/*)
 
-.PHONY : all build elf hex bin lss sym clean
+.PHONY : all build elf bin lss sym size program clean

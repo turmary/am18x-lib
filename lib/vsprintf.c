@@ -15,7 +15,7 @@
  * So Feb  1 16:51:32 CET 2004 Juergen Quade <quade@hsnr.de>
  * - scnprintf and vscnprintf
  */
-#include <s3c24xx_lib.h>
+#include <am18x_lib.h>
 #include <stdarg.h>
 #include <string.h>
 #include <limits.h>
