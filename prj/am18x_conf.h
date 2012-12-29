@@ -6,7 +6,7 @@
 
 #include <am18x_type.h>
 
-#define F_OSC			24000000UL	//Hz
+#define F_OSCIN			24000000UL	//Hz
 
 #define _PSC
 #define _PSC0

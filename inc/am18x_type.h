@@ -124,4 +124,4 @@ typedef enum { AM18X_FALSE = 0, AM18X_TRUE = !AM18X_FALSE} am18x_bool;
 #define countof(x)			(sizeof(x) / sizeof(x[0]))
 
 
-#endif //__AM18X_TYPE_H__
+#endif//__AM18X_TYPE_H__

@@ -11,10 +11,10 @@ int uart_init(void) {
 
 	syscfg_kick(AM18X_FALSE);
 
+	psc_state_transition(PSC_UART2, PSC_STATE_ENABLE);
+
 	syscfg_pinmux(UART2_TXD);
 	syscfg_pinmux(UART2_RXD);
-
-	psc_state_transition(PSC_UART2, PSC_STATE_ENABLE);
 
 	uart_init_conf(&conf);
 	uart_set_conf(UART2, &conf);

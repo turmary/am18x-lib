@@ -2,7 +2,7 @@
 #include "am18x_uart.h"
 
 uint32_t uart_input_clock_frequency(UART_con_t* ucon) {
-	return F_OSC;
+	return F_OSCIN / 2UL;
 }
 
 static inline uint32_t uart_get_divisor(UART_con_t* ucon, uint32_t baud_rate) {
@@ -40,8 +40,8 @@ am18x_rt uart_set_conf(UART_con_t* ucon, const uart_conf_t* conf) {
 	ucon->MDR = FIELD_SET(ucon->MDR, MDR_OSM_SEL_MASK, MDR_OSM_SEL_13x);
 
 	v = uart_get_divisor(ucon, conf->baudrate);
-	ucon->DLL = FIELD_SET(ucon->DLL, DLL_MASK, v >> 0);
-	ucon->DLH = FIELD_SET(ucon->DLH, DLL_MASK, v >> 8);
+	ucon->DLL = __field_xget(v, 0x00FF);
+	ucon->DLH = __field_xget(v, 0xFF00);
 
 	// 4. Choose the desired protocol settings by writing the
 	// appropriate values to the line control register
@@ -102,8 +102,8 @@ am18x_rt uart_set_conf(UART_con_t* ucon, const uart_conf_t* conf) {
 	// by configuring the FREE bit and enable the UART
 	// by setting the UTRST and URRST bits in the power and emulation
 	// management register
-	msk = PWREMU_UTRST_MASK | PWREMU_URRST_MASK | PWREMU_FREE_MASK;
-	v = PWREMU_UTRST_enabled | PWREMU_URRST_enabled | PWREMU_FREE_run;
+	msk = PWREMU_UTRST_MASK | PWREMU_URRST_MASK;// | PWREMU_FREE_MASK;
+	v = PWREMU_UTRST_enabled | PWREMU_URRST_enabled;// | PWREMU_FREE_run;
 	ucon->PWREMU_MGMT = FIELD_SET(ucon->PWREMU_MGMT, msk, v);
 
 	return AM18X_OK;

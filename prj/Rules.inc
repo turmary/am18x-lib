@@ -45,9 +45,10 @@ LST	+= $(ASRC:.S=.lst)
 GENDEPFLAGS = -MD -MP -MF .dep/$(@F).d
 
 ALL_CFLAGS = $(ARCH) $(DEFS) $(CFLAGS) $(GENDEPFLAGS)
-ALL_ASFLAGS = $(ARCH) $(DEFS) $(ASFLAGS) -x assembler-with-cpp
+ALL_ASFLAGS = $(ARCH) $(DEFS) $(ASFLAGS)
+# -x assembler-with-cpp
 
-CROSS_COMPILE := arm-none-linux-gnueabi-
+CROSS_COMPILE := arm-none-eabi-
 CC = $(CROSS_COMPILE)gcc
 OBJCOPY = $(CROSS_COMPILE)objcopy
 OBJDUMP = $(CROSS_COMPILE)objdump

@@ -52,7 +52,7 @@ HandleUndef:
 __undef_loop:
 	B	__undef_loop
 
-	.align	2
+	.align	4
 	.ltorg
 
 __undef_fmt:
@@ -68,4 +68,5 @@ __undef_arm_instruction:
 __undef_thumb_instruction:
 	.string "\t[PC] = 0x%.4X\n"
 
+	.align	4
 	.end

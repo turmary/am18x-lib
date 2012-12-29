@@ -1,7 +1,7 @@
 #ifndef __LINKAGE_H__
 #define __LINKAGE_H__
 
-#define __LINUX_ARM_ARCH__	4
+#define __LINUX_ARM_ARCH__	5
 #define ENTRY(x)		\
 	.GLOBAL	x;		\
 	.ALIGN	4;		\

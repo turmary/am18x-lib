@@ -414,10 +414,10 @@ typedef struct {
 	vuint32_t	MSR;
 #define SCR_MASK			0xFFUL
 	vuint32_t	SCR;
-#define DLL_MASK			0xFFUL
-	vuint32_t	DLL;
-#define DLH_MASK			0xFFUL
-	vuint32_t	DLH;
+	vuint8_t	DLL;
+	uint8_t		RESERVED0[3];
+	vuint8_t	DLH;
+	uint8_t		RESERVED1[3];
 	vuint32_t	REVID[2];
 #define PWREMU_UTRST_MASK		(0x1UL << 14)
 #define PWREMU_UTRST_reset		(0x0UL << 14)

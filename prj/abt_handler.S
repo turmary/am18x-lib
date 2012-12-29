@@ -106,7 +106,7 @@ __dabt_loop:
 	B	__dabt_loop
 	.endfunc
 
-	.align	2
+	.align	4
 	.ltorg
 
 __pabt_fmt:
@@ -128,4 +128,5 @@ __abt_thumb_instruction:
 __new_line__:
 	.string "\n"
 
+	.align	4
 	.end
