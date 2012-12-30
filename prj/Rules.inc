@@ -30,7 +30,7 @@ ASFLAGS += -Wa,--keep-locals
 ASFLAGS += -Wa,-ahdlns=$(<:.S=.lst)
 
 LDFLAGS += $(DEBUG)
-LDFLAGS += -nostdlib -lgcc
+LDFLAGS += -static -nostdlib -lc -lgcc
 LDFLAGS += -Wl,-Map=$(TARGET).map
 LDFLAGS += -Wl,-T../prj/am18x.ld
 
@@ -60,9 +60,8 @@ COPY = cp
 
 all: build
 
-build: elf hex bin lss sym size
+build: elf bin lss sym size
 
-hex: $(TARGET).hex
 bin: $(TARGET).bin
 elf: $(TARGET).elf
 lss: $(TARGET).lss

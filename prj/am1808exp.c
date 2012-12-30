@@ -18,13 +18,6 @@ int low_level_init(void) {
 	}
 */
 	uart_init();
-	putchar('H');
-	putchar('E');
-	putchar('L');
-	putchar('L');
-	putchar('O');
-	putchar('\n');
-	for(;;);
 /*
 	if (AM18X_OK != (r = systick_init(SYSTICK_PERIOD))) {
 		printk("systick_init() error\n");

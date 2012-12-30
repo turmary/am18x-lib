@@ -72,3 +72,21 @@ int strcmp(const char* ss, const char* sd) {
 	while (*ss && *sd && *ss++ == *sd++);
 	return *ss - *sd;
 }
+
+#define heap_size	0x2000
+char* _sbrk(int incr) {
+	static char heap[heap_size];
+	static char* heap_end;
+	char* prev_end;
+
+	if (heap_end == 0) {
+		heap_end = &heap[0];
+	}
+	prev_end = heap_end;
+	if (heap_end + incr > heap + heap_size) {
+		// error: out of heap memory
+		return 0;
+	}
+	heap_end += incr;
+	return prev_end;
+}

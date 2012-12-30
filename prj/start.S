@@ -50,7 +50,7 @@ __bss_clear_loop:
 		BLO	__bss_clear_loop
 
 		.extern	arm_intr_disable
-		@BL	arm_intr_disable
+		BL	arm_intr_disable
 
 		ldr_fix SL, __load_addr
 
