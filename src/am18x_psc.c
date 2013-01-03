@@ -46,7 +46,7 @@ am18x_rt psc_state_transition(psc_module_t module, psc_state_t state) {
 	// 4. Wait for the GOSTAT[x] bit in PTSTAT to clear to 0
 	while (FIELD_GET(psc->PTSTAT, PTSTAT_GO0_MASK) != PTSTAT_GO0_no);
 
-	while (__field_xget(psc->MDSTATx[nr], MDSTATx_STATE_MASK) != val);
+	// while (__field_xget(psc->MDSTATx[nr], MDSTATx_STATE_MASK) != val);
 
 	return AM18X_TRUE;
 }

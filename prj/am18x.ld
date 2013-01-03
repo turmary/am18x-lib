@@ -17,7 +17,7 @@ SECTIONS {
 		*(.rodata .rodata.*);
 		. = ALIGN(0x10);
 
-		*(.data.rel.ro*);
+		*(.data.rel.*);
 		. = ALIGN(0x10);
 
 		PROVIDE(__got_start = .);
@@ -31,7 +31,6 @@ SECTIONS {
 	. = ALIGN(0x10);
 	PROVIDE (__text_end = .);
 
-	. = ALIGN(0x10);
 	PROVIDE (__data_start = .);
 	.data : {
 		*(.data);

@@ -27,7 +27,7 @@ int printk(const char* s, ...) {
 	int r;
 
 	va_start(v, s);
-	r = vsprintf(prbuf, s, v);
+	memcpy(prbuf, "printk()\n", strlen("printk()\n"));//r = vsprintf(prbuf, s, v);
 	puts(prbuf);
 	va_end(v);
 	return r;

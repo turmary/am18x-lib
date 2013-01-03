@@ -30,7 +30,7 @@ ASFLAGS += -Wa,--keep-locals
 ASFLAGS += -Wa,-ahdlns=$(<:.S=.lst)
 
 LDFLAGS += $(DEBUG)
-LDFLAGS += -static -nostdlib -lc -lgcc
+LDFLAGS += -static -nostdlib
 LDFLAGS += -Wl,-Map=$(TARGET).map
 LDFLAGS += -Wl,-T../prj/am18x.ld
 
