@@ -13,8 +13,8 @@ static inline uint32_t uart_get_divisor(UART_con_t* ucon, uint32_t baud_rate) {
 		samp_clk = 13;
 	}
 
-	//return uart_input_clock_frequency(ucon) / (samp_clk * baud_rate);
-	return 8;
+	return uart_input_clock_frequency(ucon) / (samp_clk * baud_rate);
+	//return 8;
 }
 
 am18x_rt uart_init_conf(uart_conf_t* conf) {
