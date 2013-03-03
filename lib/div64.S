@@ -173,10 +173,10 @@ ENDPROC(__do_div64)
 	.global	__div0
 	.extern	puts
 __div0:
-	ldr	r0, =__div_0__
-	ldr	r1, =puts
-	bx	r1
-	mov	pc, lr
+	push	{lr}
+	adr	r0, __div_0__
+	bl	puts
+	pop	{pc}
 __div_0__:
 	.string	"division by 0\n"
 	.balign	4
