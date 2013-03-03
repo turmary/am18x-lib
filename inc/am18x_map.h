@@ -503,3 +503,5 @@ typedef struct {
 
 
 #endif//__AM18X_MAP_H__
+// to generate am18x_map_s.h, run the command
+// cat am18x_map.h | sed -e "s/\([^0]0x[0-9a-fA-F]\+\)UL/\1/g" | egrep "^#define " >am18x_map_s.h
