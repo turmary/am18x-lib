@@ -3,6 +3,10 @@
 #include "auxlib.h"
 #include "uart.h"
 
+#ifndef NULL
+#define NULL	((void*)0)
+#endif
+
 extern int vsprintf(char *buf, const char *fmt, va_list args);
 
 int delay(int d) {
@@ -70,4 +74,48 @@ size_t strnlen(const char* s, size_t size) {
 int strcmp(const char* ss, const char* sd) {
 	while (*ss && *sd && *ss++ == *sd++);
 	return *ss - *sd;
+}
+
+const char* strchr(const char* s, char c) {
+	for (; *s && *s != c; s++);
+	if (*s == c) {
+		return s;
+	}
+	return NULL;
+}
+
+int debug_buf(const char* head, char* buf, int len) {
+	int i;
+
+	printk("\r\nDBG:%s[%d] = \r\n\t", head, len);
+	for (i = 0; i < len; i++) {
+		printk("%.2X ", buf[i]);
+	}
+	return len;
+}
+
+int debug_line(const char* file, int lin, int nr, ...) {
+	int val = 0;
+	const char* s;
+	va_list ap;
+
+	printk("\r\nDBG:%s() L%d\t", file, lin);
+	
+	va_start(ap, nr);
+	while (nr-- > 0) {
+		s = va_arg(ap, char*);
+		if (nr-- <= 0) {
+			printk(s);
+			break;
+		}
+		val = va_arg(ap, int);
+		if (strchr(s, '%') == NULL) {
+			printk("%s=%d", s, val);
+		} else {
+			printk(s, val);
+		}
+	}
+ 	va_end(ap);
+
+	return nr;
 }
