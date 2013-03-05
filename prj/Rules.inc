@@ -16,6 +16,7 @@ CFLAGS += $(DEBUG)
 CFLAGS += -Os
 CFLAGS += -Wall
 CFLAGS += -std=gnu99
+CFLAGS += -fno-builtin
 CFLAGS += -I.
 CFLAGS += $(patsubst %,-I%,$(CINCS))
 CFLAGS += -fpic -msingle-pic-base -mpic-register=r10
