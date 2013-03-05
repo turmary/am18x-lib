@@ -8,7 +8,7 @@ const uint32_t f_osc = F_OSCIN;
 int main(int argc, char* argv[]) {
 	const char* title = "\nam18x library for am1808 uart!\n";
 
-	puts(title);
+	printk(title);
 	puts("now press any key\n");
 	getchar();
 	puts("press complete\n");
