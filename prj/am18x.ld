@@ -26,32 +26,30 @@ SECTIONS {
 		. = ALIGN(0x10);
 		PROVIDE(__got_end = .);
 		PROVIDE(__got_size = __got_end - __got_start);
-
+		. = ALIGN(0x10);
 	} = 0
-	. = ALIGN(0x10);
 	PROVIDE (__text_end = .);
 
 	PROVIDE (__data_start = .);
 	.data : {
 		*(.data);
+		. = ALIGN(0x10);
 	} = 0
-	. = ALIGN(0x10);
 	PROVIDE (__data_end = .);
 
 	PROVIDE (__bss_start = .);
 	.bss : {
 		*(.bss)
 		*(COMMON)
+		. = ALIGN(0x10);
 	} = 0
-	. = ALIGN(0x10);
 	PROVIDE (__bss_end = .);
 
 	. = ALIGN(0x10);
 	.stack : {
 		*(.stack)
+		. = ALIGN(0x10);
 	}
-	. = ALIGN(0x10);
-
 	PROVIDE (end = .);
 
 	/DISCARD/ : {

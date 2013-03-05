@@ -33,7 +33,7 @@ __load_addr:
 		SUB	R9, R9, R0
 
 		@ Setup the stack pointer
-		LDR	r0, _stack
+		LDR	r0, stack_top
 		ADD	sp, r0, r9
 		SUB	sp, sp, #4
 		BIC	sp, sp, #7
@@ -87,13 +87,13 @@ __link_addr:
 		.extern	__got_size
 		.long	__got_size
 
-		.global	_stack
-_stack:
-		.long	STACKStart
+		.global	stack_top
+stack_top:
+		.long	__stack_top
 		.ltorg
 
 		.align	2
 		.section .stack, "w"
 		.space	0x4000
-STACKStart:
+__stack_top:
 		.end
