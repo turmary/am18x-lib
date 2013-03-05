@@ -5,6 +5,7 @@
 #include "auxlib.h"
 
 #define SYSTICK_PERIOD			10/* milli seconds */
+extern int output_a_char(void);
 
 int low_level_init(void) {
 	int r;
@@ -17,6 +18,9 @@ int low_level_init(void) {
 		return r;
 	}
 */
+
+	output_a_char();
+
 	uart_init();
 /*
 	if (AM18X_OK != (r = systick_init(SYSTICK_PERIOD))) {
