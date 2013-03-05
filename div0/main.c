@@ -1,4 +1,5 @@
 // tary, 1:12 2013/3/6
+#include "am18x_lib.h"
 #include "auxlib.h"
 
 const uint32_t f_osc = F_OSCIN;
