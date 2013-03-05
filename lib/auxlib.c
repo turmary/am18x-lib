@@ -1,6 +1,5 @@
 // tary 22:35 2011/6/19
 #include <stdarg.h>
-#include <stdlib.h>
 #include "auxlib.h"
 #include "uart.h"
 
@@ -27,8 +26,7 @@ int printk(const char* s, ...) {
 	int r;
 
 	va_start(v, s);
-	memcpy(prbuf, "printk()\n", strlen("printk()\n") + 1);
-	//r = vsprintf(prbuf, s, v);
+	r = vsprintf(prbuf, s, v);
 	puts(prbuf);
 	va_end(v);
 	return r;
@@ -72,22 +70,4 @@ size_t strnlen(const char* s, size_t size) {
 int strcmp(const char* ss, const char* sd) {
 	while (*ss && *sd && *ss++ == *sd++);
 	return *ss - *sd;
-}
-
-#define heap_size	0x2000
-char* _sbrk(int incr) {
-	static char heap[heap_size];
-	static char* heap_end;
-	char* prev_end;
-
-	if (heap_end == 0) {
-		heap_end = &heap[0];
-	}
-	prev_end = heap_end;
-	if (heap_end + incr > heap + heap_size) {
-		// error: out of heap memory
-		return 0;
-	}
-	heap_end += incr;
-	return prev_end;
 }
