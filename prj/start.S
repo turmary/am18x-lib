@@ -72,6 +72,11 @@ __bss_clear_loop:
 _loop:
 		B	_loop
 
+		.global get_exec_base
+get_exec_base:
+		MOV	R0, SL
+		MOV	PC, LR
+
 		@ Add every element in [r1,r2) with r0
 		.global	__reloc_got
 __reloc_got:

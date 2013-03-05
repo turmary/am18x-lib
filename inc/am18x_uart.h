@@ -117,5 +117,4 @@ am18x_bool uart_state(const UART_con_t* con, uart_state_type_t type);
 am18x_rt uart_write_byte(UART_con_t* con, uint8_t c);
 uint8_t uart_read_byte(const UART_con_t* con);
 
-
 #endif//__AM18X_UART_H__
