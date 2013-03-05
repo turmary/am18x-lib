@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
 
 	printk(title);
 
-	for (i = 0; i < 20; i++) {
+	for (i = 0; i < countof(psc_kv); i++) {
 		int v;
 		char* stat;
 
