@@ -13,6 +13,10 @@
 #include "am18x_psc.h"
 #endif
 
+#ifdef _TIMER
+#include "am18x_timer.h"
+#endif
+
 #ifdef _UART
 #include "am18x_uart.h"
 #endif

@@ -283,6 +283,157 @@ typedef struct {
 } SYSCFG1_con_t;
 
 typedef struct {
+	vcuint32_t	REVID;
+#define EMUMGT_SOFT_MASK		(0x1UL << 1)
+#define EMUMGT_SOFT_stop		(0x0UL << 1)
+#define EMUMGT_SOFT_reach		(0x1UL << 1)
+#define EMUMGT_FREE_MASK		(0x1UL << 0)
+#define EMUMGT_FREE_soft		(0x0UL << 0)
+#define EMUMGT_FREE_run			(0x1UL << 0)
+	vuint32_t	EMUMGT;
+#define GPINTGPEN_GPENO12_MASK		(0x1UL << 17)
+#define GPINTGPEN_GPENO12_timer		(0x0UL << 17)
+#define GPINTGPEN_GPENO12_gpio		(0x1UL << 17)
+#define GPINTGPEN_GPENI12_MASK		(0x1UL << 16)
+#define GPINTGPEN_GPENI12_timer		(0x0UL << 16)
+#define GPINTGPEN_GPENI12_gpio		(0x1UL << 16)
+#define GPINTGPEN_GPINT12INVO_MASK	(0x1UL << 5)
+#define GPINTGPEN_GPINT12INVO_rising	(0x0UL << 5)
+#define GPINTGPEN_GPINT12INVO_falling	(0x1UL << 5)
+#define GPINTGPEN_GPINT12INVI_MASK	(0x1UL << 4)
+#define GPINTGPEN_GPINT12INVI_rising	(0x0UL << 4)
+#define GPINTGPEN_GPINT12INVI_falling	(0x1UL << 4)
+#define GPINTGPEN_GPINT12ENO_MASK	(0x1UL << 1)
+#define GPINTGPEN_GPINT12ENO_rising	(0x0UL << 1)
+#define GPINTGPEN_GPINT12ENO_falling	(0x1UL << 1)
+#define GPINTGPEN_GPINT12ENI_MASK	(0x1UL << 0)
+#define GPINTGPEN_GPINT12ENI_rising	(0x0UL << 0)
+#define GPINTGPEN_GPINT12ENI_falling	(0x1UL << 0)
+	vuint32_t	GPINTGPEN;
+#define GPDATGPDIR_GPDIRO12_MASK	(0x1UL << 17)
+#define GPDATGPDIR_GPDIRO12_gpio_in	(0x0UL << 17)
+#define GPDATGPDIR_GPDIRO12_gpio_out	(0x1UL << 17)
+#define GPDATGPDIR_GPDIRI12_MASK	(0x1UL << 16)
+#define GPDATGPDIR_GPDIRI12_gpio_in	(0x0UL << 16)
+#define GPDATGPDIR_GPDIRI12_gpio_out	(0x1UL << 16)
+#define GPDATGPDIR_GPDATO12_MASK	(0x1UL << 1)
+#define GPDATGPDIR_GPDATO12_low		(0x0UL << 1)
+#define GPDATGPDIR_GPDATO12_high	(0x1UL << 1)
+#define GPDATGPDIR_GPDATI12_MASK	(0x1UL << 0)
+#define GPDATGPDIR_GPDATI12_low		(0x0UL << 0)
+#define GPDATGPDIR_GPDATI12_high	(0x1UL << 0)
+	vuint32_t	GPDATGPDIR;
+	vuint32_t	TIMx[2];
+	vuint32_t	PRDx[2];
+#define TCR_READRSTMODE34_MASK		(0x1UL << 26)
+#define TCR_READRSTMODE34_none		(0x0UL << 26)
+#define TCR_READRSTMODE34_reset		(0x1UL << 26)
+#define TCR_ENAMODE34_MASK		(0x3UL << 22)
+#define TCR_ENAMODE34_disabled		(0x0UL << 22)
+#define TCR_ENAMODE34_once		(0x1UL << 22)
+#define TCR_ENAMODE34_enabled		(0x2UL << 22)
+#define TCR_ENAMODE34_reload		(0x3UL << 22)
+#define TCR_CAPEVTMODE12_MASK		(0x3UL << 12)
+#define TCR_CAPEVTMODE12_rising		(0x0UL << 12)
+#define TCR_CAPEVTMODE12_falling	(0x1UL << 12)
+#define TCR_CAPEVTMODE12_both		(0x2UL << 12)
+#define TCR_CAPMODE12_MASK		(0x1UL << 11)
+#define TCR_CAPMODE12_none		(0x0UL << 11)
+#define TCR_CAPMODE12_capture		(0x1UL << 11)
+#define TCR_READRSTMODE12_MASK		(0x1UL << 10)
+#define TCR_READRSTMODE12_none		(0x0UL << 10)
+#define TCR_READRSTMODE12_reset		(0x1UL << 10)
+#define TCR_TIEN12_MASK			(0x1UL << 9)
+#define TCR_TIEN12_none			(0x0UL << 9)
+#define TCR_TIEN12_gated		(0x1UL << 9)
+#define TCR_CLKSRC12_MASK		(0x1UL << 8)
+#define TCR_CLKSRC12_internal		(0x0UL << 8)
+#define TCR_CLKSRC12_external		(0x1UL << 8)
+#define TCR_ENAMODE12_MASK		(0x3UL << 6)
+#define TCR_ENAMODE12_disabled		(0x0UL << 6)
+#define TCR_ENAMODE12_once		(0x1UL << 6)
+#define TCR_ENAMODE12_enabled		(0x2UL << 6)
+#define TCR_ENAMODE12_reload		(0x3UL << 6)
+#define TCR_PWID12_MASK			(0x3UL << 4)
+#define TCR_PWID12_VAL(x)		((x - 1) << 4)
+#define TCR_CP12_MASK			(0x1UL << 3)
+#define TCR_CP12_pulse			(0x0UL << 3)
+#define TCR_CP12_clock			(0x1UL << 3)
+#define TCR_INVINP12_MASK		(0x1UL << 2)
+#define TCR_INVINP12_uninverted		(0x0UL << 2)
+#define TCR_INVINP12_inverted		(0x1UL << 2)
+#define TCR_INVOUTP12_MASK		(0x1UL << 1)
+#define TCR_INVOUTP12_uninverted	(0x0UL << 1)
+#define TCR_INVOUTP12_inverted		(0x1UL << 1)
+#define TCR_TSTAT12_MASK		(0x1UL << 0)
+#define TCR_TSTAT12_unasserted		(0x0UL << 0)
+#define TCR_TSTAT12_asserted		(0x1UL << 0)
+	vuint32_t	TCR;
+#define TGCR_TDDR34_MASK		(0xFUL << 12)
+#define TGCR_TDDR34_VAL(x)		((x) << 12)
+#define TGCR_PSC34_MASK			(0xFUL << 8)
+#define TGCR_PSC34_VAL(x)		((x) << 8)
+#define TGCR_PLUSEN_MASK		(0x1UL << 4)
+#define TGCR_PLUSEN_enable		(0x0UL << 4)
+#define TGCR_PLUSEN_disable		(0x1UL << 4)
+#define TGCR_TIMMODE_MASK		(0x3UL << 2)
+#define TGCR_TIMMODE_64bit		(0x0UL << 2)
+#define TGCR_TIMMODE_unchained		(0x1UL << 2)
+#define TGCR_TIMMODE_watchdog		(0x2UL << 2)
+#define TGCR_TIMMODE_chained		(0x3UL << 2)
+#define TGCR_TIM34RS_MASK		(0x1UL << 1)
+#define TGCR_TIM34RS_reset		(0x0UL << 1)
+#define TGCR_TIM34RS_none		(0x1UL << 1)
+#define TGCR_TIM12RS_MASK		(0x1UL << 0)
+#define TGCR_TIM12RS_reset		(0x0UL << 0)
+#define TGCR_TIM12RS_none		(0x1UL << 0)
+	vuint32_t	TGCR;
+#define WDTCR_WDKEY_MASK		(0xFFFFUL << 16)
+#define WDTCR_WDKEY_VAL(x)		((x) << 16)
+#define WDTCR_WDFLAG_MASK		(0x1UL << 15)
+#define WDTCR_WDFLAG_none		(0x0UL << 15)
+#define WDTCR_WDFLAG_timeout		(0x1UL << 15)
+#define WDTCR_WDEN_MASK			(0x1UL << 14)
+#define WDTCR_WDEN_disable		(0x0UL << 14)
+#define WDTCR_WDEN_enable		(0x1UL << 14)
+	vuint32_t	WDTCR;
+	uint32_t	RESERVED0[2];
+	vuint32_t	RELx[2];
+	vuint32_t	CAPx[2];
+#define INTCTLSTAT_EVTINTSTAT34_MASK	(0x1UL << 19)
+#define INTCTLSTAT_EVTINTSTAT34_none	(0x0UL << 19)
+#define INTCTLSTAT_EVTINTSTAT34_occurred (0x1UL << 19)
+#define INTCTLSTAT_EVTINTSTAT34_clear	(0x1UL << 19)
+#define INTCTLSTAT_EVTINTEN34_MASK	(0x1UL << 18)
+#define INTCTLSTAT_EVTINTEN34_disable	(0x0UL << 18)
+#define INTCTLSTAT_EVTINTEN34_enable	(0x1UL << 18)
+#define INTCTLSTAT_PRDINTSTAT34_MASK	(0x1UL << 17)
+#define INTCTLSTAT_PRDINTSTAT34_none	(0x0UL << 17)
+#define INTCTLSTAT_PRDINTSTAT34_occurred (0x1UL << 17)
+#define INTCTLSTAT_PRDINTSTAT34_clear	(0x1UL << 17)
+#define INTCTLSTAT_PRDINTEN34_MASK	(0x1UL << 16)
+#define INTCTLSTAT_PRDINTEN34_disable	(0x0UL << 16)
+#define INTCTLSTAT_PRDINTEN34_enable	(0x1UL << 16)
+#define INTCTLSTAT_EVTINTSTAT12_MASK	(0x1UL << 3)
+#define INTCTLSTAT_EVTINTSTAT12_none	(0x0UL << 3)
+#define INTCTLSTAT_EVTINTSTAT12_occurred (0x1UL << 3)
+#define INTCTLSTAT_EVTINTSTAT12_clear	(0x1UL << 3)
+#define INTCTLSTAT_EVTINTEN12_MASK	(0x1UL << 2)
+#define INTCTLSTAT_EVTINTEN12_disable	(0x0UL << 2)
+#define INTCTLSTAT_EVTINTEN12_enable	(0x1UL << 2)
+#define INTCTLSTAT_PRDINTSTAT12_MASK	(0x1UL << 1)
+#define INTCTLSTAT_PRDINTSTAT12_none	(0x0UL << 1)
+#define INTCTLSTAT_PRDINTSTAT12_occurred (0x1UL << 1)
+#define INTCTLSTAT_PRDINTSTAT12_clear	(0x1UL << 1)
+#define INTCTLSTAT_PRDINTEN12_MASK	(0x1UL << 0)
+#define INTCTLSTAT_PRDINTEN12_disable	(0x0UL << 0)
+#define INTCTLSTAT_PRDINTEN12_enable	(0x1UL << 0)
+	vuint32_t	INTCTLSTAT;
+	uint32_t	RESERVED1[6];
+	vuint32_t	CMPx[8];
+} TIMER_con_t;
+
+typedef struct {
 #define RBR_DATA_MASK			0xFFUL
 #define THRw				RBRr
 #define THR_DATA_MASK			0xFFUL
@@ -443,11 +594,15 @@ typedef struct {
 // 2.4 Memory Map Summary
 #define PSC0_BASE			0x01C10000UL
 #define SYSCFG0_BASE			0x01C14000UL
+#define TIMER0_BASE			0x01C20000UL
+#define TIMER1_BASE			0x01C21000UL
 #define UART0_BASE			0x01C42000UL
 #define UART1_BASE			0x01D0C000UL
 #define UART2_BASE			0x01D0D000UL
 #define PSC1_BASE			0x01E27000UL
 #define SYSCFG1_BASE			0x01E2C000UL
+#define TIMER2_BASE			0x01F0C000UL
+#define TIMER3_BASE			0x01F0D000UL
 
 
 /*----------------------------------------------------------------------------*/
@@ -466,6 +621,18 @@ typedef struct {
 #endif
 #ifdef _SYSCFG1
 	#define SYSCFG1			((SYSCFG1_con_t*)SYSCFG1_BASE)
+#endif
+#ifdef _TIMER0
+	#define TIMER0			((TIMER_con_t*)TIMER0_BASE)
+#endif
+#ifdef _TIMER1
+	#define TIMER1			((TIMER_con_t*)TIMER1_BASE)
+#endif
+#ifdef _TIMER2
+	#define TIMER2			((TIMER_con_t*)TIMER2_BASE)
+#endif
+#ifdef _TIMER3
+	#define TIMER3			((TIMER_con_t*)TIMER3_BASE)
 #endif
 #ifdef _UART0
 	#define UART0			((UART_con_t*)UART0_BASE)
@@ -489,6 +656,18 @@ typedef struct {
 #endif
 #ifdef _SYSCFG1
 	_EXTERN SYSCFG1_con_t		*SYSCFG1;
+#endif
+#ifdef _TIMER0
+	_EXTERN TIMER_con_t		*TIMER0
+#endif
+#ifdef _TIMER1
+	_EXTERN TIMER_con_t		*TIMER1
+#endif
+#ifdef _TIMER2
+	_EXTERN TIMER_con_t		*TIMER2
+#endif
+#ifdef _TIMER3
+	_EXTERN TIMER_con_t		*TIMER3
 #endif
 #ifdef _UART0
 	_EXTERN UART_con_t		*UART0;

@@ -16,6 +16,12 @@
 #define _SYSCFG0
 #define _SYSCFG1
 
+#define _TIMER
+#define _TIMER0
+#define _TIMER1
+#define _TIMER2
+#define _TIMER3
+
 #define _UART
 #define _UART0
 #define _UART1

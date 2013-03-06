@@ -79,6 +79,8 @@ get_exec_base:
 
 		@ Add every element in [r1,r2) with r0
 		.global	__reloc_got
+		CMP	R1, R2
+		MOVHS	PC, LR
 __reloc_got:
 		LDR	R4, [R1]
 		ADD	R4, R4, R0

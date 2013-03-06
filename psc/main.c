@@ -73,6 +73,14 @@ int main(int argc, char* argv[]) {
 	const char* title = "\nam18x library for am1808 psc!\n";
 	int i;
 
+	for (i = 0; i < countof(psc_kv); i++) {
+		psc_kv[i].val += get_exec_base();
+	}
+
+	for (i = 0; i < countof(state_kv); i++) {
+		state_kv[i].val += get_exec_base();
+	}
+
 	printk(title);
 
 	for (i = 0; i < countof(psc_kv); i++) {
@@ -80,8 +88,8 @@ int main(int argc, char* argv[]) {
 		char* stat;
 
 		v = psc_get_state(psc_kv[i].key);
-		stat = state_kv[v].val + get_exec_base();
-		printk("[%2d] %-20s =[%2d] %s\n", psc_kv[i].key, psc_kv[i].val + get_exec_base(), v, stat);
+		stat = state_kv[v].val;
+		printk("[%2d] %-20s =[%2d] %s\n", psc_kv[i].key, psc_kv[i].val, v, stat);
 	}
 /*
      950:	e59f3050 	ldr	r3, [pc, #80]	; 9a8 <main+0x6c>	;r3 = 0x31c4
