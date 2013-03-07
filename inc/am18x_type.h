@@ -12,48 +12,59 @@
 typedef signed char			int8_t;
 typedef short				int16_t;
 typedef int				int32_t;
+typedef long long			int64_t;
 
 typedef unsigned char			uint8_t;
 typedef unsigned short			uint16_t;
 typedef unsigned int			uint32_t;
+typedef unsigned long long		uint64_t;
 
 #define INT8_MIN			(-128)
 #define INT16_MIN			(-32767-1)
 #define INT32_MIN			(-2147483647-1)
+#define INT64_MIN			(-0x7FFFFFFFFFFFFFFFLL - 1)
 
 #define INT8_MAX			(127)
 #define INT16_MAX			(32767)
 #define INT32_MAX			(2147483647)
+#define INT64_MAX			(0x7FFFFFFFFFFFFFFFLL)
 
 #define UINT8_MAX			(255)
 #define UINT16_MAX			(65535)
 #define UINT32_MAX			(4294967295U)
+#define UINT64_MAX			(0xFFFFFFFFFFFFFFFFULL)
 
 #endif //__USE_STDINT_H
 
 typedef signed char const		cint8_t;
 typedef short const			cint16_t;
 typedef int const			cint32_t;
+typedef long long const			cint64_t;
 
 typedef unsigned char const		cuint8_t;
 typedef unsigned short const		cuint16_t;
 typedef unsigned int const		cuint32_t;
+typedef unsigned long long const	cuint64_t;
 
 typedef volatile signed char		vint8_t;
 typedef volatile short			vint16_t;
 typedef volatile int			vint32_t;
+typedef volatile long long		vint64_t;
 
 typedef volatile unsigned char		vuint8_t;
 typedef volatile unsigned short		vuint16_t;
 typedef volatile unsigned int		vuint32_t;
+typedef volatile unsigned long long	vuint64_t;
 
 typedef volatile signed char const	vcint8_t;
 typedef volatile short const		vcint16_t;
 typedef volatile int const		vcint32_t;
+typedef volatile long long const	vcint64_t;
 
 typedef volatile unsigned char const	vcuint8_t;
 typedef volatile unsigned short const	vcuint16_t;
 typedef volatile unsigned int const	vcuint32_t;
+typedef volatile unsigned long long const vcuint64_t;
 
 #define _MASK_OFFSET_8BIT(x)		(((x) & 0x00000001UL)?0:	\
 					(((x) & 0x00000002UL)?1:	\
