@@ -35,9 +35,12 @@ int main(int argc, char* argv[]) {
 	timer_init();
 
 	printk("SYSCFG0->SUSPSRC = 0x%.8X\n", SYSCFG0->SUSPSRC);
-/*	printk("TCFG1 = 0x%.8X\n", TIMERCON->TCFG1);
-	printk("TCON  = 0x%.8X\n", TIMERCON->TCON);
-*/
+
+	for (i = 0; i < sizeof(TIMER_con_t) / sizeof (uint32_t); i++) {
+		printk("TIMER[%.2d] = 0x%.8X\n", i, ((volatile unsigned*)TIMER0)[i]);
+	}
+
+	i = 0;
 	while (i++ < 200) {
 		printk("%d ", timer_get_count(TIMER_NR));
 	}
