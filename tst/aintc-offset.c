@@ -5,8 +5,8 @@
 
 #define KV(x)		{ offsetof(AINTC_con_t, x), #x }
 typedef struct {
-	int offset;
-	char* name;
+	int	offset;
+	char*	name;
 } kv_t;
 
 kv_t aintc_kv[] = {
@@ -22,8 +22,8 @@ kv_t aintc_kv[] = {
 	KV(VNR),
 	KV(GPIR),
 	KV(GPVR),
-	KV(SPSRx),
-	KV(SPCRx),
+	KV(SRSRx),
+	KV(SECRx),
 	KV(ESRx),
 	KV(ECRx),
 	KV(CMRx),

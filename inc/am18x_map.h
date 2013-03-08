@@ -282,44 +282,215 @@ typedef struct {
 	vuint32_t	PWRDN;
 } SYSCFG1_con_t;
 
+typedef enum {
+	AINTC_COMMTX = 0,		// 0
+	AINTC_COMMRX,
+	AINTC_MINT,
+	AINTC_PRU_EVTOUT0,
+	AINTC_PRU_EVTOUT1,
+
+	AINTC_PRU_EVTOUT2,
+	AINTC_PRU_EVTOUT3,
+	AINTC_PRU_EVTOUT4,
+	AINTC_PRU_EVTOUT5,
+	AINTC_PRU_EVTOUT6,
+
+	AINTC_PRU_EVTOUT7,		// 10
+	AINTC_EDMA3_0_CC0_INT0,
+	AINTC_EDMA3_0_CC0_ERRINT,
+	AINTC_EDMA3_0_TC0_ERRINT,
+	AINTC_EMIFA_INT,
+
+	AINTC_IIC0_INT,
+	AINTC_MMCSD0_INT0,
+	AINTC_MMCSD0_INT1,
+	AINTC_PSC0_ALLINT,
+	AINTC_RTC_IRQS_1_0,
+
+	AINTC_SPI0_INT,			// 20
+	AINTC_T64P0_TINT12,
+	AINTC_T64P0_TINT32,
+	AINTC_T64P1_TINT12,
+	AINTC_T64P1_TINT34,
+
+	AINTC_UART0_INT,
+	AINTC_RESERVED0,
+	AINTC_PROTERR,
+	AINTC_SYSCFG_CHIPINT0,
+	AINTC_SYSCFG_CHIPINT1,
+
+	AINTC_SYSCFG_CHIPINT2,		// 30
+	AINTC_SYSCFG_CHIPINT3,
+	AINTC_EDMA3_0_TC1_ERRINT,
+	AINTC_EMAC_C0RXTHRESH,
+	AINTC_EMAC_C0RX,
+
+	AINTC_EMAC_C0TX,
+	AINTC_EMAC_C0MISC,
+	AINTC_EMAC_C1RXTHRESH,
+	AINTC_EMAC_C1RX,
+	AINTC_EMAC_C1TX,
+
+	AINTC_EMAC_C1MISC,		// 40
+	AINTC_DDR2_MEMERR,
+	AINTC_GPIO_B0INT,
+	AINTC_GPIO_B1INT,
+	AINTC_GPIO_B2INT,
+
+	AINTC_GPIO_B3INT,
+	AINTC_GPIO_B4INT,
+	AINTC_GPIO_B5INT,
+	AINTC_GPIO_B6INT,
+	AINTC_GPIO_B7INT,
+
+	AINTC_GPIO_B8INT,		// 50
+	AINTC_IIC1_INT,
+	AINTC_LCDC_INT,
+	AINTC_UART_INT1,
+	AINTC_MCASP_INT,
+
+	AINTC_PSC1_ALLINT,
+	AINTC_SPI1_INT,
+	AINTC_UHPI_ARMINT,
+	AINTC_USB0_INT,
+	AINTC_USB1_HCINT,
+
+	AINTC_USB1_R_WAKEUP,		// 60
+	AINTC_UART2_INT,
+	AINTC_RESERVED1,
+	AINTC_EHRPWM0,
+	AINTC_EHRPWM0TZ,
+
+	AINTC_EHRPWM1,
+	AINTC_EHRPWM1TZ,
+	AINTC_SATA_INT,
+	AINTC_T64P2_ALL,
+	AINTC_ECAP0,
+
+	AINTC_ECAP1,			// 70
+	AINTC_ECAP2,
+	AINTC_MMCSD1_INT0,
+	AINTC_MMCSD1_INT1,
+	AINTC_T64P2_CMPINT0,
+
+	AINTC_T64P2_CMPINT1,
+	AINTC_T64P2_CMPINT2,
+	AINTC_T64P2_CMPINT3,
+	AINTC_T64P2_CMPINT4,
+	AINTC_T64P2_CMPINT5,
+
+	AINTC_T64P2_CMPINT6,		// 80
+	AINTC_T64P2_CMPINT7,
+	AINTC_T64P3_CMPINT0,
+	AINTC_T64P3_CMPINT1,
+	AINTC_T64P3_CMPINT2,
+
+	AINTC_T64P3_CMPINT3,
+	AINTC_T64P3_CMPINT4,
+	AINTC_T64P3_CMPINT5,
+	AINTC_T64P3_CMPINT6,
+	AINTC_T64P3_CMPINT7,
+
+	AINTC_ARMCLKSTOPREQ,		// 90
+	AINTC_uPP_AlLINT,
+	AINTC_VPIF_ALLINT,
+	AINTC_EDMA3_1_CC0_INT0,
+	AINTC_EDMA3_1_CC0_ERRINT,
+
+	AINTC_EDMA3_1_TC0_ERRINT,
+	AINTC_T64P3_ALL,
+	AINTC_MCBSP0_RINT,
+	AINTC_MCBSP0_XINT,
+	AINTC_MCBSP1_RINT,
+
+	AINTC_MCBSP1_XINT,		// 100
+} AINTC_assign_t;
+
 typedef struct {
 	vcuint32_t	REVID;
+#define CR_PRHOLDMODE_MASK		(0x1UL << 4)
+#define CR_PRHOLDMODE_disable		(0x0UL << 4)
+#define CR_PRHOLDMODE_enable		(0x1UL << 4)
+#define CR_NESTMODE_MASK		(0x3UL << 2)
+#define CR_NESTMODE_None		(0x0UL << 2)
+#define CR_NESTMODE_Individual		(0x1UL << 2)
+#define CR_NESTMODE_Global		(0x2UL << 2)
+#define CR_NESTMODE_Manual		(0x3UL << 2)
 	vuint32_t	CR;
 	uint32_t	RESERVED0[2];
+#define GER_ENABLE_MASK			(0x1UL << 0)
+#define GER_ENABLE_no			(0x0UL << 0)
+#define GER_ENABLE_yes			(0x1UL << 0)
 	vuint32_t	GER;
 	uint32_t	RESERVED1[2];
+#define GNLR_OVERRIDE_SET		(0x1UL << 31)
+#define GNLR_NESTLVL_MASK		(0xFFUL << 0)
+#define GNLR_NESTLVL_VAL(x)		((x) << 0)
 	vuint32_t	GNLR;
-#define AINTC_IDX_SET	0x00
-#define AINTC_IDX_CLR	0x01
+// AINTC_IDX_XX include SIxR, EIxR, HIEIxR
+#define AINTC_IDX_SET			0x00
+#define AINTC_IDX_CLR			0x01
+#define XIxR_INDEX_MASK			(0x7FUL << 0)
+#define XIxR_INDEX_VAL(x)		((x) << 0)
 	vuint32_t	SIxR[2];
 	vuint32_t	EIxR[2];
 	uint32_t	RESERVED2;
+#define HIEIxR_INDEX_MASK		(0x1UL << 0)
+#define HIEIxR_INDEX_FIQ		(0x0UL << 0)
+#define HIEIxR_INDEX_IRQ		(0x1UL << 0)
 	vuint32_t	HIEIxR[2];
 	uint32_t	RESERVED3[5];
 	vuint32_t	VBR;
+#define VSR_SIZE_MASK			(0xFFUL << 0)
+#define VSR_SIZE_VAL(x)			(((x) >> 2) - 1)
 	vuint32_t	VSR;
 	vuint32_t	VNR;
 	uint32_t	RESERVED4[9];
-	vuint32_t	GPIR;
+#define GPIR_NONE_MASK			(0x1UL << 31)
+#define GPIR_NONE_no			(0x0UL << 31)
+#define GPIR_NONE_yes			(0x1UL << 31)
+#define GPIR_PRI_INDX_MASK		(0x3FFUL << 0)
+	vcint32_t	GPIR;
 	vuint32_t	GPVR;
 	uint32_t	RESERVED5[94];
-	vuint32_t	SPSRx[4];
+#define SXXRx_WR_X(x)			((x) >> 5)
+#define SXXRx_WR_VAL(x)			(0x1UL << ((x) & 0x1F))
+	vuint32_t	SRSRx[4];
 	uint32_t	RESERVED6[28];
-	vuint32_t	SPCRx[4];
+	vuint32_t	SECRx[4];
 	uint32_t	RESERVED7[28];
+#define EXRx_WR_X(x)			((x) >> 5)
+#define EXRx_WR_VAL(x)			(0x1UL << ((x) & 0x1F))
 	vuint32_t	ESRx[4];
 	uint32_t	RESERVED8[28];
 	vuint32_t	ECRx[4];
 	uint32_t	RESERVED9[28];
+#define CMRx_X(x)			((x) >> 2)
+#define CMRx_MASK(x)			(0xFFUL << (((x) & 0x3UL) << 3))
 	vuint32_t	CMRx[26];
 	uint32_t	RESERVED10[294];
+// AINTC_IDX_XXX include HIPIRx, HINLRx, HIPVRx
+#define AINTC_IDX_FIQ			0x00
+#define AINTC_IDX_IRQ			0x01
+#define HIPIRx_NONE_MASK		(0x1UL << 31)
+#define HIPIRx_NONE_no			(0x0UL << 31)
+#define HIPIRx_NONE_yes			(0x1UL << 31)
+#define HIPIRx_PRI_INDX_MASK		(0x3FFUL << 0)
 	vuint32_t	HIPIRx[2];
 	uint32_t	RESERVED11[510];
+#define HINLRx_OVERRIDE_SET		(0x1UL << 31)
+#define HINLRx_NEST_LVL_MASK		(0x1FFUL << 0)
 	vuint32_t	HINLRx[2];
 	uint32_t	RESERVED12[254];
+#define HIER_IRQ_MASK			(0x1UL << 1)
+#define HIER_IRQ_disabled		(0x0UL << 1)
+#define HIER_IRQ_enabled		(0x1UL << 1)
+#define HIER_FIQ_MASK			(0x1UL << 0)
+#define HIER_FIQ_disabled		(0x0UL << 0)
+#define HIER_FIQ_enabled		(0x1UL << 0)
 	vuint32_t	HIER;
 	uint32_t	RESERVED13[63];
-	vuint32_t	HIPVRx[2];
+	vcuint32_t	HIPVRx[2];
 } AINTC_con_t;
 
 
@@ -644,6 +815,7 @@ typedef struct {
 #define SYSCFG1_BASE			0x01E2C000UL
 #define TIMER2_BASE			0x01F0C000UL
 #define TIMER3_BASE			0x01F0D000UL
+#define AINTC_BASE			0xFFFEE000UL
 
 
 /*----------------------------------------------------------------------------*/
@@ -684,6 +856,9 @@ typedef struct {
 #ifdef _UART2
 	#define UART2			((UART_con_t*)UART2_BASE)
 #endif
+#ifdef _AINTC
+	#define AINTC			((AINTC_con_t*)AINTC_BASE)
+#endif
 
 #else//__MEM_REMAP
 #ifdef _PSC0
@@ -718,6 +893,9 @@ typedef struct {
 #endif
 #ifdef _UART2
 	_EXTERN UART_con_t		*UART2;
+#endif
+#ifdef _AINTC
+	_EXTERN AINTC_con_t		*AINTC;
 #endif
 #endif//__MEM_REMAP
 

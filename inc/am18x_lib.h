@@ -21,4 +21,8 @@
 #include "am18x_uart.h"
 #endif
 
+#ifdef _AINTC
+#include "am18x_aintc.h"
+#endif
+
 #endif//__AM18X_LIB_H__
