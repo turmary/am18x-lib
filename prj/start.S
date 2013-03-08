@@ -18,12 +18,12 @@ __load_addr:
 		MSR	cpsr_cxsf, r0
 		NOP
 
-		@ Set the IVT to low memory, leave MMU & caches disabled
+		@ Set the IVT to high memory, leave MMU & caches disabled
 		MRC	p15, #0, r0, c1, c0, #0
 		BIC	r0, r0, #0x00002300
 		BIC	r0, r0, #0x00000087
 		ORR	r0, r0, #0x00000002
-		ORR	r0, r0, #0x00001000
+		ORR	r0, r0, #0x00003000
 		MCR	p15, #0, r0, c1, c0, #0
 		NOP
 
