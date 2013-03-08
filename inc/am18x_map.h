@@ -284,6 +284,47 @@ typedef struct {
 
 typedef struct {
 	vcuint32_t	REVID;
+	vuint32_t	CR;
+	uint32_t	RESERVED0[2];
+	vuint32_t	GER;
+	uint32_t	RESERVED1[2];
+	vuint32_t	GNLR;
+#define AINTC_IDX_SET	0x00
+#define AINTC_IDX_CLR	0x01
+	vuint32_t	SIxR[2];
+	vuint32_t	EIxR[2];
+	uint32_t	RESERVED2;
+	vuint32_t	HIEIxR[2];
+	uint32_t	RESERVED3[5];
+	vuint32_t	VBR;
+	vuint32_t	VSR;
+	vuint32_t	VNR;
+	uint32_t	RESERVED4[9];
+	vuint32_t	GPIR;
+	vuint32_t	GPVR;
+	uint32_t	RESERVED5[94];
+	vuint32_t	SPSRx[4];
+	uint32_t	RESERVED6[28];
+	vuint32_t	SPCRx[4];
+	uint32_t	RESERVED7[28];
+	vuint32_t	ESRx[4];
+	uint32_t	RESERVED8[28];
+	vuint32_t	ECRx[4];
+	uint32_t	RESERVED9[28];
+	vuint32_t	CMRx[26];
+	uint32_t	RESERVED10[294];
+	vuint32_t	HIPIRx[2];
+	uint32_t	RESERVED11[510];
+	vuint32_t	HINLRx[2];
+	uint32_t	RESERVED12[254];
+	vuint32_t	HIER;
+	uint32_t	RESERVED13[63];
+	vuint32_t	HIPVRx[2];
+} AINTC_con_t;
+
+
+typedef struct {
+	vcuint32_t	REVID;
 #define EMUMGT_SOFT_MASK		(0x1UL << 1)
 #define EMUMGT_SOFT_stop		(0x0UL << 1)
 #define EMUMGT_SOFT_reach		(0x1UL << 1)

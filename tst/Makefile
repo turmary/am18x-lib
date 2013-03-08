@@ -3,12 +3,19 @@ _INCS = .
 _INCS += ../inc
 _INCS += ../prj
 
+EXE = 
+EXE += uart-test.exe
+EXE += aintc-offset.exe
+
 INCS = $(patsubst %, -I%, $(_INCS))
 
-all: uart-test.exe
+all:  $(EXE)
 
-%.exe: %.c
+uart-test.exe: uart-test.c
 	gcc $(INCS) -o $@ $< ../src/am18x_uart.c
 
+%.exe: %.c
+	gcc $(INCS) -o $@ $<
+
 clean:
-	rm -rf uart-test.exe
+	rm -rf $(EXE)
