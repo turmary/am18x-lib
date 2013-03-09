@@ -24,19 +24,24 @@ HandlePrefetchAbort:
 	SUBEQ	V2, LR, #4
 	LDRNE	R1, =__thumb_mode_fmt
 	SUBNE	V2, LR, #4
+	ADD	R1, R1, SL
 
 	LDR	V1, =printk
+	ADD	V1, V1, SL
 
 	LDR	R0, =__pabt_fmt
+	ADD	R0, R0, SL
 	MOV	LR, PC
 	BX	V1
 
 	LDR	R0, =__abt_pc_fmt
+	ADD	R0, R0, SL
 	MOV	R1, V2
 	MOV	LR, PC
 	BX	V1
 
 	LDR	R0, =__new_line__
+	ADD	R0, R0, SL
 2:
 	MOV	LR, PC
 	BX	V1
@@ -67,14 +72,18 @@ HandleDataAbort:
 	SUBEQ	V2, LR, #8
 	LDRNE	R1, =__thumb_mode_fmt
 	SUBNE	V2, LR, #8
+	ADD	R1, R1, SL
 
 	LDR	V1, =printk
+	ADD	V1, V1, SL
 
 	LDR	R0, =__dabt_fmt
+	ADD	R0, R0, SL
 	MOV	LR, PC
 	BX	V1
 
 	LDR	R0, =__abt_pc_fmt
+	ADD	R0, R0, SL
 	MOV	R1, V2
 	MOV	LR, PC
 	BX	V1
@@ -83,10 +92,12 @@ HandleDataAbort:
 	BNE	1f
 0:
 	LDR	R0, =__abt_arm_instruction
+	ADD	R0, R0, SL
 	LDR	R1, [V2, #0]
 	B	2f
 1:
 	LDR	R0, =__abt_thumb_instruction
+	ADD	R0, R0, SL
 	LDRH	R1, [V2, #0]
 	B	2f
 2:
@@ -96,6 +107,7 @@ HandleDataAbort:
 	BL	arm_read_cp15_fault_address
 	MOV	R1, R0
 	LDR	R0, =__dabt_addr_fmt
+	ADD	R0, R0, SL
 	MOV	LR, PC
 	BX	V1
 

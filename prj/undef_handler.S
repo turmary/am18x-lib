@@ -74,5 +74,5 @@ __undef_arm_instruction:
 __undef_thumb_instruction:
 	.string "\t[PC] = 0x%.4X\n"
 
-	.align	4
+	.balign	4
 	.end
