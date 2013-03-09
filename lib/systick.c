@@ -11,6 +11,7 @@ static volatile systick_handler_t systick_handler = dummy_handler;
 static volatile unsigned long ticks = 0;
 static unsigned inner_period = 1000U;
 
+static void systick_isr(void);
 static int dummy_handler(int ticks) { return 0;}
 
 int systick_init(unsigned period) {
@@ -32,6 +33,8 @@ int systick_init(unsigned period) {
 	}
 
 	aintc_sys_enable(TIMER_INTR_NR);
+
+	isr_set_hander(TIMER_INTR_NR, systick_isr);
 
 	return 0;
 }
@@ -88,7 +91,7 @@ int systick_sleep(int msecs) {
 	return 0;
 }
 
-void systick_isr(void) {
+static void systick_isr(void) {
 	systick_handler(ticks++);
 
 	timer_cmd(TIMER_NR, TIMER_CMD_INTR_CLEAR, 0);

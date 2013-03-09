@@ -2,7 +2,6 @@
 #include "am18x_lib.h"
 #include "auxlib.h"
 
-extern void systick_isr(void);
 extern int output_a_char(int);
 
 static none_arg_handler_t isr_vector[] = {
@@ -32,7 +31,7 @@ static none_arg_handler_t isr_vector[] = {
 	NULL,
 	// 20
 	NULL,
-	systick_isr,
+	NULL,
 	NULL,
 	NULL,
 	NULL,
@@ -160,8 +159,6 @@ int isr_init(void) {
 	aconf->isr_size = sizeof isr_vector;
 
 	aintc_conf(aconf);
-
-	isr_set_hander(AINTC_T64P0_TINT12, systick_isr);
 
 	aintc_enable(AINTC_GLOBAL);
 	aintc_enable(AINTC_HOST_IRQ);
