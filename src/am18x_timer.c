@@ -123,6 +123,10 @@ am18x_rt timer_cmd(TIMER_con_t* tcon, timer_cmd_t cmd, uint32_t arg) {
 		tcon->RELx[0] = arg - 1UL;
 		tcon->RELx[1] = 0UL;
 		break;
+	case TIMER_CMD_INTR_CLEAR:
+		reg = tcon->INTCTLSTAT;
+		msk = INTCTLSTAT_PRDINTSTAT12_MASK;
+		tcon->INTCTLSTAT = FIELD_SET(reg, msk, INTCTLSTAT_PRDINTSTAT12_clear);
 	default:
 		break;
 	}

@@ -90,5 +90,8 @@ int systick_sleep(int msecs) {
 
 void systick_isr(void) {
 	systick_handler(ticks++);
+
+	timer_cmd(TIMER_NR, TIMER_CMD_INTR_CLEAR, 0);
+
 	return;
 }

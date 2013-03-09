@@ -20,8 +20,6 @@ int systick_callback(int ticks) {
 int systick_callbackx(int ticks) {
 	static int l_seconds = 0;
 
-	printk("\nelapse %d seconds", l_seconds);
-
 	if (l_seconds != systick_elapsed() / 1000UL) {
 		l_seconds = systick_elapsed() / 1000UL;
 		printk("\nelapse %d seconds", l_seconds);

@@ -37,6 +37,7 @@ typedef enum {
 	TIMER_CMD_RESET,
 	TIMER_CMD_START,
 	TIMER_CMD_RELOAD,
+	TIMER_CMD_INTR_CLEAR,
 } timer_cmd_t;
 
 typedef struct {

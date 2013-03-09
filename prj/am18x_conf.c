@@ -141,20 +141,14 @@ int isr_set_hander(int intr_nr, none_arg_handler_t handle) {
 int c_irq_handler(void) {
 	int32_t irq_nr = aintc_get_active();
 
-	output_a_char('A');
-
 	if (irq_nr == AINTC_INVALID_ACTIVE) {
-		output_a_char('B');
 		return -1;
 	}
 	if (isr_vector[irq_nr] != NULL) {
-		output_a_char('C');
 		(*isr_vector[irq_nr])();
 	}
 
 	aintc_clear(irq_nr);
-
-	output_a_char('D');
 
 	return 0;
 }
