@@ -7,10 +7,10 @@
 #include "arm920t.h"
 #include "am18x_map_s.h"
 
-.EQU		USR_Stack_Size, 0x00002000
-.EQU		ISR_Stack_Size, 0x00002000
-.EQU		ABT_Stack_Size, 0x00002000
-.EQU		UND_Stack_Size, 0x00002000
+.equ		usr_stack_size, 0x00002000
+.equ		isr_stack_size, 0x00002000
+.equ		und_stack_size, 0x00002000
+.equ		und_stack_size, 0x00002000
 
 		.section .init, "ax"
 		.arm
@@ -23,7 +23,7 @@
 		.global	_start
 _start:
 __load_addr:
-__vectors_start:
+__vector_start:
 		B	HandleReset
 		LDR	PC, undef_addr
 		LDR	PC, swi_addr
@@ -32,7 +32,7 @@ __vectors_start:
 		LDR	PC, notused_addr
 		LDR	PC, irq_addr
 		LDR	PC, fiq_addr
-__vectors_jump:	.long	HandleReset
+__vector_jump:	.long	HandleReset
 undef_addr:	.long	HandleUndef
 swi_addr:	.long	HandleSWI
 pabt_addr:	.long	HandlePrefetchAbort
@@ -40,7 +40,7 @@ dabt_addr:	.long	HandleDataAbort
 notused_addr:	.long	HandleNotUsed
 irq_addr:	.long	HandleIRQ
 fiq_addr:	.long	HandleFIQ
-__vectors_end:
+__vector_end:
 
 HandleSWI:
 HandleNotUsed:
@@ -50,8 +50,7 @@ __dummy_handler:
 
 
 HandleIRQ:
-		.EXTERN	c_irq_handler
-
+		.extern	c_irq_handler
 		SUB	LR, LR, #4
 		STMDB	SP!, {R0-R12, LR}
 
@@ -67,45 +66,45 @@ HandleReset:
 
 		@ Enter User Mode and set its Stack Pointer
 		MSR	CPSR_c, #XPSR_Mode_System | XPSR_F_FIQ | XPSR_F_IRQ
-		ldr_fix R0, StackUsr
+		ldr_fix R0, stack_usr
 		MOV	SP, R0
 
 		MSR	CPSR_c, #XPSR_Mode_IRQ | XPSR_F_FIQ | XPSR_F_IRQ
-		ldr_fix	R0, StackIsr
+		ldr_fix	R0, stack_isr
 		MOV	SP, R0
 
 		MSR	CPSR_c, #XPSR_Mode_Abort | XPSR_F_FIQ | XPSR_F_IRQ
-		ldr_fix	R0, StackAbt
+		ldr_fix	R0, stack_abt
 		MOV	SP, R0
 
 		MSR	CPSR_c, #XPSR_Mode_Undefined | XPSR_F_FIQ | XPSR_F_IRQ
-		ldr_fix	R0, StackUnd
+		ldr_fix	R0, stack_und
 		MOV	SP, R0
 
 		MSR	CPSR_c, #XPSR_Mode_System | XPSR_F_FIQ | XPSR_F_IRQ
 
 		@ Set the IVT to high memory, leave MMU & caches disabled
-		MRC	p15, #0, r0, c1, c0, #0
-		BIC	r0, r0, #0x00000300
-		BIC	r0, r0, #0x00000087
-		ORR	r0, r0, #0x00000002
-		ORR	r0, r0, #0x00003000
-		MCR	p15, #0, r0, c1, c0, #0
+		MRC	P15, #0, R0, C1, C0, #0
+		BIC	R0, R0, #0x00000300
+		BIC	R0, R0, #0x00000087
+		ORR	R0, R0, #0x00000002
+		ORR	R0, R0, #0x00003000
+		MCR	P15, #0, R0, C1, C0, #0
 		NOP
 
 		@ fix vector jump address
 		MOV	R0, R9
-		ldr_fix	R1, __vectors_jump
-		ldr_fix R2, __vectors_end
+		ldr_fix	R1, __vector_jump
+		ldr_fix R2, __vector_end
 		BL	__reloc_got
 
 		@ copy vectors to high memory
 		LDR	R0, =ARMlocalRAM_BASE
-		ldr_fix	R1, __vectors_start
-		ldr_fix	R2, __vectors_end
+		ldr_fix	R1, __vector_start
+		ldr_fix	R2, __vector_end
 		BL	__copy_mem
 
-		@ Clear BSS area
+		@ clear BSS area
 		.extern	__bss_start
 		.extern	__bss_end
 		MOV	R0, #0
@@ -132,7 +131,7 @@ __bss_clear_loop:
 		.extern	low_level_init
 		BL	low_level_init
 
-		@ Call to main entry point
+		@ call to main entry point
 		.extern	main
 		bl	main
 
@@ -157,7 +156,7 @@ __reloc_got_1:
 		BLO	__reloc_got_1
 		MOV	PC, LR
 
-		@ copy memory from [r1, r2) to [r0, r0 + r2 - r1)
+		@ copy memory from [r1, r2) to [R0, r0 + r2 - r1)
 		.global __copy_mem
 __copy_mem:
 		CMP	R1, R2
@@ -178,13 +177,13 @@ __link_addr:
 
 		.section .stack, "w"
 		.balign	0x10
-StackMem:
-		.SPACE	USR_Stack_Size
-StackUsr:
-		.SPACE	ISR_Stack_Size
-StackIsr:
-		.SPACE	ABT_Stack_Size
-StackAbt:
-		.SPACE	UND_Stack_Size
-StackUnd:
+stack_mem:
+		.space	usr_stack_size
+stack_usr:
+		.space	isr_stack_size
+stack_isr:
+		.space	und_stack_size
+stack_abt:
+		.space	und_stack_size
+stack_und:
 		.end

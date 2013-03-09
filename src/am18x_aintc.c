@@ -15,7 +15,7 @@ am18x_rt aintc_conf(const aintc_conf_t* conf) {
 	for (i = 0; i < AINTC_ASSIGN_CNT; i++) {
 		reg = acon->CMRx[CMRx_X(i)];
 		msk = CMRx_MASK(i);
-		acon->CMRx[CMRx_X(i)] = FIELD_SET(reg, msk, 2);
+		acon->CMRx[CMRx_X(i)] = __field_xset(reg, msk, 2);
 
 		reg = FIELD_SET(0, XIxR_INDEX_MASK, XIxR_INDEX_VAL(i));
 		acon->EIxR[AINTC_IDX_CLR] = reg;

@@ -9,6 +9,8 @@ int main(int argc, char* argv[]) {
 	const char* title = "\nam18x library for am1808 uart!\n";
 
 	printk(title);
+	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);
+
 	puts("now press any key\n");
 	getchar();
 	puts("press complete\n");

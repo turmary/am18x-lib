@@ -4,31 +4,29 @@
 #include "uart.h"
 #include "auxlib.h"
 
-#define SYSTICK_PERIOD			10/* milli seconds */
-extern int output_a_char(void);
+#define SYSTICK_PERIOD			100/* milli seconds */
 
 int low_level_init(void) {
+	extern int isr_init(void);
+	extern int output_a_char(int);
 	int r;
 /*
 	if (AM18X_OK != (r = intr_con_init(INTRCON))) {
 		return r;
 	}
-
-	if (AM18X_OK != (r = timer_con_init())) {
-		return r;
-	}
 */
-
-	output_a_char();
+	// output_a_char('S');
 
 	uart_init();
-/*
+
+	isr_init();
+
 	if (AM18X_OK != (r = systick_init(SYSTICK_PERIOD))) {
 		printk("systick_init() error\n");
 		return r;
 	}
 
-	if (AM18X_OK != (r = systick_start())) {
+/*	if (AM18X_OK != (r = systick_start())) {
 		printk("systick_start() error\n");
 		return r;
 	}

@@ -82,6 +82,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	printk(title);
+	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);
 
 	for (i = 0; i < countof(psc_kv); i++) {
 		int v;

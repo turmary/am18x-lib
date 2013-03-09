@@ -121,6 +121,53 @@
 #define FLTSTAT_TYPE_SupervisorExec	0x8
 #define FLTSTAT_TYPE_SupervisorWrite	0x10
 #define FLTSTAT_TYPE_SupervisorRead	0x20
+#define CR_PRHOLDMODE_MASK		(0x1 << 4)
+#define CR_PRHOLDMODE_disable		(0x0 << 4)
+#define CR_PRHOLDMODE_enable		(0x1 << 4)
+#define CR_NESTMODE_MASK		(0x3 << 2)
+#define CR_NESTMODE_None		(0x0 << 2)
+#define CR_NESTMODE_Individual		(0x1 << 2)
+#define CR_NESTMODE_Global		(0x2 << 2)
+#define CR_NESTMODE_Manual		(0x3 << 2)
+#define GER_ENABLE_MASK			(0x1 << 0)
+#define GER_ENABLE_no			(0x0 << 0)
+#define GER_ENABLE_yes			(0x1 << 0)
+#define GNLR_OVERRIDE_SET		(0x1 << 31)
+#define GNLR_NESTLVL_MASK		(0xFF << 0)
+#define GNLR_NESTLVL_VAL(x)		((x) << 0)
+#define AINTC_IDX_SET			0x00
+#define AINTC_IDX_CLR			0x01
+#define XIxR_INDEX_MASK			(0x7F << 0)
+#define XIxR_INDEX_VAL(x)		((x) << 0)
+#define HIEIxR_INDEX_MASK		(0x1 << 0)
+#define HIEIxR_INDEX_FIQ		(0x0 << 0)
+#define HIEIxR_INDEX_IRQ		(0x1 << 0)
+#define VSR_SIZE_MASK			(0xFF << 0)
+#define VSR_SIZE_VAL(x)			(((x) >> 2) - 1)
+#define GPIR_NONE_MASK			(0x1 << 31)
+#define GPIR_NONE_no			(0x0 << 31)
+#define GPIR_NONE_yes			(0x1 << 31)
+#define GPIR_PRI_INDX_MASK		(0x3FF << 0)
+#define SXXRx_WR_X(x)			((x) >> 5)
+#define SXXRx_WR_VAL(x)			(0x1 << ((x) & 0x1F))
+#define EXRx_WR_X(x)			((x) >> 5)
+#define EXRx_WR_VAL(x)			(0x1 << ((x) & 0x1F))
+#define CMRx_X(x)			((x) >> 2)
+#define CMRx_MASK(x)			(0xFF << (((x) & 0x3) << 3))
+#define AINTC_IDX_FIQ			0x00
+#define AINTC_IDX_IRQ			0x01
+#define HIPIRx_NONE_MASK		(0x1 << 31)
+#define HIPIRx_NONE_no			(0x0 << 31)
+#define HIPIRx_NONE_yes			(0x1 << 31)
+#define HIPIRx_PRI_INDX_MASK		(0x3FF << 0)
+#define HINLRx_OVERRIDE_SET		(0x1 << 31)
+#define HINLRx_NEST_LVL_MASK		(0x1FF << 0)
+#define HIER_IRQ_MASK			(0x1 << 1)
+#define HIER_IRQ_disabled		(0x0 << 1)
+#define HIER_IRQ_enabled		(0x1 << 1)
+#define HIER_FIQ_MASK			(0x1 << 0)
+#define HIER_FIQ_disabled		(0x0 << 0)
+#define HIER_FIQ_enabled		(0x1 << 0)
 #define EMUMGT_SOFT_MASK		(0x1 << 1)
 #define EMUMGT_SOFT_stop		(0x0 << 1)
 #define EMUMGT_SOFT_reach		(0x1 << 1)
@@ -400,3 +447,6 @@
 #define SYSCFG1_BASE			0x01E2C000
 #define TIMER2_BASE			0x01F0C000
 #define TIMER3_BASE			0x01F0D000
+#define AINTC_BASE			0xFFFEE000
+#define ARMlocalRAM_BASE		0xFFFF0000
+#define ARMLocalRAM_SIZE		0x00002000

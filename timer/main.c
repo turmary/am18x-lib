@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
 	int i = 0;
 
 	printk(title);
+	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);
 
 	timer_init();
 

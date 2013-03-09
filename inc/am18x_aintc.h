@@ -16,6 +16,8 @@ typedef struct {
 	uint32_t	isr_size;
 } aintc_conf_t;
 
+#define AINTC_INVALID_ACTIVE		(-1)
+
 am18x_rt aintc_conf(const aintc_conf_t* conf);
 am18x_rt aintc_enable(aintc_host_t host);
 am18x_rt aintc_disable(aintc_host_t host);
@@ -23,5 +25,6 @@ am18x_rt aintc_sys_enable(AINTC_assign_t assign);
 am18x_rt aintc_sys_disable(AINTC_assign_t assign);
 am18x_rt aintc_trigger(AINTC_assign_t assign);
 am18x_rt aintc_clear(AINTC_assign_t assign);
+int32_t	 aintc_get_active(void);
 
 #endif//__AM18X_AINTC_H__

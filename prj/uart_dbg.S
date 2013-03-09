@@ -7,6 +7,8 @@
 		.arm
 		.global output_a_char
 output_a_char:
+		MOV	R12, R0
+
 		@ kick off
 		LDR	R0, =SYSCFG0_BASE
 		LDR	R1, =KICK0R_UNLOCK
@@ -97,7 +99,8 @@ __skip_psc:
 		BEQ	4b
 
 		@ output a char to uart
-		LDR	R1, ='X'
+		@LDR	R1, ='X'
+		MOV	R1, R12
 		STR	R1, [R0, #0x00]
 
 		MOV	PC, LR

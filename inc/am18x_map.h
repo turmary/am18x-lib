@@ -404,6 +404,7 @@ typedef enum {
 	AINTC_MCBSP1_RINT,
 
 	AINTC_MCBSP1_XINT,		// 100
+	AINTC_ASSIGN_CNT,
 } AINTC_assign_t;
 
 typedef struct {
@@ -467,6 +468,7 @@ typedef struct {
 	uint32_t	RESERVED9[28];
 #define CMRx_X(x)			((x) >> 2)
 #define CMRx_MASK(x)			(0xFFUL << (((x) & 0x3UL) << 3))
+#define CMRx_VAL(x,v)			((0xFFUL & (v)) << (((x) & 0x3UL) << 3))
 	vuint32_t	CMRx[26];
 	uint32_t	RESERVED10[294];
 // AINTC_IDX_XXX include HIPIRx, HINLRx, HIPVRx
@@ -816,6 +818,8 @@ typedef struct {
 #define TIMER2_BASE			0x01F0C000UL
 #define TIMER3_BASE			0x01F0D000UL
 #define AINTC_BASE			0xFFFEE000UL
+#define ARMlocalRAM_BASE		0xFFFF0000UL
+#define ARMLocalRAM_SIZE		0x00002000UL
 
 
 /*----------------------------------------------------------------------------*/

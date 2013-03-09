@@ -10,6 +10,8 @@ int main(int argc, char* argv[]) {
 	int result = 5;
 
 	printk(title);
+	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);
+
 	result = 0x100 / divider;
 	printk("divide process end with [%d]\n", result);
 	return 0;

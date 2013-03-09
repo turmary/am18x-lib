@@ -97,7 +97,7 @@ am18x_rt timer_conf(TIMER_con_t* tcon, const timer_conf_t* conf) {
 }
 
 am18x_rt timer_cmd(TIMER_con_t* tcon, timer_cmd_t cmd, uint32_t arg) {
-	uint32_t msk;
+	uint32_t reg, msk;
 
 	switch(cmd) {
 /*	case TIMER_CMD_PAUSE:
