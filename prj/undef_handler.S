@@ -23,12 +23,16 @@ HandleUndef:
 	SUBEQ	V2, LR, #4
 	LDRNE	R1, =__thumb_mode_fmt
 	SUBNE	V2, LR, #2
+	ADD	R1, R1, SL
 	LDR	R0, =__undef_fmt
+	ADD	R0, R0, SL
 	LDR	V1, =printk
+	ADD	V1, V1, SL
 	MOV	LR, PC
 	BX	V1
 
 	LDR	R0, =__undef_pc_fmt
+	ADD	R0, R0, SL
 	MOV	R1, V2
 	MOV	LR, PC
 	BX	V1
@@ -37,10 +41,12 @@ HandleUndef:
 	BNE	1f
 0:
 	LDR	R0, =__undef_arm_instruction
+	ADD	R0, R0, SL
 	LDR	R1, [V2, #0]
 	B	2f
 1:
 	LDR	R0, =__undef_thumb_instruction
+	ADD	R0, R0, SL
 	LDRH	R1, [V2, #0]
 	B	2f
 2:
