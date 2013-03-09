@@ -8,7 +8,28 @@ static void null_operation(void) {
 }
 
 am18x_rt aintc_conf(const aintc_conf_t* conf) {
+	uint32_t reg, msk;
+	int i;
+
+	// all system interrupt for IRQ
+	for (i = 0; i < AINTC_ASSIGN_CNT; i++) {
+		reg = acon->CMRx[CMRx_X(i)];
+		msk = CMRx_MASK(i);
+		acon->CMRx[CMRx_X(i)] = FIELD_SET(reg, msk, 2);
+
+		reg = FIELD_SET(0, XIxR_INDEX_MASK, XIxR_INDEX_VAL(i));
+		acon->EIxR[AINTC_IDX_CLR] = reg;
+
+		reg = FIELD_SET(0, XIxR_INDEX_MASK, XIxR_INDEX_VAL(i));
+		acon->SIxR[AINTC_IDX_CLR] = reg;
+	}
+	acon->VBR = conf->isr_addr;
+	acon->VSR = VSR_SIZE_VAL(conf->isr_size);
 	acon->VNR = (uint32_t)&null_operation;
+
+	msk = GER_ENABLE_MASK;
+	acon->GER = FIELD_SET(acon->GER, msk, GER_ENABLE_no);
+
 	return AM18X_OK;
 }
 
@@ -103,4 +124,14 @@ am18x_rt aintc_clear(AINTC_assign_t assign) {
 	reg = FIELD_SET(0, XIxR_INDEX_MASK, XIxR_INDEX_VAL(assign));
 	acon->SIxR[AINTC_IDX_CLR] = reg;
 	return AM18X_OK;
+}
+
+int32_t	aintc_get_active(void) {
+	int32_t reg;
+
+	reg = acon->HIPIRx[AINTC_IDX_IRQ];
+	if (reg < 0) {
+		return AINTC_INVALID_ACTIVE;
+	}
+	return reg;
 }

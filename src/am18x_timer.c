@@ -80,7 +80,6 @@ am18x_rt timer_conf(TIMER_con_t* tcon, const timer_conf_t* conf) {
 		msk = INTCTLSTAT_PRDINTEN12_MASK;
 		tcon->INTCTLSTAT = FIELD_SET(reg, msk, INTCTLSTAT_PRDINTEN12_enable);
 		break;
-		break;
 	case TIMER_RESULT_NONE:
 	default:
 		reg = tcon->INTCTLSTAT;
