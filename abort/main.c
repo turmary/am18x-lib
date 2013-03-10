@@ -40,12 +40,12 @@ int main(int argc, char* argv[]) {
 	"nop\n"
 	);
 
-	printk("undef abort passed\n");
-
-	// *(unsigned*)0x3ABCDEFF = 0x0;
+	*(unsigned*)0x3ABCDEFF = 0x0;
 	// *(unsigned*)0x3ABCDEFC = 0x0;
-	handler = (systick_handler_t)0x3ABCDEFC;
+	handler = (systick_handler_t)0xFFFEE000;
 	// handler(1);
+
+	printk("abort end\n");
 
 	return 0;
 }

@@ -32,9 +32,9 @@ int systick_init(unsigned period) {
 		printk("error timer_conf()\n");
 	}
 
-	aintc_sys_enable(TIMER_INTR_NR);
-
 	isr_set_hander(TIMER_INTR_NR, systick_isr);
+
+	aintc_sys_enable(TIMER_INTR_NR);
 
 	return 0;
 }
