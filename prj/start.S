@@ -64,7 +64,7 @@ HandleReset:
 		ADR	R9, __load_addr
 		SUB	R9, R9, R0
 
-		@ Enter User Mode and set its Stack Pointer
+		@ enter user mode and set its stack pointer
 		MSR	CPSR_c, #XPSR_Mode_System | XPSR_F_FIQ | XPSR_F_IRQ
 		ldr_fix R0, stack_usr
 		MOV	SP, R0
@@ -85,10 +85,10 @@ HandleReset:
 
 		@ Set the IVT to high memory, leave MMU & caches disabled
 		MRC	P15, #0, R0, C1, C0, #0
-		BIC	R0, R0, #0x00000300
+		BIC	R0, R0, #0x00003300
 		BIC	R0, R0, #0x00000087
 		ORR	R0, R0, #0x00000002
-		ORR	R0, R0, #0x00003000
+		ORR	R0, R0, #0x00002000
 		MCR	P15, #0, R0, C1, C0, #0
 		NOP
 

@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
 
 	*(unsigned*)0x3ABCDEFF = 0x0;
 	// *(unsigned*)0x3ABCDEFC = 0x0;
-	handler = (systick_handler_t)0xFFFEE000;
+	handler = (systick_handler_t)0xFFFEE002;
 	// handler(1);
 
 	printk("abort end\n");

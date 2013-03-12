@@ -9,10 +9,10 @@
 #define DBG_BUF(name, buf, size)	do {					\
 	if (LOCAL_DBG) debug_buf(name, buf, size);				\
 					}while(0)
-#define DBG_PRINT(fmt, ...)		do {						\
+#define DBG_PRINT(fmt, ...)		do {					\
 	if (LOCAL_DBG){								\
 		printf("\r\nDBG:%s() L%d\t", __FUNCTION__, __LINE__);		\
-		printf(fmt, __VA_ARGS__);						\
+		printf(fmt, __VA_ARGS__);					\
 	}				}while(0)
 #else
 #define DBG_LINE(...)

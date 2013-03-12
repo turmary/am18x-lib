@@ -100,7 +100,7 @@ int debug_line(const char* file, int lin, int nr, ...) {
 	va_list ap;
 
 	printk("\r\nDBG:%s() L%d\t", file, lin);
-	
+
 	va_start(ap, nr);
 	while (nr-- > 0) {
 		s = va_arg(ap, char*);
@@ -115,7 +115,7 @@ int debug_line(const char* file, int lin, int nr, ...) {
 			printk(s, val);
 		}
 	}
- 	va_end(ap);
+	va_end(ap);
 
 	return nr;
 }
