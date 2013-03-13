@@ -13,6 +13,10 @@
 #include "am18x_psc.h"
 #endif
 
+#ifdef _I2C
+#include "am18x_i2c.h"
+#endif
+
 #ifdef _TIMER
 #include "am18x_timer.h"
 #endif

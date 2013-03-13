@@ -16,6 +16,12 @@
 #define _SYSCFG0
 #define _SYSCFG1
 
+#define _AINTC
+
+#define _I2C
+#define _I2C0
+#define _I2C1
+
 #define _TIMER
 #define _TIMER0
 #define _TIMER1
@@ -26,8 +32,6 @@
 #define _UART0
 #define _UART1
 #define _UART2
-
-#define _AINTC
 
 
 #ifdef DEBUG

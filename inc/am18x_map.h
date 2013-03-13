@@ -495,6 +495,183 @@ typedef struct {
 	vcuint32_t	HIPVRx[2];
 } AINTC_con_t;
 
+typedef struct {
+#define ICOAR_OADDR_MASK		(0x3FFUL << 0)
+#define ICOAR_OADDR_VAL(x)		((0x3FFUL & (x)) << 0)
+	vuint32_t	ICOAR;
+#define ICIMR_AAS_MASK			(0x1UL << 6)
+#define ICIMR_AAS_disabled		(0x0UL << 6)
+#define ICIMR_AAS_enabled		(0x1UL << 6)
+#define ICIMR_SCD_MASK			(0x1UL << 5)
+#define ICIMR_SCD_disabled		(0x0UL << 5)
+#define ICIMR_SCD_enabled		(0x1UL << 5)
+#define ICIMR_ICXRDY_MASK		(0x1UL << 4)
+#define ICIMR_ICXRDY_disabled		(0x0UL << 4)
+#define ICIMR_ICXRDY_enabled		(0x1UL << 4)
+#define ICIMR_ICRRDY_MASK		(0x1UL << 3)
+#define ICIMR_ICRRDY_disabled		(0x0UL << 3)
+#define ICIMR_ICRRDY_enabled		(0x1UL << 3)
+#define ICIMR_ARDY_MASK			(0x1UL << 2)
+#define ICIMR_ARDY_disabled		(0x0UL << 2)
+#define ICIMR_ARDY_enabled		(0x1UL << 2)
+#define ICIMR_NACK_MASK			(0x1UL << 1)
+#define ICIMR_NACK_disabled		(0x0UL << 1)
+#define ICIMR_NACK_enabled		(0x1UL << 1)
+#define ICIMR_AL_MASK			(0x1UL << 0)
+#define ICIMR_AL_disabled		(0x0UL << 0)
+#define ICIMR_AL_enabled		(0x1UL << 0)
+	vuint32_t	ICIMR;
+#define ICSTR_SDIR_MASK			(0x1UL << 14)
+#define ICSTR_SDIR_other		(0x0UL << 14)
+#define ICSTR_SDIR_slaveTX		(0x1UL << 14)
+#define ICSTR_SDIR_clear		(0x1UL << 14)
+#define ICSTR_NACKSNT_MASK		(0x1UL << 13)
+#define ICSTR_NACKSNT_none		(0x0UL << 13)
+#define ICSTR_NACKSNT_sent		(0x1UL << 13)
+#define ICSTR_NACKSNT_clear		(0x1UL << 13)
+#define ICSTR_BB_MASK			(0x1UL << 12)
+#define ICSTR_BB_free			(0x0UL << 12)
+#define ICSTR_BB_busy			(0x1UL << 12)
+#define ICSTR_BB_clear			(0x1UL << 12)
+#define ICSTR_RSFULL_MASK		(0x1UL << 11)
+#define ICSTR_RSFULL_none		(0x0UL << 11)
+#define ICSTR_RSFULL_overrun		(0x1UL << 11)
+#define ICSTR_XSMT_MASK			(0x1UL << 10)
+#define ICSTR_XSMT_underflow		(0x0UL << 10)
+#define ICSTR_XSMT_none			(0x1UL << 10)
+#define ICSTR_AAS_MASK			(0x1UL << 9)
+#define ICSTR_ASS_cleared		(0x0UL << 9)
+#define ICSTR_ASS_set			(0x1UL << 9)
+#define ICSTR_AD0_MASK			(0x1UL << 8)
+#define ICSTR_AD0_cleared		(0x0UL << 8)
+#define ICSTR_AD0_detected		(0x1UL << 8)
+#define ICSTR_SCD_MASK			(0x1UL << 5)
+#define ICSTR_SCD_none			(0x0UL << 5)
+#define ICSTR_SCD_detected		(0x1UL << 5)
+#define ICSTR_SCD_clear			(0x1UL << 5)
+#define ICSTR_ICXRDY_MASK		(0x1UL << 4)
+#define ICSTR_ICXRDY_none		(0x0UL << 4)
+#define ICSTR_ICXRDY_ready		(0x1UL << 4)
+#define ICSTR_ICXRDY_clear		(0x1UL << 4)
+#define ICSTR_ICRRDY_MASK		(0x1UL << 3)
+#define ICSTR_ICRRDY_none		(0x0UL << 3)
+#define ICSTR_ICRRDY_ready		(0x1UL << 3)
+#define ICSTR_ICRRDY_clear		(0x1UL << 3)
+#define ICSTR_ARDY_MASK			(0x1UL << 2)
+#define ICSTR_ARDY_none			(0x0UL << 2)
+#define ICSTR_ARDY_ready		(0x1UL << 2)
+#define ICSTR_ARDY_clear		(0x1UL << 2)
+#define ICSTR_NACK_MASK			(0x1UL << 1)
+#define ICSTR_NACK_ack			(0x0UL << 1)
+#define ICSTR_NACK_nack			(0x1UL << 1)
+#define ICSTR_NACK_clear		(0x1UL << 1)
+#define ICSTR_AL_MASK			(0x1UL << 0)
+#define ICSTR_AL_none			(0x0UL << 0)
+#define ICSTR_AL_lost			(0x1UL << 0)
+#define ICSTR_AL_clear			(0x1UL << 0)
+	vuint32_t	ICSTR;
+#define ICCLKL_MASK			(0xFFFFUL << 0)
+	vuint32_t	ICCLKL;
+#define ICCLKH_MASK			(0xFFFFUL << 0)
+	vuint32_t	ICCLKH;
+#define ICCNT_MASK			(0xFFFFUL << 0)
+	vuint32_t	ICCNT;
+#define ICDRR_MASK			(0xFFUL << 0)
+	vuint32_t	ICDRR;
+#define ICSAR_SADDR_MASK		(0x3FFUL << 0)
+#define ICSAR_SADDR_VAL(x)		((0x3FFUL & (x)) << 0)
+	vuint32_t	ICSAR;
+#define ICDXR_MASK			(0xFFUL << 0)
+	vuint32_t	ICDXR;
+#define ICMDR_NACKMOD_MASK		(0x1UL << 15)
+#define ICMDR_NACKMOD_no		(0x0UL << 15)
+#define ICMDR_NACKMOD_yes		(0x1UL << 15)
+#define ICMDR_FREE_MASK			(0x1UL << 14)
+#define ICMDR_FREE_emu			(0x0UL << 14)
+#define ICMDR_FREE_run			(0x1UL << 14)
+#define ICMDR_STT_MASK			(0x1UL << 13)
+#define ICMDR_STT_no			(0x0UL << 13)
+#define ICMDR_STT_yes			(0x1UL << 13)
+#define ICMDR_STP_MASK			(0x1UL << 11)
+#define ICMDR_STP_no			(0x0UL << 11)
+#define ICMDR_STP_yes			(0x1UL << 11)
+#define ICMDR_MST_MASK			(0x1UL << 10)
+#define ICMDR_MST_slave			(0x0UL << 10)
+#define ICMDR_MST_master		(0x1UL << 10)
+#define ICMDR_TRX_MASK			(0x1UL << 9)
+#define ICMDR_TRX_receiver		(0x0UL << 9)
+#define ICMDR_TRX_transmitter		(0x1UL << 9)
+#define ICMDR_XA_MASK			(0x1UL << 8)
+#define ICMDR_XA_7bit			(0x0UL << 8)
+#define ICMDR_XA_10bit			(0x1UL << 8)
+#define ICMDR_RM_MASK			(0x1UL << 7)
+#define ICMDR_RM_no			(0x0UL << 7)
+#define ICMDR_RM_yes			(0x1UL << 7)
+#define ICMDR_DLB_MASK			(0x1UL << 6)
+#define ICMDR_DLB_disable		(0x0UL << 6)
+#define ICMDR_DLB_enable		(0x1UL << 6)
+#define ICMDR_IRS_MASK			(0x1UL << 5)
+#define ICMDR_IRS_reset			(0x0UL << 5)
+#define ICMDR_IRS_none			(0x1UL << 5)
+#define ICMDR_STB_MASK			(0x1UL << 4)
+#define ICMDR_STB_no			(0x0UL << 4)
+#define ICMDR_STB_yes			(0x1UL << 4)
+#define ICMDR_FDF_MASK			(0x1UL << 3)
+#define ICMDR_FDF_no			(0x0UL << 3)
+#define ICMDR_FDF_yes			(0x1UL << 3)
+#define ICMDR_BC_MASK			(0x7UL << 0)
+#define ICMDR_BC_VAL(x)			((0x7UL & (x)) << 0)
+	vuint32_t	ICMDR;
+#define ICIVR_INTCODE_MASK		(0x7UL << 0)
+#define ICIVR_INTCODE_none		(0x0UL << 0)
+#define ICIVR_INTCODE_AL		(0x1UL << 0)
+#define ICIVR_INTCODE_NACK		(0x2UL << 0)
+#define ICIVR_INTCODE_ARDY		(0x3UL << 0)
+#define ICIVR_INTCODE_ICRRDY		(0x4UL << 0)
+#define ICIVR_INTCODE_ICXRDY		(0x5UL << 0)
+#define ICIVR_INTCODE_SCD		(0x6UL << 0)
+#define ICIVR_INTCODE_AAS		(0x7UL << 0)
+	vuint32_t	ICIVR;
+#define ICEMDR_IGNACK_MASK		(0x1UL << 1)
+#define ICEMDR_IGNACK_no		(0x0UL << 1)
+#define ICEMDR_IGNACK_yes		(0x1UL << 1)
+#define ICEMDR_BCM_MASK			(0x1UL << 0)
+#define ICEMDR_BCM_ack			(0x0UL << 0)
+#define ICEMDR_BCM_none			(0x1UL << 0)
+	vuint32_t	ICEMDR;
+#define ICPSC_IPSC_MASK			(0xFFUL << 0)
+#define ICPSC_IPSC_VAL(x)		((0xFFUL & (x)) << 0)
+	vuint32_t	ICPSC;
+	vcuint32_t	REVID[2];
+#define ICDMAC_TXDMAEN_MASK		(0x1UL << 1)
+#define ICDMAC_TXDMAEN_disable		(0x0UL << 1)
+#define ICDMAC_TXDMAEN_enable		(0x1UL << 1)
+#define ICDMAC_RXDMAEN_MASK		(0x1UL << 0)
+#define ICDMAC_RXDMAEN_disable		(0x0UL << 0)
+#define ICDMAC_RXDMAEN_enable		(0x1UL << 0)
+	vuint32_t	ICDMAC;
+	uint32_t	RESERVED0[2];
+#define ICPFUNC_PFUNC0_MASK		(0x1UL << 0)
+#define ICPFUNC_PFUNC0_i2c		(0x0UL << 0)
+#define ICPFUNC_PFUNC0_gpio		(0x1UL << 0)
+	vuint32_t	ICPFUNC;
+#define ICPXXX_SCL			0x0
+#define ICPXXX_SDA			0x1
+#define ICPDIR_PDIRx_MASK(x)		(0x1UL << (x))
+#define ICPDIR_PDIRx_input(x)		(0x0UL << (x))
+#define ICPDIR_PDIRx_output(x)		(0x1UL << (x))
+	vuint32_t	ICPDIR;
+#define ICPDIO_PDIO_MASK(x)		(0x1UL << (x))
+#define ICPDIO_PDIO_low(x)		(0x0UL << (x))
+#define ICPDIO_PDIO_high(x)		(0x1UL << (x))
+	vuint32_t	ICPDIN;
+	vuint32_t	ICPDOUT;
+#define ICPDXXX_MASK(x)			(0x1UL << (x))
+#define ICPDXXX_none(x)			(0x0UL << (x))
+#define ICPDXXX_assert(x)		(0x1UL << (x))
+	vuint32_t	ICPDSET;
+	vuint32_t	ICPDCLR;
+} I2C_con_t;
 
 typedef struct {
 	vcuint32_t	REVID;
@@ -810,10 +987,12 @@ typedef struct {
 #define SYSCFG0_BASE			0x01C14000UL
 #define TIMER0_BASE			0x01C20000UL
 #define TIMER1_BASE			0x01C21000UL
+#define I2C0_BASE			0x01C22000UL
 #define UART0_BASE			0x01C42000UL
 #define UART1_BASE			0x01D0C000UL
 #define UART2_BASE			0x01D0D000UL
 #define PSC1_BASE			0x01E27000UL
+#define I2C1_BASE			0x01E28000UL
 #define SYSCFG1_BASE			0x01E2C000UL
 #define TIMER2_BASE			0x01F0C000UL
 #define TIMER3_BASE			0x01F0D000UL
@@ -838,6 +1017,12 @@ typedef struct {
 #endif
 #ifdef _SYSCFG1
 	#define SYSCFG1			((SYSCFG1_con_t*)SYSCFG1_BASE)
+#endif
+#ifdef _I2C0
+	#define I2C0 			((I2C_con_t*)I2C0_BASE);
+#endif
+#ifdef _I2C1
+	#define I2C1			((I2C_con_t*)I2C1_BASE);
 #endif
 #ifdef _TIMER0
 	#define TIMER0			((TIMER_con_t*)TIMER0_BASE)
@@ -876,6 +1061,12 @@ typedef struct {
 #endif
 #ifdef _SYSCFG1
 	_EXTERN SYSCFG1_con_t		*SYSCFG1;
+#endif
+#ifdef _I2C0
+	_EXTERN I2C_con_t		*I2C0;
+#endif
+#ifdef _I2C1
+	_EXTERN I2C_con_t		*I2C1;
 #endif
 #ifdef _TIMER0
 	_EXTERN TIMER_con_t		*TIMER0
