@@ -1019,10 +1019,10 @@ typedef struct {
 	#define SYSCFG1			((SYSCFG1_con_t*)SYSCFG1_BASE)
 #endif
 #ifdef _I2C0
-	#define I2C0 			((I2C_con_t*)I2C0_BASE);
+	#define I2C0 			((I2C_con_t*)I2C0_BASE)
 #endif
 #ifdef _I2C1
-	#define I2C1			((I2C_con_t*)I2C1_BASE);
+	#define I2C1			((I2C_con_t*)I2C1_BASE)
 #endif
 #ifdef _TIMER0
 	#define TIMER0			((TIMER_con_t*)TIMER0_BASE)
