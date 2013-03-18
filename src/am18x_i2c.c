@@ -17,12 +17,8 @@ uint32_t i2c_input_clock_frequency(I2C_con_t* icon) {
 	return F_OSCIN / 4UL;
 }
 
-uint32_t i2c_get_serial_clock(I2C_con_t* icon) {
-	uint32_t freq, scale_freq, ipsc, d, divider;
-
-	freq = i2c_input_clock_frequency(icon);
-
-	ipsc = FIELD_XGET(icon->ICPSC, ICPSC_IPSC_MASK);
+static inline uint32_t ipsc_to_d(uint32_t ipsc) {
+	uint32_t d;
 
 	if (ipsc == 0) {
 		d = 7;
@@ -31,8 +27,17 @@ uint32_t i2c_get_serial_clock(I2C_con_t* icon) {
 	} else {
 		d = 5;
 	}
+	return d;
+}
 
-	divider = (d << 1);
+uint32_t i2c_get_serial_clock(I2C_con_t* icon) {
+	uint32_t freq, scale_freq, ipsc, divider;
+
+	freq = i2c_input_clock_frequency(icon);
+
+	ipsc = FIELD_XGET(icon->ICPSC, ICPSC_IPSC_MASK);
+
+	divider = (ipsc_to_d(ipsc) << 1);
 	divider += FIELD_XGET(icon->ICCLKL, ICCLKL_MASK);
 	divider += FIELD_XGET(icon->ICCLKH, ICCLKH_MASK);
 
@@ -42,12 +47,12 @@ uint32_t i2c_get_serial_clock(I2C_con_t* icon) {
 }
 
 am18x_rt i2c_set_serial_clock(I2C_con_t* icon, uint32_t freq) {
-	uint32_t msk, ipsc, d, scale_freq;
+	uint32_t msk, ipsc, scale_freq;
 
 	if (icon == I2C0) {
-		ipsc = 0;
-	} else {
 		ipsc = 1;
+	} else {
+		ipsc = 0;
 	}
 
 	scale_freq = i2c_input_clock_frequency(icon) / (ipsc + 1);
@@ -57,18 +62,10 @@ am18x_rt i2c_set_serial_clock(I2C_con_t* icon, uint32_t freq) {
 
 	icon->ICPSC = FIELD_SET(0, ICPSC_IPSC_MASK, ICPSC_IPSC_VAL(ipsc));
 
-	if (ipsc == 0) {
-		d = 7;
-	} else if (ipsc == 1) {
-		d = 6;
-	} else {
-		d = 5;
-	}
-
 	// 22.2.2 Clock Generation
 	// I2C serial clock frequency = prescaled module clock frequency
 	//                              / ( ICCL + d ) + ( ICCH + d )
-	icon->ICCLKL = scale_freq / (freq * 2) - d;
+	icon->ICCLKL = scale_freq / (freq * 2) - ipsc_to_d(ipsc);
 	icon->ICCLKH = icon->ICCLKL;
 
 	icon->ICMDR = FIELD_SET(icon->ICMDR, msk, ICMDR_IRS_none);
