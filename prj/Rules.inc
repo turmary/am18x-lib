@@ -70,13 +70,20 @@ sym: $(TARGET).sym
 size: $(TARGET).elf
 	$(SIZE) -B $(TARGET).elf
 
-AIS = $(TARGET).ais
+AIS_SPI = $(TARGET)_spi.ais
+AIS_UART = $(TARGET)_uart.ais
 
-program: build ${AIS}
-	../tools/sfh_OMAP-L138 -p COM3 -flash_noubl -targetType AM1808 ${AIS}
+program: build ${AIS_SPI}
+	../tools/sfh_OMAP-L138 -p COM3 -flash_noubl -targetType AM1808 ${AIS_SPI}
 
-${AIS}: bin
+run: build ${AIS_UART}
+	../tools/slh_OMAP-L138 -p COM3 -waitForDevice -v ${AIS_UART}
+
+${AIS_SPI}: bin
 	../tools/AISgen_d800k008 -cfg="..\tools\am1808exp-spi.cfg"
+
+${AIS_UART}: bin
+	../tools/AISgen_d800k008 -cfg="..\tools\am1808exp-uart.cfg"
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
@@ -112,7 +119,8 @@ clean:
 	$(REMOVE) $(TARGET).lss
 	$(REMOVE) $(TARGET).sym
 	$(REMOVE) $(TARGET).map
-	$(REMOVE) $(TARGET).ais
+	$(REMOVE) $(TARGET)*.ais
+	$(REMOVE) AIGgen_log.txt
 	$(REMOVE) $(OBJS) $(LST)
 	$(REMOVE) -r .dep
 
