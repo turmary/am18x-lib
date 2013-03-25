@@ -120,10 +120,10 @@ int debug_line(const char* file, int lin, int nr, ...) {
 	return nr;
 }
 
-int dump_regs_word(const char* head, uint32_t base, uint32_t size) {
+int dump_regs_word(const char* head, unsigned base, size_t size) {
 	int i;
 
-	for (i = 0; i < size / sizeof (uint32_t); i++) {
+	for (i = 0; i < size / sizeof (unsigned long); i++) {
 		printk("%s[0x%.2X] = 0x%.8X\n", head, i << 2, ((volatile unsigned*)base)[i]);
 	}
 	return 0;

@@ -32,7 +32,7 @@ int memset(void* dst, int pattern, size_t size);
 int memcpy(char* dst, const char* src, size_t size);
 int debug_buf(const char* head, char* buf, int len);
 int debug_line(const char* file, int lin, int nr, ...);
-int dump_regs_word(const char* head, uint32_t base, uint32_t size);
+int dump_regs_word(const char* head, unsigned base, size_t size);
 
 unsigned get_exec_base(void);
 
