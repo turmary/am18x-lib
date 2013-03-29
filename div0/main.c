@@ -16,12 +16,12 @@ int main(int argc, char* argv[]) {
 	arm_intr_enable();
 	systick_start();
 
-	printk("delay begin : %d ms\n", systick_elapsed());
-	delay(delay_count);
-	printk("delay end   : %d ms\n", systick_elapsed());
-
 	printk(title);
 	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);
+
+	printk("delay start: %d ms\n", systick_elapsed());
+	delay(delay_count);
+	printk("delay stop : %d ms\n", systick_elapsed());
 
 	result = 0x100 / divider;
 	printk("divide process end with [%d]\n", result);
