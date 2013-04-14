@@ -29,4 +29,8 @@
 #include "am18x_aintc.h"
 #endif
 
+#ifdef _PLL
+#include "am18x_pll.h"
+#endif
+
 #endif//__AM18X_LIB_H__

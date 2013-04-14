@@ -14,6 +14,8 @@
 // Peripheral register structures
 /*----------------------------------------------------------------------------*/
 
+#define _RS(b,a)	(((b) - (a) - 0x4UL) >> 2)
+
 typedef struct {
 	vuint32_t	PROGx_MPSAR;
 	vuint32_t	PROGx_MPEAR;
@@ -22,7 +24,7 @@ typedef struct {
 } MPU_range_t;
 
 typedef struct {
-	vuint32_t	REVID;
+	vcuint32_t	REVID;
 	vuint32_t	CONFIG;
 	uint32_t	RESERVED0[2];
 	vuint32_t	IRAWSTAT;
@@ -38,6 +40,129 @@ typedef struct {
 	vuint32_t	FLTSTAT;
 	vuint32_t	FLTCLR;
 } MPU_con_t;
+
+typedef struct {
+#define PLL0_REVID	0x44813C00UL
+#define PLL1_REVID	0x44814400UL
+	vcuint32_t	REVID;
+	uint32_t	RESERVED0[_RS(0xE4,0x0)];
+#define RSTYPE_PLLSWRST_MASK		(0x1UL << 2)
+#define RSTYPE_PLLSWRST_no		(0x0UL << 2)
+#define RSTYPE_PLLSWRST_yes		(0x1UL << 2)
+#define RSTYPE_XWRST_MASK		(0x1UL << 1)
+#define RSTYPE_XWRST_no			(0x0UL << 1)
+#define RSTYPE_XWRST_yes		(0x1UL << 1)
+#define RSTYPE_POR_MASK			(0x1UL << 0)
+#define RSTYPE_POR_no			(0x0UL << 0)
+#define RSTYPE_POR_yes			(0x1UL << 0)
+	vcuint32_t	RSTYPE;
+#define RSCTRL_SWRST_MASK		(0x1UL << 16)
+#define RSCTRL_SWRST_yes		(0x0UL << 16)
+#define RSCTRL_SWRST_no			(0x1UL << 16)
+#define RSCTRL_KEY_MASK			(0xFFFFUL << 0)
+#define RSCTRL_KEY_locked		(0x3UL << 0)
+#define RSCTRL_KEY_unlocked		(0xCUL << 0)
+#define RSCTRL_KEY_unlock		(0x5A69UL << 0)
+	vuint32_t	RSCTRL;
+	uint32_t	RESERVED1[_RS(0x100,0xE8)];
+#define PLLCTL_EXTCLKSRC_MASK		(0x1UL << 9)
+#define PLLCTL_EXTCLKSRC_oscin		(0x0UL << 9)
+#define PLLCTL_EXTCLKSRC_PLL1sysclk3	(0x1UL << 9)
+#define PLLCTL_CLKMODE_MASK		(0x1UL << 8)
+#define PLLCTL_CLKMODE_crystal		(0x0UL << 8)
+#define PLLCTL_CLKMODE_wave		(0x1UL << 8)
+#define PLLCTL_PLLENSRC_MASK		(0x1UL << 5)
+#define PLLCTL_PLLENSRC_none		(0x0UL << 5)
+#define PLLCTL_PLLENSRC_cleared		(0x1UL << 5)
+#define PLLCTL_PLLRST_MASK		(0x1UL << 3)
+#define PLLCTL_PLLRST_asserted		(0x0UL << 3)
+#define PLLCTL_PLLRST_unasserted	(0x1UL << 3)
+#define PLLCTL_PLLPWRDN_MASK		(0x1UL << 1)
+#define PLLCTL_PLLPWRDN_no		(0x0UL << 1)
+#define PLLCTL_PLLPWRDN_yes		(0x1UL << 1)
+#define PLLCTL_PLLEN_MASK		(0x1UL << 0)
+#define PLLCTL_PLLEN_no			(0x0UL << 0)
+#define PLLCTL_PLLEN_yes		(0x1UL << 0)
+	vuint32_t	PLLCTL;
+#define OCSEL_OCSRC_MASK		(0x1FUL << 0)
+#define OCSEL_OCSRC_oscin		(0x14UL << 0)
+#define OCSEL_OCSRC_PLLsysclkx(x)	((0x16UL + (x)) << 0)
+#define OCSEL_OCSRC_PLL1obsclk		(0x1EUL << 0)
+	vuint32_t	OCSEL;
+	uint32_t	RESERVED2[_RS(0x110,0x104)];
+#define PLLM_MASK			(0x1FUL << 0)
+#define PLLM_WR(m)			(((m) - 0x1UL) << 0)
+	vuint32_t	PLLM;
+// XXXDIVx include PREDIV, PLLDIV1, PLLDIV2, PLLDIV3,
+//		PLLDIV4, PLLDIV5, PLLDIV6, PLLDIV7,
+//		OSCDIV, POSTDIV
+#define XXXDIVx_DxEN_MASK		(0x1UL << 15)
+#define XXXDIVx_DxEN_disable		(0x0UL << 15)
+#define XXXDIVx_DxEN_enable		(0x1UL << 15)
+#define XXXDIVx_RATIO_MASK		(0x1FUL << 0)
+#define XXXDIVx_RATIO_WR(r)		(((r) - 0x1UL) << 0)
+	vuint32_t	PREDIV;
+// PLLDIVxA_IDX include PLLDIV1, PLLDIV2, PLLDIV3 
+#define PLLDIVxA_IDX_1			0x0
+#define PLLDIVxA_IDX_2			0x1
+#define PLLDIVxA_IDX_3			0x2
+	vuint32_t	PLLDIVxA[3];
+	vuint32_t	OSCDIV;
+	vuint32_t	POSTDIV;
+	uint32_t	RESERVED3[_RS(0x138,0x128)];
+#define PLLCMD_GOSET_MASK		(0x1UL << 0)
+#define PLLCMD_GOSET_clear		(0x0UL << 0)
+#define PLLCMD_GOSET_initiate		(0x1UL << 0)
+	vuint32_t	PLLCMD;
+#define PLLSTAT_STABLE_MASK		(0x1UL << 2)
+#define PLLSTAT_STABLE_no		(0x0UL << 2)
+#define PLLSTAT_STABLE_no		(0x1UL << 2)
+#define PLLSTAT_GOSTAT_MASK		(0x1UL << 0)
+#define PLLSTAT_GOSTAT_done		(0x0UL << 1)
+#define PLLSTAT_GOSTAT_in_progress	(0x1UL << 1)
+	vcuint32_t	PLLSTAT;
+// PLL0 x = 1..7
+// PLL1 x = 1..3
+#define ALNCTL_ALNx_MASK(x)		(0x1UL << ((x) - 1))
+#define ALNCTL_ALNx_no			(0x0UL << ((x) - 1))
+#define ALNCTL_ALNx_yes			(0x1UL << ((x) - 1))
+	vuint32_t	ALNCTL;
+// PLL0 x = 1..7
+// PLL1 x = 1..3
+#define DCHANGE_SYSx_MASK(x)		(0x1UL << ((x) - 1))
+#define DCHANGE_SYSx_none		(0x0UL << ((x) - 1))
+#define DCHANGE_SYSx_modified		(0x1UL << ((x) - 1))
+	vcuint32_t	DCHANGE;
+#define CKEN_OBSEN_MASK			(0x1UL << 1)
+#define CKEN_OBSEN_disable		(0x0UL << 1)
+#define CKEN_OBSEN_enable		(0x1UL << 1)
+#define CKEN_AUXEN_MASK			(0x1UL << 0)
+#define CKEN_AUXEN_disable		(0x0UL << 0)
+#define CKEN_AUXEN_enable		(0x1UL << 0)
+	vuint32_t	CKEN;
+#define CKSTAT_OBSEN_MASK		(0x1UL << 1)
+#define CKSTAT_OBSEN_off		(0x0UL << 1)
+#define CKSTAT_OBSEN_on			(0x1UL << 1)
+#define CKSTAT_AUXEN_MASK		(0x1UL << 0)
+#define CKSTAT_AUXEN_off		(0x0UL << 0)
+#define CKSTAT_AUXEN_on			(0x1UL << 0)
+	vcuint32_t	CKSTAT;
+// PLL0 x = 1..7
+// PLL1 x = 1..3
+#define SYSTAT_SYSxON_MASK(X)		(0x1UL << ((x) - 1))
+#define SYSTAT_SYSxON_off		(0x0UL << ((x) - 1))
+#define SYSTAT_SYSxON_on		(0x1UL << ((x) - 1))
+	vcuint32_t	SYSTAT;
+	uint32_t	RESERVED4[_RS(0x160,0x150)];
+// PLLDIVxB_IDX include PLLDIV4, PLLDIV5, PLLDIV6, PLLDIV7
+#define PLLDIVxB_IDX_4			0x0
+#define PLLDIVxB_IDX_5			0x1
+#define PLLDIVxB_IDX_6			0x2
+#define PLLDIVxB_IDX_7			0x3
+	vuint32_t	PLLDIVxB[4];
+	uint32_t	RESERVED5[_RS(0x1F0,0x16C)];
+	vuint32_t	EMUCNTx[2];
+} PLL_con_t;
 
 #define MODULE_NR_PER_PSC	32
 typedef enum {
@@ -125,7 +250,7 @@ typedef struct {
 #define PDSTATx_PORDONE_yes		(0x1UL << 9)
 #define PDSTATx_POR_MASK		(0x1UL << 8)
 #define PDSTATx_POR_asserted		(0x0UL << 8)
-#define PDSTATx_POR_deasserted		(0x1UL << 8)
+#define PDSTATx_POR_unasserted		(0x1UL << 8)
 #define PDSTATx_STATE_MASK		(0x1FUL << 0)
 #define PDSTATx_STATE_off		(0x0UL << 0)
 #define PDSTATx_STATE_on		(0x1UL << 0)
@@ -173,13 +298,13 @@ typedef struct {
 #define MDSTATx_MCKOUT_on		(0x1UL << 12)
 #define MDSTATx_MRST_MASK		(0x1UL << 10)
 #define MDSTATx_MRST_asserted		(0x0UL << 10)
-#define MDSTATx_MRST_deasserted		(0x1UL << 10)
+#define MDSTATx_MRST_unasserted		(0x1UL << 10)
 #define MDSTATx_LRSTDONE_MASK		(0x1UL << 9)
 #define MDSTATx_LRSTDONE_yes		(0x0UL << 9)
 #define MDSTATx_LRSTDONE_no		(0x1UL << 9)
 #define MDSTATx_LRST_MASK		(0x1UL << 8)
 #define MDSTATx_LRST_asserted		(0x0UL << 8)
-#define MDSTATx_LRST_deasserted		(0x1UL << 8)
+#define MDSTATx_LRST_unasserted		(0x1UL << 8)
 #define MDSTATx_STATE_MASK		(0x3FUL << 0)
 #define MDSTATx_STATE_SwRstDisable	(0x0UL)
 #define MDSTATx_STATE_SyncReset		(0x1UL)
@@ -977,6 +1102,7 @@ typedef struct {
 	vuint32_t	MDR;
 } UART_con_t;
 
+#undef _RS
 
 /*----------------------------------------------------------------------------*/
 // periheral addresses
@@ -984,6 +1110,7 @@ typedef struct {
 // AM1808 ARM Microprocessor
 // 2.4 Memory Map Summary
 #define PSC0_BASE			0x01C10000UL
+#define PLL0_BASE			0x01C11000UL
 #define SYSCFG0_BASE			0x01C14000UL
 #define TIMER0_BASE			0x01C20000UL
 #define TIMER1_BASE			0x01C21000UL
@@ -991,6 +1118,7 @@ typedef struct {
 #define UART0_BASE			0x01C42000UL
 #define UART1_BASE			0x01D0C000UL
 #define UART2_BASE			0x01D0D000UL
+#define PLL1_BASE			0x01E1A000UL
 #define PSC1_BASE			0x01E27000UL
 #define I2C1_BASE			0x01E28000UL
 #define SYSCFG1_BASE			0x01E2C000UL
@@ -1006,6 +1134,12 @@ typedef struct {
 /*----------------------------------------------------------------------------*/
 
 #ifndef __MEM_REMAP
+#ifdef _PLL0
+	#define PLL0			((PLL_con_t*)PLL0_BASE)
+#endif
+#ifdef _PLL1
+	#define PLL1			((PLL_con_t*)PLL1_BASE)
+#endif
 #ifdef _PSC0
 	#define PSC0			((PSC_con_t*)PSC0_BASE)
 #endif
@@ -1017,6 +1151,9 @@ typedef struct {
 #endif
 #ifdef _SYSCFG1
 	#define SYSCFG1			((SYSCFG1_con_t*)SYSCFG1_BASE)
+#endif
+#ifdef _AINTC
+	#define AINTC			((AINTC_con_t*)AINTC_BASE)
 #endif
 #ifdef _I2C0
 	#define I2C0 			((I2C_con_t*)I2C0_BASE)
@@ -1045,11 +1182,14 @@ typedef struct {
 #ifdef _UART2
 	#define UART2			((UART_con_t*)UART2_BASE)
 #endif
-#ifdef _AINTC
-	#define AINTC			((AINTC_con_t*)AINTC_BASE)
-#endif
 
 #else//__MEM_REMAP
+#ifdef _PLL0
+	_EXTERN PLL_con_t		*PLL0;
+#endif
+#ifdef _PLL1
+	_EXTERN PLL_con_t		*PLL1;
+#endif
 #ifdef _PSC0
 	_EXTERN PSC_con_t		*PSC0;
 #endif
@@ -1061,6 +1201,9 @@ typedef struct {
 #endif
 #ifdef _SYSCFG1
 	_EXTERN SYSCFG1_con_t		*SYSCFG1;
+#endif
+#ifdef _AINTC
+	_EXTERN AINTC_con_t		*AINTC;
 #endif
 #ifdef _I2C0
 	_EXTERN I2C_con_t		*I2C0;
@@ -1088,9 +1231,6 @@ typedef struct {
 #endif
 #ifdef _UART2
 	_EXTERN UART_con_t		*UART2;
-#endif
-#ifdef _AINTC
-	_EXTERN AINTC_con_t		*AINTC;
 #endif
 #endif//__MEM_REMAP
 

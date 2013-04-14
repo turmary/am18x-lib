@@ -8,6 +8,10 @@
 
 #define F_OSCIN			24000000UL	//Hz
 
+#define _PLL
+#define _PLL0
+#define _PLL1
+
 #define _PSC
 #define _PSC0
 #define _PSC1

@@ -11,7 +11,7 @@
 // -1 as error, 0 as success
 int tca6416_conf(uint16_t dir);
 // bit set as high level, bit clear as low level
-// -1 as error, the port value as other
+// -1 as error, the port value otherwise
 int tca6416_read(void);
 // -1 as error, 0 as success
 int tca6416_write(uint16_t val);

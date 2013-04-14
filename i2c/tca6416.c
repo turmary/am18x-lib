@@ -60,7 +60,7 @@ static int i2c_read(I2C_con_t* bus, uint16_t dev, uint8_t* bytes, uint32_t cnt) 
 	i2c_cmd(bus, I2C_CMD_WAIT_FREE, 0);
 	i2c_cmd(bus, I2C_CMD_BUS_START, 0);
 	i2c_cmd(bus, I2C_CMD_WAIT_BUSY, 0);
-  
+
 	for (i = 0; i < cnt; i++) {
 		// dump_regs_word("I2C0", (uint32_t)bus, sizeof(I2C_con_t));
 		i2c_cmd(bus, I2C_CMD_WAIT_RX, 0);
