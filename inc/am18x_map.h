@@ -42,8 +42,8 @@ typedef struct {
 } MPU_con_t;
 
 typedef struct {
-#define PLL0_REVID	0x44813C00UL
-#define PLL1_REVID	0x44814400UL
+#define PLL0_REVID			0x44813C00UL
+#define PLL1_REVID			0x44814400UL
 	vcuint32_t	REVID;
 	uint32_t	RESERVED0[_RS(0xE4,0x0)];
 #define RSTYPE_PLLSWRST_MASK		(0x1UL << 2)
@@ -86,6 +86,8 @@ typedef struct {
 	vuint32_t	PLLCTL;
 #define OCSEL_OCSRC_MASK		(0x1FUL << 0)
 #define OCSEL_OCSRC_oscin		(0x14UL << 0)
+// PLL0 x = 1..7
+// PLL1 x = 1..3
 #define OCSEL_OCSRC_PLLsysclkx(x)	((0x16UL + (x)) << 0)
 #define OCSEL_OCSRC_PLL1obsclk		(0x1EUL << 0)
 	vuint32_t	OCSEL;
@@ -102,7 +104,7 @@ typedef struct {
 #define XXXDIVx_RATIO_MASK		(0x1FUL << 0)
 #define XXXDIVx_RATIO_WR(r)		(((r) - 0x1UL) << 0)
 	vuint32_t	PREDIV;
-// PLLDIVxA_IDX include PLLDIV1, PLLDIV2, PLLDIV3 
+// PLLDIVxA_IDX include PLLDIV1, PLLDIV2, PLLDIV3
 #define PLLDIVxA_IDX_1			0x0
 #define PLLDIVxA_IDX_2			0x1
 #define PLLDIVxA_IDX_3			0x2
@@ -116,7 +118,7 @@ typedef struct {
 	vuint32_t	PLLCMD;
 #define PLLSTAT_STABLE_MASK		(0x1UL << 2)
 #define PLLSTAT_STABLE_no		(0x0UL << 2)
-#define PLLSTAT_STABLE_no		(0x1UL << 2)
+#define PLLSTAT_STABLE_yes		(0x1UL << 2)
 #define PLLSTAT_GOSTAT_MASK		(0x1UL << 0)
 #define PLLSTAT_GOSTAT_done		(0x0UL << 1)
 #define PLLSTAT_GOSTAT_in_progress	(0x1UL << 1)
@@ -394,6 +396,40 @@ typedef struct {
 	vuint32_t	SUSPSRC;
 	vuint32_t	CHIPSIG;
 	vuint32_t	CHIPSIG_CLR;
+#define CFGCHIP0_PLL_MASTER_LOCK_MASK	(0x1UL << 4)
+#define CFGCHIP0_PLL_MASTER_LOCK_no	(0x0UL << 4)
+#define CFGCHIP0_PLL_MASTER_LOCK_yes	(0x1UL << 4)
+// x = 0..1
+#define CFGCHIP0_EDMA30TCxDBS_MASK(x)	(0x3UL << (2*(x)))
+#define CFGCHIP0_EDMA30TCxDBS_16B(x)	(0x0UL << (2*(x)))
+#define CFGCHIP0_EDMA30TCxDBS_32B(x)	(0x1UL << (2*(x)))
+#define CFGCHIP0_EDMA30TCxDBS_64B(x)	(0x2UL << (2*(x)))
+
+#define CFGCHIP3_RMII_SEL_MASK		(0x1UL << 8)
+#define CFGCHIP3_RMII_SEL_mii		(0x0UL << 8)
+#define CFGCHIP3_RMII_SEL_rmii		(0x1UL << 8)
+#define CFGCHIP3_UPP_TX_CLKSRC_MASK	(0x1UL << 6)
+#define CFGCHIP3_UPP_TX_CLKSRC_asyn3	(0x0UL << 6)
+#define CFGCHIP3_UPP_TX_CLKSRC_2xTXCLK	(0x1UL << 6)
+#define CFGCHIP3_PLL1_MASTER_LOCK_MASK	(0x1UL << 5)
+#define CFGCHIP3_PLL1_MASTER_LOCK_no	(0x0UL << 5)
+#define CFGCHIP3_PLL1_MASTER_LOCK_yes	(0x1UL << 5)
+#define CFGCHIP3_ASYNC3_CLKSRC_MASK	(0x1UL << 4)
+#define CFGCHIP3_ASYNC3_CLKSRC_pll0	(0x0UL << 4)
+#define CFGCHIP3_ASYNC3_CLKSRC_pll1	(0x1UL << 4)
+#define CFGCHIP3_PRUEVTSEL_MASK		(0x1UL << 3)
+#define CFGCHIP3_PRUEVTSEL_normal	(0x0UL << 3)
+#define CFGCHIP3_PRUEVTSEL_alternate	(0x1UL << 3)
+#define CFGCHIP3_DIV45PENA_MASK		(0x1UL << 2)
+#define CFGCHIP3_DIV45PENA_no		(0x0UL << 2)
+#define CFGCHIP3_DIV45PENA_yes		(0x1UL << 2)
+#define CFGCHIP3_EMA_CLKSRC_MASK	(0x1UL << 1)
+#define CFGCHIP3_EMA_CLKSRC_sysclk3	(0x0UL << 1)
+#define CFGCHIP3_EMA_CLKSRC_pll_out	(0x1UL << 1)
+
+#define CFGCHIP4_AMUTECLR0_MASK		(0x1UL << 0)
+#define CFGCHIP4_AMUTECLR0_none		(0x0UL << 0)
+#define CFGCHIP4_AMUTECLR0_clr_int	(0x1UL << 0)
 	vuint32_t	CFGCHIPx[5];
 } SYSCFG0_con_t;
 
