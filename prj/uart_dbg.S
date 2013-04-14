@@ -83,6 +83,11 @@ __skip_psc:
 		LDR	R1, =0x03
 		STR	R1, [R0, #0x0C]
 
+		// DLH:DLL = 0x0008
+		// oscin = 24000000 Hz
+		// UART working clock (PLLx_SYSCLK2) = oscin / 2 = 12000000 Hz
+		// UART bit clock =  PLLx_SYSCLK2 / 13 Hz
+		// DLH:DLL = UART bit clock / ( 115200 Hz )
 		LDR	R1, =0x08
 		STR	R1, [R0, #0x20]
 		MOV	R1, #0x00
