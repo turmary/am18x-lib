@@ -2,7 +2,7 @@
 #include "am18x_uart.h"
 
 uint32_t uart_input_clock_frequency(UART_con_t* ucon) {
-	return F_OSCIN / 2UL;
+	return f_osc / 2UL;
 }
 
 static inline uint32_t uart_get_divisor(UART_con_t* ucon, uint32_t baud_rate) {

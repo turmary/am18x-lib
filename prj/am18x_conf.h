@@ -7,6 +7,7 @@
 #include <am18x_type.h>
 
 #define F_OSCIN			24000000UL	//Hz
+extern uint32_t f_osc;
 
 #define _PLL
 #define _PLL0

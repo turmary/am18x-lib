@@ -28,7 +28,7 @@ int low_level_init(void) {
 	}
 */
 
-	delay(284091 * 3);
+	// delay(284091 * 3);
 
 	return AM18X_OK;
 }

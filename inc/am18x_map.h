@@ -72,8 +72,8 @@ typedef struct {
 #define PLLCTL_CLKMODE_crystal		(0x0UL << 8)
 #define PLLCTL_CLKMODE_wave		(0x1UL << 8)
 #define PLLCTL_PLLENSRC_MASK		(0x1UL << 5)
-#define PLLCTL_PLLENSRC_none		(0x0UL << 5)
-#define PLLCTL_PLLENSRC_cleared		(0x1UL << 5)
+#define PLLCTL_PLLENSRC_cleared		(0x0UL << 5)
+#define PLLCTL_PLLENSRC_none		(0x1UL << 5)
 #define PLLCTL_PLLRST_MASK		(0x1UL << 3)
 #define PLLCTL_PLLRST_asserted		(0x0UL << 3)
 #define PLLCTL_PLLRST_deasserted	(0x1UL << 3)
@@ -120,8 +120,8 @@ typedef struct {
 #define PLLSTAT_STABLE_no		(0x0UL << 2)
 #define PLLSTAT_STABLE_yes		(0x1UL << 2)
 #define PLLSTAT_GOSTAT_MASK		(0x1UL << 0)
-#define PLLSTAT_GOSTAT_done		(0x0UL << 1)
-#define PLLSTAT_GOSTAT_in_progress	(0x1UL << 1)
+#define PLLSTAT_GOSTAT_done		(0x0UL << 0)
+#define PLLSTAT_GOSTAT_in_progress	(0x1UL << 0)
 	vcuint32_t	PLLSTAT;
 // PLL0 x = 1..7
 // PLL1 x = 1..3
