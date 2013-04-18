@@ -3,8 +3,9 @@
 #include "arm920t.h"
 #include "systick.h"
 #include "auxlib.h"
+#include "uart.h"
 
-extern uint32_t f_osc = F_OSCIN;
+uint32_t f_osc = F_OSCIN;
 const int32_t delay_count = 284 * 1000;
 
 static const pll_conf_t pllconf[1] = {
@@ -19,11 +20,27 @@ static const pll_conf_t pllconf[1] = {
 }
 };
 
+kv_t reset_sources[] = {
+	KV(PLL_RESET_SOFTWARE),
+	KV(PLL_RESET_EXTERNAL),
+	KV(PLL_RESET_POWER_ON),
+};
+
 int main(int argc, char* argv[]) {
 	const char* title = "\nam18x library for pll!\n";
+	uint32_t start_minutes, stop_minutes;
+	pll_reset_t reset;
+	int i;
 
 	printk(title);
 	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);
+
+	for (i = 0; i < countof(reset_sources); i++) {
+		reset_sources[i].val += get_exec_base();
+	}
+	reset = pll_get_reset();
+	printk("RSTYPE = 0x%.8X\n", PLL0->RSTYPE);
+	printk("Reset by %s\n", reset_sources[reset].val);
 
 	pll_conf(PLL0, pllconf);
 	f_osc = F_OSCIN * pllconf->pllm / (pllconf->prediv * pllconf->postdiv);
@@ -33,9 +50,13 @@ int main(int argc, char* argv[]) {
 	arm_intr_enable();
 	systick_start();
 
-	printk("delay start: %d ms\n", systick_elapsed());
+	start_minutes = systick_elapsed();
 	delay(delay_count);
-	printk("delay stop : %d ms\n", systick_elapsed());
+	stop_minutes = systick_elapsed();
+	printk("delay start: %d ms\n", start_minutes);
+	printk("delay stop : %d ms\n", stop_minutes);
+
+	pll_cmd(PLL0, PLL_CMD_SOFT_RESET, 0);
 
 	return 0;
 }

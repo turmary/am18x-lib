@@ -122,7 +122,7 @@ am18x_rt pll_cmd(PLL_con_t* pcon, uint32_t cmd, uint32_t arg) {
 		if (pcon != PLL0) break;
 		pcon->RSCTRL = FIELD_SET(0, RSCTRL_KEY_MASK, RSCTRL_KEY_unlock);
 		while (FIELD_GET(pcon->RSCTRL, RSCTRL_KEY_MASK) != RSCTRL_KEY_unlocked);
-		pcon->RSCTRL = FIELD_SET(0, RSCTRL_SWRST_MASK, RSCTRL_SWRST_no);
+		pcon->RSCTRL = FIELD_SET(0, RSCTRL_SWRST_MASK, RSCTRL_SWRST_yes);
 		break;
 
 	default:
