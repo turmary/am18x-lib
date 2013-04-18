@@ -4,12 +4,6 @@
 
 const uint32_t f_osc = F_OSCIN;
 
-#define KV(x)		{ x, #x }
-typedef struct {
-	int key;
-	char* val;
-} kv_t;
-
 kv_t psc_kv[] = {
 	KV(PSC_EDMA3_0_C0),
 	KV(PSC_EDMA3_0_T0),
