@@ -20,6 +20,12 @@
 #define DBG_PRINT(...)
 #endif//LBP_DBG
 
+#define KV(x)		{ x, #x }
+typedef struct {
+	int key;
+	char* val;
+} kv_t;
+
 typedef unsigned long size_t;
 
 int delay(int d);
