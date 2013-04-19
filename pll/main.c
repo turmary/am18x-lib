@@ -56,7 +56,10 @@ int main(int argc, char* argv[]) {
 	printk("delay start: %d ms\n", start_minutes);
 	printk("delay stop : %d ms\n", stop_minutes);
 
-	pll_cmd(PLL0, PLL_CMD_SOFT_RESET, 0);
+	clk_node_init();
+	clk_node_output();
+
+	// pll_cmd(PLL0, PLL_CMD_SOFT_RESET, 0);
 
 	return 0;
 }

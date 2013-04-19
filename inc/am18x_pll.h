@@ -6,6 +6,8 @@
 #include "am18x_map.h"
 
 typedef enum {
+	CLK_NODE_INVALID,
+
 	CLK_NODE_PLL0_SYSCLK1,
 	CLK_NODE_PLL0_SYSCLK2,
 	CLK_NODE_PLL0_SYSCLK3,
@@ -23,36 +25,55 @@ typedef enum {
 
 	CLK_NODE_ASYNC3,
 
-	CLK_NODE_PLLCTL0_PLLEN,
-	CLK_NODE_PLLCTL0_EXTCLKSRC,
+	CLK_NODE_PLL0_PLLEN,
+	CLK_NODE_PLL_EXTSRC,
 	CLK_NODE_POSTDIV0,
 	CLK_NODE_PLLM0,
 	CLK_NODE_PREDIV0,
-	CLK_NODE_PLLCTL_CLKMODE,
-	CLK_NODE_OSCIN,
+	CLK_NODE_PLL_CLKMODE,
 
+	CLK_NODE_DIV4_5X,
 	CLK_NODE_DIV4_5,
 
 	CLK_NODE_OSCDIV0,
 	CLK_NODE_OCSEL0_OCSRC,
 
-	CLK_NODE_PLLCTL1_PLLEN,
+	CLK_NODE_PLL1_PLLEN,
 	CLK_NODE_POSTDIV1,
 	CLK_NODE_PLLM1,
 
 	CLK_NODE_OSCDIV1,
 	CLK_NODE_OCSEL1_OCSRC,
 
+	CLK_NODE_OSCIN,
 	CLK_NODE_CNT,
 } clk_node_id_t;
 
+typedef uint32_t (*pll_calc_freq_t) (uint32_t parent);
+
 typedef struct {
 	cuint32_t	id;
+	const char*	name;
 	uint32_t	parent;
+#define CN_FLAG_DIV			0x00000001UL
+#define CN_FLAG_MULT			0x00000002UL
+#define CN_FLAG_MULTI_DIV		0x00000003UL
+#define CN_FLAG_MUX			0x00000004UL
+#define CN_FLAG_REREAD			0x00000008UL
+#define CN_FLAG_RECALC			0x00000010UL
+	uint32_t	flag;
 	uint32_t	multiplier;
 	uint32_t	divider;
-	uint8_t		recalc;
+	pll_calc_freq_t	calc_freq;
+	pll_calc_freq_t do_change;
+	uint32_t*	parent_list;
 } clk_node_t;
+
+extern clk_node_t clk_nodes[];
+
+am18x_rt clk_node_init(void);
+am18x_rt clk_node_output(void);
+am18x_rt clk_node_calc_freq(uint32_t id, uint32_t* pf);
 
 #define DCLK_ID_GRP_SZ			0x100
 typedef enum {
