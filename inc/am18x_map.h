@@ -404,7 +404,9 @@ typedef struct {
 #define CFGCHIP0_EDMA30TCxDBS_16B(x)	(0x0UL << (2*(x)))
 #define CFGCHIP0_EDMA30TCxDBS_32B(x)	(0x1UL << (2*(x)))
 #define CFGCHIP0_EDMA30TCxDBS_64B(x)	(0x2UL << (2*(x)))
-
+	vuint32_t	CFGCHIP0;
+	vuint32_t	CFGCHIP1;
+	vuint32_t	CFGCHIP2;
 #define CFGCHIP3_RMII_SEL_MASK		(0x1UL << 8)
 #define CFGCHIP3_RMII_SEL_mii		(0x0UL << 8)
 #define CFGCHIP3_RMII_SEL_rmii		(0x1UL << 8)
@@ -426,11 +428,11 @@ typedef struct {
 #define CFGCHIP3_EMA_CLKSRC_MASK	(0x1UL << 1)
 #define CFGCHIP3_EMA_CLKSRC_sysclk3	(0x0UL << 1)
 #define CFGCHIP3_EMA_CLKSRC_pll_out	(0x1UL << 1)
-
+	vuint32_t	CFGCHIP3;
 #define CFGCHIP4_AMUTECLR0_MASK		(0x1UL << 0)
 #define CFGCHIP4_AMUTECLR0_none		(0x0UL << 0)
 #define CFGCHIP4_AMUTECLR0_clr_int	(0x1UL << 0)
-	vuint32_t	CFGCHIPx[5];
+	vuint32_t	CFGCHIP4;
 } SYSCFG0_con_t;
 
 typedef struct {

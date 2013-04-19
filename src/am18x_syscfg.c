@@ -21,8 +21,8 @@ am18x_rt syscfg_kick(am18x_bool lock) {
 am18x_rt syscfg_pll(am18x_bool lock) {
 	uint32_t cfg0, cfg3, msk;
 
-	cfg0 = SYSCFG0->CFGCHIPx[0];
-	cfg3 = SYSCFG0->CFGCHIPx[3];
+	cfg0 = SYSCFG0->CFGCHIP0;
+	cfg3 = SYSCFG0->CFGCHIP3;
 	if (lock) {
 		msk = CFGCHIP0_PLL_MASTER_LOCK_MASK;
 		cfg0 = FIELD_SET(cfg0, msk, CFGCHIP0_PLL_MASTER_LOCK_yes);
@@ -35,8 +35,8 @@ am18x_rt syscfg_pll(am18x_bool lock) {
 		cfg3 = FIELD_SET(cfg3, msk, CFGCHIP3_PLL1_MASTER_LOCK_no);
 	}
 
-	SYSCFG0->CFGCHIPx[0] = cfg0;
-	SYSCFG0->CFGCHIPx[3] = cfg3;
+	SYSCFG0->CFGCHIP0 = cfg0;
+	SYSCFG0->CFGCHIP3 = cfg3;
 
 	return AM18X_TRUE;
 }
