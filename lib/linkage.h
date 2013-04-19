@@ -2,6 +2,7 @@
 #define __LINKAGE_H__
 
 #define __LINUX_ARM_ARCH__	5
+#define CONFIG_AEABI		1
 #define ENTRY(x)		\
 	.GLOBAL	x;		\
 	.BALIGN	4;		\
