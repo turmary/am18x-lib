@@ -1,8 +1,15 @@
 // tary, 0:22 2012/12/22
 #include "am18x_uart.h"
+#include "am18x_pll.h"
 
 uint32_t uart_input_clock_frequency(UART_con_t* ucon) {
-	return f_osc / 2UL;
+	if (ucon == UART0) {
+		return dev_get_freq(DCLK_ID_UART0);
+	}
+	if (ucon == UART1) {
+		return dev_get_freq(DCLK_ID_UART1);
+	}
+	return dev_get_freq(DCLK_ID_UART2);
 }
 
 static inline uint32_t uart_get_divisor(UART_con_t* ucon, uint32_t baud_rate) {

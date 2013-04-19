@@ -15,6 +15,7 @@ int low_level_init(void) {
 
 	isr_init();
 
+	clk_node_init();
 	uart_init();
 
 	if (AM18X_OK != (r = systick_init(SYSTICK_PERIOD))) {

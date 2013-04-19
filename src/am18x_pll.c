@@ -390,6 +390,7 @@ uint32_t do_change_OCSEL1_OCSRC (uint32_t parent) {
 #define cfdc(name)	calc_freq_##name, do_change_##name
 #define CFMUX		CN_FLAG_MUX
 #define REREAD		CN_FLAG_REREAD
+#define CFDC_VALID(flg)	((flg) & (CN_FLAG_MUX | CN_FLAG_REREAD))
 #define RECALC		CN_FLAG_RECALC
 
 clk_node_t clk_nodes[] = {
@@ -428,9 +429,24 @@ clk_node_t clk_nodes[] = {
 	{ cnm(OSCIN),	     cm(INVALID),          0, 0, 0, },
 };
 
+am18x_rt clk_node_init(void) {
+	int i;
+
+	for (i = 0; i < countof(clk_nodes); i++) {
+		clk_node_t* cni = clk_nodes + i;
+
+		cni->name += get_exec_base();
+		*(uint32_t*)&cni->calc_freq += get_exec_base();
+		*(uint32_t*)&cni->do_change += get_exec_base();
+		cni->flag |= CN_FLAG_RECALC;
+	}
+	return AM18X_TRUE;
+}
+
 static uint32_t clk_node_calc_freq_inner(uint32_t id) {
 	uint32_t freq;
 	clk_node_t* cni = clk_nodes + id;
+
 	#if 0
 	printk("%d ", id);
 	#endif
@@ -441,59 +457,137 @@ static uint32_t clk_node_calc_freq_inner(uint32_t id) {
 	if (id == CLK_NODE_OSCIN) {
 		return F_OSCIN;
 	}
-	if (cni->flag != 0) {
+	if ((cni->flag & CN_FLAG_RECALC) == 0) {
+		return cni->freq;
+	}
+
+	if (CFDC_VALID(cni->flag)) {
 		(cni->calc_freq)(0);
 	}
+	
 	freq = clk_node_calc_freq_inner(cni->parent);
 	if ((cni->flag & CN_FLAG_MUX) == 0) {
 		if (cni->multiplier != 0) freq *= cni->multiplier;
 		if (cni->divider != 0) freq /= cni->divider;
 	}
+
+	if (cni->flag & CN_FLAG_RECALC) {
+		cni->flag &= ~CN_FLAG_RECALC;
+		cni->freq = freq;
+	}
 	return freq;
 }
 
-am18x_rt clk_node_calc_freq(uint32_t id, uint32_t* pf) {
+am18x_rt clk_node_recalc_freq(void) {
+	int i;
+
+	for (i = CLK_NODE_INVALID + 1; i < CLK_NODE_CNT; i++) {
+		clk_node_t* cni = clk_nodes + i;
+		cni->flag |= CN_FLAG_RECALC;
+	}
+	for (i = CLK_NODE_INVALID + 1; i < CLK_NODE_CNT; i++) {
+		clk_node_calc_freq_inner(i);
+	}
+	return AM18X_TRUE;
+}
+
+uint32_t clk_node_get_freq(uint32_t id) {
 	uint32_t freq;
 
 	freq = clk_node_calc_freq_inner(id);
-	#if 0
-	printk("\n");
-	#endif
 
-	if (pf) {
-		*pf = freq;
-	}
-	return AM18X_TRUE;
-}
-
-am18x_rt clk_node_init(void) {
-	int i;
-
-	for (i = 0; i < countof(clk_nodes); i++) {
-		clk_nodes[i].name += get_exec_base();
-		*(uint32_t*)&clk_nodes[i].calc_freq += get_exec_base();
-		*(uint32_t*)&clk_nodes[i].do_change += get_exec_base();
-	}
-	return AM18X_TRUE;
+	return freq;
 }
 
 am18x_rt clk_node_output(void) {
+	#define ONE_MEGA	1000000
 	int i;
 
-#define ONE_MEGA	1000000
-	for (i = CLK_NODE_INVALID + 1; i < CLK_NODE_CNT; i++) {
-		uint32_t f[1];
-		clk_node_calc_freq(i, f);
-		printk("[%12s] = ", clk_nodes[i].name);
-		if (*f % ONE_MEGA == 0) {
-			printk("%10dMhz\n", *f / ONE_MEGA);
-		} else {
-			uint32_t frac, integ;
+	clk_node_recalc_freq();
 
-			frac = *f % ONE_MEGA / 1000;
-			integ = *f / ONE_MEGA;
-			printk("%6d.%3dMhz\n", integ, frac);
+	for (i = CLK_NODE_INVALID + 1; i < CLK_NODE_CNT; i++) {
+		uint32_t f = clk_node_get_freq(i);
+
+		printk("[%12s] = ", clk_nodes[i].name);
+		if (f % ONE_MEGA == 0) {
+			printk("%10dMhz\n", f / ONE_MEGA);
+		} else {
+			uint32_t frac = f % ONE_MEGA / 1000;
+			printk("%6d.%3dMhz\n", f / ONE_MEGA, frac);
 		}
 	}
 	return AM18X_TRUE;
+}
+
+static uint32_t clk_node_tree_innner(uint32_t id, int level) {
+	#define LINE_SIZE	1024
+	#define LINE_UNIT	14
+	static char line0[LINE_SIZE];
+	static char line1[LINE_SIZE];
+	uint32_t freq;
+	int i, found = 0;
+
+	freq = clk_node_get_freq(id);
+
+	sprintf(line0 + LINE_UNIT * level, "[%12s]", clk_nodes[id].name);
+	sprintf(line1 + LINE_UNIT * level, "    %4dMhz   ", freq / ONE_MEGA);
+
+	for (i = CLK_NODE_INVALID + 1; i < CLK_NODE_CNT; i++) {
+		if (clk_nodes[i].parent == id) {
+			clk_node_tree_innner(i, level + 1);
+			found = 1;
+		}
+	}
+
+	if (found) {
+		return 0;
+	}
+
+	for (i = level; i >= 0; i--) {
+		if (line0[i * LINE_UNIT] != '[') {
+			break;
+		}
+	}
+	if (i >= 0) {
+		int j = i * LINE_UNIT + LINE_UNIT / 2 + 1;
+
+		line0[j++] = '|';
+		for (; j < (i + 1) * LINE_UNIT; j++) {
+			line0[j] = '_';
+		}
+	}
+	printk("%s\n", line0);
+	printk("%s\n", line1);
+
+	for (i = 0; i < level * LINE_UNIT; i++) {
+		line0[i] = line1[i] = ' ';
+	}
+	return 0;
+}
+
+am18x_rt clk_node_tree(void) {
+	clk_node_recalc_freq();
+	clk_node_tree_innner(CLK_NODE_OSCIN, 0);
+	return AM18X_TRUE;
+}
+
+am18x_rt clk_node_change_parent(uint32_t id, uint32_t parent) {
+	clk_node_t* cni = clk_nodes + id;
+
+	if (CFDC_VALID(cni->flag) == 0) {
+		return AM18X_FALSE;
+	}
+
+	cni->parent = parent;
+	(cni->do_change)(0);
+
+	cni->flag |= CN_FLAG_RECALC;
+	clk_node_calc_freq_inner(id);
+	return AM18X_TRUE;
+}
+
+uint32_t dev_get_freq(uint32_t dclk_id) {
+	uint32_t cn_id = dclk_id / DCLK_ID_GRP_SZ;
+
+	return clk_node_get_freq(cn_id);
 }

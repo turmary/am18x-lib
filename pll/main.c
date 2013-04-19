@@ -8,7 +8,7 @@
 uint32_t f_osc = F_OSCIN;
 const int32_t delay_count = 284 * 1000;
 
-static const pll_conf_t pllconf[1] = {
+static pll_conf_t pllconf[1] = {
 {
 	.pllm = 30,
 	.prediv = 1,
@@ -43,8 +43,7 @@ int main(int argc, char* argv[]) {
 	printk("Reset by %s\n", reset_sources[reset].val);
 
 	pll_conf(PLL0, pllconf);
-	f_osc = F_OSCIN * pllconf->pllm / (pllconf->prediv * pllconf->postdiv);
-
+	clk_node_recalc_freq();
 	uart_init();
 
 	arm_intr_enable();
@@ -56,8 +55,23 @@ int main(int argc, char* argv[]) {
 	printk("delay start: %d ms\n", start_minutes);
 	printk("delay stop : %d ms\n", stop_minutes);
 
-	clk_node_init();
 	clk_node_output();
+
+	printk("\n\n");
+	clk_node_tree();
+
+	printk("\n\n");
+	pllconf->pllm = 12;
+	pll_conf(PLL1, pllconf);
+	clk_node_tree();
+
+	clk_node_change_parent(CLK_NODE_DIV4_5X, CLK_NODE_DIV4_5);
+	clk_node_change_parent(CLK_NODE_PLL1_OBSCLK, CLK_NODE_OSCDIV1);
+	// clk_node_change_parent(CLK_NODE_ASYNC3, CLK_NODE_PLL1_SYSCLK2);
+	uart_init();
+	clk_node_change_parent(CLK_NODE_EMA_CLKSRC, CLK_NODE_DIV4_5X);
+	printk("\n\n");
+	clk_node_tree();
 
 	// pll_cmd(PLL0, PLL_CMD_SOFT_RESET, 0);
 
