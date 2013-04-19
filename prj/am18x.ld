@@ -17,7 +17,7 @@ SECTIONS {
 		*(.rodata .rodata.*);
 		. = ALIGN(0x10);
 
-		*(.data.rel.*);
+		*(.data.rel .data.rel.*);
 		. = ALIGN(0x10);
 
 		PROVIDE(__got_start = .);
