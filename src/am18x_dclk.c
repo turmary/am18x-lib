@@ -3,7 +3,7 @@
 #include "am18x_pll.h"
 #include "auxlib.h"
 
-extern clk_node_t clk_nodes[];
+static clk_node_t clk_nodes[];
 
 #define cfdc_pllx_sysclk_1_3(pll_nr, s_nr)					\
 static uint32_t calc_freq_PLL##pll_nr##_SYSCLK##s_nr (uint32_t parent) {	\
@@ -304,7 +304,7 @@ uint32_t do_change_OCSEL1_OCSRC (uint32_t parent) {
 #define CFDC_VALID(flg)	((flg) & (CN_FLAG_MUX | CN_FLAG_REREAD))
 #define RECALC		CN_FLAG_RECALC
 
-clk_node_t clk_nodes[] = {
+static clk_node_t clk_nodes[] = {
 	// ID                  PARENT,       FLAG, MULT, DIV, CALC_FREQ, DO_CHANGE, PARENT_LIST
 	{ 0, 0, },
 	{ cnm(PLL0_SYSCLK1), cm(PLL0_PLLEN),  REREAD, 0, 1, cfdc(PLL0_SYSCLK1), },

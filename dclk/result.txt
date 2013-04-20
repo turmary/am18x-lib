@@ -1,0 +1,175 @@
+am18x library for dclk!
+tary, compiled date : Apr 21 2013 00:38:10
+[PLL0_SYSCLK1] =         24Mhz
+[PLL0_SYSCLK2] =         12Mhz
+[PLL0_SYSCLK3] =          8Mhz
+[PLL0_SYSCLK4] =          6Mhz
+[PLL0_SYSCLK5] =          8Mhz
+[PLL0_SYSCLK6] =         24Mhz
+[PLL0_SYSCLK7] =          4Mhz
+[  EMA_CLKSRC] =          8Mhz
+[ PLL0_AUXCLK] =         24Mhz
+[ PLL0_OBSCLK] =         24Mhz
+[PLL1_SYSCLK1] =          0Mhz
+[PLL1_SYSCLK2] =          0Mhz
+[PLL1_SYSCLK3] =          0Mhz
+[ PLL1_OBSCLK] =          0Mhz
+[      ASYNC3] =         12Mhz
+[  PLL0_PLLEN] =         24Mhz
+[  PLL_EXTSRC] =         24Mhz
+[    POSTDIV0] =        240Mhz
+[       PLLM0] =        480Mhz
+[     PREDIV0] =         24Mhz
+[ PLL_CLKMODE] =         24Mhz
+[     DIV4_5X] =          0Mhz
+[      DIV4_5] =    106.666Mhz
+[     OSCDIV0] =         24Mhz
+[OCSEL0_OCSRC] =         24Mhz
+[  PLL1_PLLEN] =         24Mhz
+[    POSTDIV1] =        240Mhz
+[       PLLM1] =        480Mhz
+[     OSCDIV1] =          0Mhz
+[OCSEL1_OCSRC] =         24Mhz
+[       OSCIN] =         24Mhz
+
+
+[PLL1_SYSCLK1]
+       0Mhz   
+[PLL1_SYSCLK2]
+       0Mhz   
+[PLL1_SYSCLK3]
+       0Mhz   
+[ PLL1_OBSCLK]
+       0Mhz   
+[     DIV4_5X]
+       0Mhz   
+[     OSCDIV1]
+       0Mhz   
+[       OSCIN][ PLL_CLKMODE][ PLL0_AUXCLK]
+      24Mhz         24Mhz         24Mhz   
+                      |_____[  PLL_EXTSRC][  PLL0_PLLEN][PLL0_SYSCLK1]
+                                  24Mhz         24Mhz         24Mhz   
+                                                  |_____[PLL0_SYSCLK2][      ASYNC3]
+                                                              12Mhz         12Mhz   
+                                                  |_____[PLL0_SYSCLK3][  EMA_CLKSRC]
+                                                               8Mhz          8Mhz   
+                                                  |_____[PLL0_SYSCLK4]
+                                                               6Mhz   
+                                                  |_____[PLL0_SYSCLK5]
+                                                               8Mhz   
+                                                  |_____[PLL0_SYSCLK6]
+                                                              24Mhz   
+                                                  |_____[PLL0_SYSCLK7]
+                                                               4Mhz   
+                      |_____[     PREDIV0][       PLLM0][    POSTDIV0]
+                                  24Mhz        480Mhz        240Mhz   
+                                                  |_____[      DIV4_5]
+                                                             106Mhz   
+                      |_____[OCSEL0_OCSRC][     OSCDIV0][ PLL0_OBSCLK]
+                                  24Mhz         24Mhz         24Mhz   
+                      |_____[  PLL1_PLLEN]
+                                  24Mhz   
+                      |_____[       PLLM1][    POSTDIV1]
+                                 480Mhz        240Mhz   
+                      |_____[OCSEL1_OCSRC]
+                                  24Mhz   
+
+
+[ PLL1_OBSCLK]
+       0Mhz   
+[     DIV4_5X]
+       0Mhz   
+[     OSCDIV1]
+       0Mhz   
+[       OSCIN][ PLL_CLKMODE][ PLL0_AUXCLK]
+      24Mhz         24Mhz         24Mhz   
+                      |_____[  PLL_EXTSRC][  PLL0_PLLEN][PLL0_SYSCLK1]
+                                  24Mhz         24Mhz         24Mhz   
+                                                  |_____[PLL0_SYSCLK2][      ASYNC3]
+                                                              12Mhz         12Mhz   
+                                                  |_____[PLL0_SYSCLK3][  EMA_CLKSRC]
+                                                               8Mhz          8Mhz   
+                                                  |_____[PLL0_SYSCLK4]
+                                                               6Mhz   
+                                                  |_____[PLL0_SYSCLK5]
+                                                               8Mhz   
+                                                  |_____[PLL0_SYSCLK6]
+                                                              24Mhz   
+                                                  |_____[PLL0_SYSCLK7]
+                                                               4Mhz   
+                      |_____[     PREDIV0][       PLLM0][    POSTDIV0]
+                                  24Mhz        480Mhz        240Mhz   
+                                                  |_____[      DIV4_5]
+                                                             106Mhz   
+                      |_____[OCSEL0_OCSRC][     OSCDIV0][ PLL0_OBSCLK]
+                                  24Mhz         24Mhz         24Mhz   
+                      |_____[       PLLM1][    POSTDIV1][  PLL1_PLLEN][PLL1_SYSCLK1]
+                                 168Mhz         84Mhz         84Mhz         84Mhz   
+                                                                |_____[PLL1_SYSCLK2]
+                                                                            42Mhz   
+                                                                |_____[PLL1_SYSCLK3]
+                                                                            28Mhz   
+                      |_____[OCSEL1_OCSRC]
+                                  24Mhz   
+
+
+[ PLL1_OBSCLK][OCSEL0_OCSRC][     OSCDIV0][ PLL0_OBSCLK]
+       0Mhz          0Mhz          0Mhz          0Mhz   
+[     DIV4_5X][  EMA_CLKSRC]
+       0Mhz          0Mhz   
+[     OSCDIV1]
+       0Mhz   
+[       OSCIN][ PLL_CLKMODE][ PLL0_AUXCLK]
+      24Mhz         24Mhz         24Mhz   
+                      |_____[     PREDIV0][       PLLM0][    POSTDIV0][  PLL0_PLLEN][PLL0_SYSCLK1]
+                                  24Mhz        600Mhz        300Mhz        300Mhz        300Mhz   
+                                                                              |_____[PLL0_SYSCLK2][      ASYNC3]
+                                                                                         150Mhz        150Mhz   
+                                                                              |_____[PLL0_SYSCLK3]
+                                                                                         100Mhz   
+                                                                              |_____[PLL0_SYSCLK4]
+                                                                                          75Mhz   
+                                                                              |_____[PLL0_SYSCLK5]
+                                                                                         100Mhz   
+                                                                              |_____[PLL0_SYSCLK6]
+                                                                                         300Mhz   
+                                                                              |_____[PLL0_SYSCLK7]
+                                                                                          50Mhz   
+                                                  |_____[      DIV4_5]
+                                                             133Mhz   
+                      |_____[       PLLM1][    POSTDIV1][  PLL1_PLLEN][PLL1_SYSCLK1]
+                                 168Mhz         84Mhz         84Mhz         84Mhz   
+                                                                |_____[PLL1_SYSCLK2]
+                                                                            42Mhz   
+                                                                |_____[PLL1_SYSCLK3][  PLL_EXTSRC]
+                                                                            28Mhz         28Mhz   
+                      |_____[OCSEL1_OCSRC]
+                                  24Mhz   
+
+
+[       OSCIN][ PLL_CLKMODE][ PLL0_AUXCLK]
+      24Mhz         24Mhz         24Mhz   
+                      |_____[     PREDIV0][       PLLM0][    POSTDIV0][  PLL0_PLLEN][PLL0_SYSCLK1]
+                                  24Mhz        600Mhz        300Mhz        300Mhz        300Mhz   
+                                                                              |_____[PLL0_SYSCLK2]
+                                                                                         150Mhz   
+                                                                              |_____[PLL0_SYSCLK3]
+                                                                                         100Mhz   
+                                                                              |_____[PLL0_SYSCLK4]
+                                                                                          75Mhz   
+                                                                              |_____[PLL0_SYSCLK5]
+                                                                                         100Mhz   
+                                                                              |_____[PLL0_SYSCLK6]
+                                                                                         300Mhz   
+                                                                              |_____[PLL0_SYSCLK7]
+                                                                                          50Mhz   
+                                                  |_____[      DIV4_5][     DIV4_5X][  EMA_CLKSRC]
+                                                             133Mhz        133Mhz        133Mhz   
+                      |_____[       PLLM1][    POSTDIV1][  PLL1_PLLEN][PLL1_SYSCLK1]
+                                 168Mhz         84Mhz         84Mhz         84Mhz   
+                                                                |_____[PLL1_SYSCLK2][      ASYNC3]
+                                                                            42Mhz         42Mhz   
+                                                                |_____[PLL1_SYSCLK3][  PLL_EXTSRC]
+                                                                            28Mhz         28Mhz   
+                      |_____[OCSEL1_OCSRC][     OSCDIV1][ PLL1_OBSCLK][OCSEL0_OCSRC][     OSCDIV0][ PLL0_OBSCLK]
+                                  24Mhz         24Mhz         24Mhz         24Mhz         24Mhz         24Mhz   
