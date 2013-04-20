@@ -57,6 +57,8 @@ int main(int argc, char* argv[]) {
 	pllconf->pllm = 25;
 	pll_conf(PLL0, pllconf);
 	clk_node_change_parent(CLK_NODE_PLL0_PLLEN, CLK_NODE_PLL_EXTSRC);
+	clk_node_change_parent(CLK_NODE_EMA_CLKSRC, CLK_NODE_DIV4_5X);
+	clk_node_change_parent(CLK_NODE_OCSEL0_OCSRC, CLK_NODE_PLL1_OBSCLK);
 	clk_node_recalc_freq();
 	uart_init();
 	// ********** tree 3 **********
@@ -78,7 +80,6 @@ int main(int argc, char* argv[]) {
 	clk_node_change_parent(CLK_NODE_PLL1_OBSCLK, CLK_NODE_OSCDIV1);
 	clk_node_change_parent(CLK_NODE_ASYNC3, CLK_NODE_PLL1_SYSCLK2);
 	uart_init();
-	clk_node_change_parent(CLK_NODE_EMA_CLKSRC, CLK_NODE_DIV4_5X);
 	// ********** tree 4 **********
 	printk("\n\n");
 	clk_node_tree();
