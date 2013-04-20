@@ -39,15 +39,10 @@ int main(int argc, char* argv[]) {
 	clk_node_tree();
 
 	pllconf->pllm = 25;
-	#if 0
-	pll_conf(PLL0, pllconf);
 	// important setting
-	pll_cmd(PLL1, PLL_CMD_ENABLE_PLL1_DIVS, 0);
-	#else
-	// important setting
-	pll_cmd(PLL1, PLL_CMD_ENABLE_PLL1_DIVS, 0);
+	// pll_cmd(PLL1, PLL_CMD_ENABLE_PLL1_DIVS, 0);
 	pll_conf(PLL0, pllconf);
-	#endif
+
 	// clk_node_set_parent(CLK_NODE_PLL0_PLLEN, CLK_NODE_PLL_EXTSRC);
 	clk_node_set_parent(CLK_NODE_EMA_CLKSRC, CLK_NODE_DIV4_5X);
 	clk_node_set_parent(CLK_NODE_OCSEL0_OCSRC, CLK_NODE_PLL1_OBSCLK);

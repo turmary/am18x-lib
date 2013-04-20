@@ -14,10 +14,12 @@ am18x_rt pll_changing_sysclk_dividers(PLL_con_t* pcon, uint32_t plldivn, uint32_
 	if (plldivn < 4) {
 		idx = PLLDIVxA_IDX_1 + plldivn - 1;
 		reg = pcon->PLLDIVxA[idx];
+		reg = FIELD_SET(reg, XXXDIVx_DxEN_MASK, XXXDIVx_DxEN_enable);
 		pcon->PLLDIVxA[idx] = FIELD_SET(reg, msk, XXXDIVx_RATIO_WR(divider));
 	} else if (plldivn < 8) {
 		idx = PLLDIVxB_IDX_4 + plldivn - 4;
 		reg = pcon->PLLDIVxB[idx];
+		reg = FIELD_SET(reg, XXXDIVx_DxEN_MASK, XXXDIVx_DxEN_enable);
 		pcon->PLLDIVxB[idx] = FIELD_SET(reg, msk, XXXDIVx_RATIO_WR(divider));
 	}
 
