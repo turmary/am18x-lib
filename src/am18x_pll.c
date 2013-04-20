@@ -28,7 +28,7 @@ am18x_rt pll_changing_sysclk_dividers(PLL_con_t* pcon, uint32_t plldivn, uint32_
 	// 4. Wait for the GOSTAT bit in PLLSTAT to clear to 0
 	while (FIELD_GET(pcon->PLLSTAT, PLLSTAT_GOSTAT_MASK) != PLLSTAT_GOSTAT_done);
 
-	return AM18X_TRUE;
+	return AM18X_OK;
 }
 
 am18x_rt pll_conf(PLL_con_t* pcon, const pll_conf_t* conf) {
@@ -114,10 +114,13 @@ am18x_rt pll_conf(PLL_con_t* pcon, const pll_conf_t* conf) {
 	msk = PLLCTL_PLLEN_MASK;
 	pcon->PLLCTL = FIELD_SET(pcon->PLLCTL, msk, PLLCTL_PLLEN_yes);
 	
-	return AM18X_TRUE;
+	return AM18X_OK;
 }
 
 am18x_rt pll_cmd(PLL_con_t* pcon, uint32_t cmd, uint32_t arg) {
+	uint32_t reg, msk;
+	int i;
+
 	switch (cmd) {
 	case PLL_CMD_SOFT_RESET:
 		if (pcon != PLL0) break;
@@ -126,11 +129,21 @@ am18x_rt pll_cmd(PLL_con_t* pcon, uint32_t cmd, uint32_t arg) {
 		pcon->RSCTRL = FIELD_SET(0, RSCTRL_SWRST_MASK, RSCTRL_SWRST_yes);
 		break;
 
+	case PLL_CMD_ENABLE_PLL1_DIVS:
+		if (pcon != PLL1) break;
+		msk = XXXDIVx_DxEN_MASK;
+		for (i = 0; i < 3; i++) {
+			int idx = PLLDIVxA_IDX_1 + i;
+			reg = pcon->PLLDIVxA[idx];
+			pcon->PLLDIVxA[idx] = FIELD_SET(reg, msk, XXXDIVx_DxEN_enable);
+		}
+		break;
+
 	default:
 		break;
 	}
 	
-	return AM18X_TRUE;
+	return AM18X_OK;
 }
 
 pll_reset_t pll_get_reset(void) {
@@ -432,6 +445,8 @@ clk_node_t clk_nodes[] = {
 am18x_rt clk_node_init(void) {
 	int i;
 
+	pll_cmd(PLL1, PLL_CMD_ENABLE_PLL1_DIVS, 0);
+
 	for (i = 0; i < countof(clk_nodes); i++) {
 		clk_node_t* cni = clk_nodes + i;
 
@@ -440,7 +455,7 @@ am18x_rt clk_node_init(void) {
 		*(uint32_t*)&cni->do_change += get_exec_base();
 		cni->flag |= CN_FLAG_RECALC;
 	}
-	return AM18X_TRUE;
+	return AM18X_OK;
 }
 
 static uint32_t clk_node_calc_freq_inner(uint32_t id) {
@@ -484,11 +499,12 @@ am18x_rt clk_node_recalc_freq(void) {
 	for (i = CLK_NODE_INVALID + 1; i < CLK_NODE_CNT; i++) {
 		clk_node_t* cni = clk_nodes + i;
 		cni->flag |= CN_FLAG_RECALC;
+		cni->flag &= ~CN_FLAG_VISITED;
 	}
 	for (i = CLK_NODE_INVALID + 1; i < CLK_NODE_CNT; i++) {
 		clk_node_calc_freq_inner(i);
 	}
-	return AM18X_TRUE;
+	return AM18X_OK;
 }
 
 uint32_t clk_node_get_freq(uint32_t id) {
@@ -516,7 +532,7 @@ am18x_rt clk_node_output(void) {
 			printk("%6d.%3dMhz\n", f / ONE_MEGA, frac);
 		}
 	}
-	return AM18X_TRUE;
+	return AM18X_OK;
 }
 
 static uint32_t clk_node_tree_innner(uint32_t id, int level) {
@@ -525,7 +541,8 @@ static uint32_t clk_node_tree_innner(uint32_t id, int level) {
 	static char line0[LINE_SIZE];
 	static char line1[LINE_SIZE];
 	uint32_t freq;
-	int i, found = 0;
+	am18x_bool found = AM18X_FALSE;
+	int i;
 
 	freq = clk_node_get_freq(id);
 
@@ -535,7 +552,7 @@ static uint32_t clk_node_tree_innner(uint32_t id, int level) {
 	for (i = CLK_NODE_INVALID + 1; i < CLK_NODE_CNT; i++) {
 		if (clk_nodes[i].parent == id) {
 			clk_node_tree_innner(i, level + 1);
-			found = 1;
+			found = AM18X_TRUE;
 		}
 	}
 
@@ -566,9 +583,35 @@ static uint32_t clk_node_tree_innner(uint32_t id, int level) {
 }
 
 am18x_rt clk_node_tree(void) {
+	int i;
+
 	clk_node_recalc_freq();
-	clk_node_tree_innner(CLK_NODE_OSCIN, 0);
-	return AM18X_TRUE;
+
+	for (i = CLK_NODE_INVALID + 1; i < CLK_NODE_CNT; i++) {
+		clk_node_t* cni = clk_nodes + i;
+
+		if (cni->parent != CLK_NODE_INVALID) {
+			continue;
+		}
+		clk_node_tree_innner(i, 0);
+	}
+	return AM18X_OK;
+}
+
+static am18x_bool clk_node_change_parent_inner(uint32_t id) {
+	am18x_bool found = AM18X_FALSE;
+	int i;
+
+	clk_nodes[id].flag |= CN_FLAG_RECALC;
+
+	for (i = CLK_NODE_INVALID + 1; i < CLK_NODE_CNT; i++) {
+		if (clk_nodes[i].parent == id) {
+			clk_node_change_parent_inner(i);
+			found = AM18X_TRUE;
+		}
+	}
+
+	return found;
 }
 
 am18x_rt clk_node_change_parent(uint32_t id, uint32_t parent) {
@@ -581,9 +624,9 @@ am18x_rt clk_node_change_parent(uint32_t id, uint32_t parent) {
 	cni->parent = parent;
 	(cni->do_change)(0);
 
-	cni->flag |= CN_FLAG_RECALC;
+	clk_node_change_parent_inner(id);
 	clk_node_calc_freq_inner(id);
-	return AM18X_TRUE;
+	return AM18X_OK;
 }
 
 uint32_t dev_get_freq(uint32_t dclk_id) {

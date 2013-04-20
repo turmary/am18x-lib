@@ -61,6 +61,7 @@ typedef struct {
 #define CN_FLAG_MUX			0x00000004UL
 #define CN_FLAG_REREAD			0x00000008UL
 #define CN_FLAG_RECALC			0x00000010UL
+#define CN_FLAG_VISITED			0x00000020UL
 	uint32_t	flag;
 	uint32_t	multiplier;
 	uint32_t	divider;
@@ -144,6 +145,7 @@ typedef enum {
 
 typedef enum {
 	PLL_CMD_SOFT_RESET,
+	PLL_CMD_ENABLE_PLL1_DIVS,
 } pll_cmd_t;
 
 typedef enum {

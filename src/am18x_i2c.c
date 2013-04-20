@@ -73,7 +73,7 @@ am18x_rt i2c_set_serial_clock(I2C_con_t* icon, uint32_t freq) {
 
 	// icon->ICMDR = FIELD_SET(icon->ICMDR, msk, ICMDR_IRS_none);
 
-	return AM18X_TRUE;
+	return AM18X_OK;
 }
 
 am18x_rt i2c_conf(I2C_con_t* icon, i2c_conf_t* conf) {
@@ -171,7 +171,7 @@ am18x_rt i2c_conf(I2C_con_t* icon, i2c_conf_t* conf) {
 	reg = icon->ICMDR;
 	icon->ICMDR = FIELD_SET(reg, ICMDR_FREE_MASK, ICMDR_FREE_run);
 
-	return AM18X_TRUE;
+	return AM18X_OK;
 }
 
 am18x_rt i2c_cmd(I2C_con_t* icon, uint32_t cmd, uint32_t arg) {
@@ -267,5 +267,5 @@ am18x_rt i2c_cmd(I2C_con_t* icon, uint32_t cmd, uint32_t arg) {
 	default:
 		break;
 	}
-	return AM18X_TRUE;
+	return AM18X_OK;
 }

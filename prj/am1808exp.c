@@ -13,6 +13,8 @@ int low_level_init(void) {
 
 	// output_a_char('S');
 
+	syscfg_kick(AM18X_FALSE);
+
 	isr_init();
 
 	clk_node_init();

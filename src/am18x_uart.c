@@ -43,6 +43,10 @@ am18x_rt uart_set_conf(UART_con_t* ucon, const uart_conf_t* conf) {
 	assert(conf);
 	assert(conf->baudrate);
 
+	msk = PWREMU_UTRST_MASK | PWREMU_URRST_MASK;
+	v = PWREMU_UTRST_reset | PWREMU_URRST_reset;
+	ucon->PWREMU_MGMT = FIELD_SET(ucon->PWREMU_MGMT, msk, v);
+
 	// 2. Set the desired baud rate by writing the appropriate
 	// clock divisor values to the divisor latch registers
 	ucon->MDR = FIELD_SET(ucon->MDR, MDR_OSM_SEL_MASK, MDR_OSM_SEL_13x);
@@ -110,7 +114,7 @@ am18x_rt uart_set_conf(UART_con_t* ucon, const uart_conf_t* conf) {
 	// by configuring the FREE bit and enable the UART
 	// by setting the UTRST and URRST bits in the power and emulation
 	// management register
-	msk = PWREMU_UTRST_MASK | PWREMU_URRST_MASK;// | PWREMU_FREE_MASK;
+	msk = PWREMU_UTRST_MASK | PWREMU_URRST_MASK;
 	v = PWREMU_UTRST_enabled | PWREMU_URRST_enabled;// | PWREMU_FREE_run;
 	ucon->PWREMU_MGMT = FIELD_SET(ucon->PWREMU_MGMT, msk, v);
 

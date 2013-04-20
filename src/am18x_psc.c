@@ -48,7 +48,7 @@ am18x_rt psc_state_transition(psc_module_t module, psc_state_t state) {
 
 	// while (__field_xget(psc->MDSTATx[nr], MDSTATx_STATE_MASK) != val);
 
-	return AM18X_TRUE;
+	return AM18X_OK;
 }
 
 psc_state_t psc_get_state(psc_module_t module) {

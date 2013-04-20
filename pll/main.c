@@ -16,7 +16,8 @@ static pll_conf_t pllconf[1] = {
 	.plldiv = { 1, 2, 3, 4, 3, 1, 6, },
 	.cflag = PLL_CFLAG_EXT_CLK_OSCIN |
 		PLL_CFLAG_REF_CRYSTAL    |
-		PLL_CFLAG_FROM_POWER_DOWN,
+		PLL_CFLAG_FROM_POWER_DOWN|
+		PLL_CFLAG_EXT_CLK_PLL1,
 }
 };
 
@@ -42,9 +43,25 @@ int main(int argc, char* argv[]) {
 	printk("RSTYPE = 0x%.8X\n", PLL0->RSTYPE);
 	printk("Reset by %s\n", reset_sources[reset].val);
 
+	// ********** tree 1 **********
+	printk("\n\n");
+	clk_node_tree();
+
+	pllconf->pllm = 7;
+	pll_conf(PLL1, pllconf);
+	clk_node_recalc_freq();
+	// ********** tree 2 **********
+	printk("\n\n");
+	clk_node_tree();
+
+	pllconf->pllm = 25;
 	pll_conf(PLL0, pllconf);
+	clk_node_change_parent(CLK_NODE_PLL0_PLLEN, CLK_NODE_PLL_EXTSRC);
 	clk_node_recalc_freq();
 	uart_init();
+	// ********** tree 3 **********
+	printk("\n\n");
+	clk_node_tree();
 
 	arm_intr_enable();
 	systick_start();
@@ -57,19 +74,12 @@ int main(int argc, char* argv[]) {
 
 	clk_node_output();
 
-	printk("\n\n");
-	clk_node_tree();
-
-	printk("\n\n");
-	pllconf->pllm = 12;
-	pll_conf(PLL1, pllconf);
-	clk_node_tree();
-
 	clk_node_change_parent(CLK_NODE_DIV4_5X, CLK_NODE_DIV4_5);
 	clk_node_change_parent(CLK_NODE_PLL1_OBSCLK, CLK_NODE_OSCDIV1);
-	// clk_node_change_parent(CLK_NODE_ASYNC3, CLK_NODE_PLL1_SYSCLK2);
+	clk_node_change_parent(CLK_NODE_ASYNC3, CLK_NODE_PLL1_SYSCLK2);
 	uart_init();
 	clk_node_change_parent(CLK_NODE_EMA_CLKSRC, CLK_NODE_DIV4_5X);
+	// ********** tree 4 **********
 	printk("\n\n");
 	clk_node_tree();
 
