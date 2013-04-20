@@ -13,9 +13,9 @@ static uint32_t calc_freq_PLL##pll_nr##_SYSCLK##s_nr (uint32_t parent) {	\
 										\
 	if (FIELD_GET(reg, msk) == XXXDIVx_DxEN_disable) {			\
 		clk_nodes[id].parent = CLK_NODE_INVALID;			\
-		return 0;							\
+	} else {								\
+		clk_nodes[id].parent = CLK_NODE_PLL##pll_nr##_PLLEN;		\
 	}									\
-	clk_nodes[id].parent = CLK_NODE_PLL##pll_nr##_PLLEN;			\
 	msk = XXXDIVx_RATIO_MASK;						\
 	clk_nodes[id].divider = 1UL + __field_xget(reg, msk);			\
 	return 0;								\
@@ -44,9 +44,9 @@ static uint32_t calc_freq_PLL##pll_nr##_SYSCLK##s_nr (uint32_t parent) {	\
 										\
 	if (FIELD_GET(reg, msk) == XXXDIVx_DxEN_disable) {			\
 		clk_nodes[id].parent = CLK_NODE_INVALID;			\
-		return 0;							\
+	} else {								\
+		clk_nodes[id].parent = CLK_NODE_PLL##pll_nr##_PLLEN;		\
 	}									\
-	clk_nodes[id].parent = CLK_NODE_PLL##pll_nr##_PLLEN;			\
 	msk = XXXDIVx_RATIO_MASK;						\
 	clk_nodes[id].divider = 1UL + __field_xget(reg, msk);			\
 	return 0;								\
@@ -114,9 +114,9 @@ static uint32_t calc_freq_##r##pll_nr (uint32_t parent) {			\
 										\
 	if (FIELD_GET(reg, msk) == XXXDIVx_DxEN_disable) {			\
 		clk_nodes[id].parent = CLK_NODE_INVALID;			\
-		return 0;							\
+	} else {								\
+		clk_nodes[id].parent = CLK_NODE_##par;				\
 	}									\
-	clk_nodes[id].parent = CLK_NODE_##par;					\
 	msk = XXXDIVx_RATIO_MASK;						\
 	clk_nodes[id].divider = 1UL + __field_xget(reg, msk);			\
 	return 0;								\
