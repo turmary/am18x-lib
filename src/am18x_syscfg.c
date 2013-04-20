@@ -15,7 +15,7 @@ am18x_rt syscfg_kick(am18x_bool lock) {
 	SYSCFG0->KICKxR[0] = kick0;
 	SYSCFG0->KICKxR[1] = kick1;
 
-	return AM18X_TRUE;
+	return AM18X_OK;
 }
 
 am18x_rt syscfg_pll(am18x_bool lock) {
@@ -38,7 +38,17 @@ am18x_rt syscfg_pll(am18x_bool lock) {
 	SYSCFG0->CFGCHIP0 = cfg0;
 	SYSCFG0->CFGCHIP3 = cfg3;
 
-	return AM18X_TRUE;
+	return AM18X_OK;
+}
+
+am18x_rt syscfg_aync3(am18x_bool ispll0) {
+	uint32_t msk, v;
+
+	msk = CFGCHIP3_ASYNC3_CLKSRC_MASK;
+	v = ispll0? CFGCHIP3_ASYNC3_CLKSRC_pll0: CFGCHIP3_ASYNC3_CLKSRC_pll1;
+	SYSCFG0->CFGCHIP3 = FIELD_SET(SYSCFG0->CFGCHIP3, msk, v);
+
+	return AM18X_OK;
 }
 
 // pos = [0,4,8,12,16,20,24,28]
@@ -53,5 +63,5 @@ am18x_rt syscfg_pinmux(uint32_t mux, uint32_t pos, uint32_t val) {
 	reg = SYSCFG0->PINMUXx[mux];
 	SYSCFG0->PINMUXx[mux] = __field_xset(reg, (0xFUL << pos), val);
 
-	return AM18X_TRUE;
+	return AM18X_OK;
 }

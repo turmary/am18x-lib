@@ -6,6 +6,8 @@
 #include "am18x_map.h"
 
 am18x_rt syscfg_kick(am18x_bool lock);
+am18x_rt syscfg_pll(am18x_bool lock);
+am18x_rt syscfg_aync3(am18x_bool ispll0);
 // pos = [0,4,8,12,16,20,24,28]
 // val = [0..15]
 am18x_rt syscfg_pinmux(uint32_t mux, uint32_t pos, uint32_t val);
