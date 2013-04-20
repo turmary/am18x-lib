@@ -5,7 +5,7 @@
 #include "auxlib.h"
 #include "uart.h"
 
-uint32_t f_osc = F_OSCIN;
+const uint32_t f_osc = F_OSCIN;
 
 static pll_conf_t pllconf[1] = {
 {

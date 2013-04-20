@@ -24,6 +24,10 @@ UART_con_t uart_reg[1] = {
 },
 };
 
+uint32_t dev_get_freq(uint32_t dc_id) {
+	return F_OSCIN;
+}
+
 int main(int argc, char* argv[]) {
 	uart_conf_t conf;
 	int i;

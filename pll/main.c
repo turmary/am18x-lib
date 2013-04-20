@@ -5,7 +5,7 @@
 #include "auxlib.h"
 #include "uart.h"
 
-uint32_t f_osc = F_OSCIN;
+const uint32_t f_osc = F_OSCIN;
 const int32_t delay_count = 284 * 1000;
 
 static const pll_conf_t pllconf[1] = {
@@ -43,8 +43,7 @@ int main(int argc, char* argv[]) {
 	printk("Reset by %s\n", reset_sources[reset].val);
 
 	pll_conf(PLL0, pllconf);
-	f_osc = F_OSCIN * pllconf->pllm / (pllconf->prediv * pllconf->postdiv);
-
+	clk_node_recalc_freq();
 	uart_init();
 
 	arm_intr_enable();
