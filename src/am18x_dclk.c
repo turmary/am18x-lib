@@ -3,6 +3,8 @@
 #include "am18x_pll.h"
 #include "auxlib.h"
 
+extern clk_node_t clk_nodes[];
+
 #define cfdc_pllx_sysclk_1_3(pll_nr, s_nr)					\
 uint32_t calc_freq_PLL##pll_nr##_SYSCLK##s_nr (uint32_t parent) {		\
 	uint32_t id = CLK_NODE_PLL##pll_nr##_SYSCLK##s_nr;			\

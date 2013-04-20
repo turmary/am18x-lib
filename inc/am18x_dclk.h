@@ -71,15 +71,6 @@ typedef struct {
 	uint32_t	freq;
 } clk_node_t;
 
-extern clk_node_t clk_nodes[];
-
-am18x_rt clk_node_init(void);
-am18x_rt clk_node_output(void);
-am18x_rt clk_node_tree(void);
-am18x_rt clk_node_recalc_freq(void);
-uint32_t clk_node_get_freq(uint32_t id);
-am18x_rt clk_node_set_parent(uint32_t id, uint32_t parent);
-
 #define DCLK_ID_GRP_SZ			0x100
 typedef enum {
 	DCLK_ID_ARM_RAM_ROM = CLK_NODE_PLL0_SYSCLK2 * DCLK_ID_GRP_SZ,
@@ -132,6 +123,12 @@ typedef enum {
 	DCLK_ID_SPI1,
 } dev_clk_id_t;
 
+am18x_rt clk_node_init(void);
+am18x_rt clk_node_output(void);
+am18x_rt clk_node_tree(void);
+am18x_rt clk_node_recalc_freq(void);
+uint32_t clk_node_get_freq(uint32_t id);
+am18x_rt clk_node_set_parent(uint32_t id, uint32_t parent);
 uint32_t dev_get_freq(uint32_t dclk_id);
 
 #endif//__AM18X_DCLK_H__
