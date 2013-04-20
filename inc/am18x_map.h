@@ -90,6 +90,7 @@ typedef struct {
 // PLL1 x = 1..3
 #define OCSEL_OCSRC_PLLsysclkx(x)	((0x16UL + (x)) << 0)
 #define OCSEL_OCSRC_PLL1obsclk		(0x1EUL << 0)
+#define OCSEL_OCSRC_Disabled		(0x1FUL << 0)
 	vuint32_t	OCSEL;
 	uint32_t	RESERVED2[_RS(0x110,0x104)];
 #define PLLM_MASK			(0x1FUL << 0)

@@ -176,7 +176,7 @@ cfdc_pllx_xxxdiv(OSCDIV,0,OCSEL0_OCSRC)
 cfdc_pllx_xxxdiv(POSTDIV,1,PLLM1)
 cfdc_pllx_xxxdiv(OSCDIV,1,OCSEL1_OCSRC)
 
-uint32_t calc_freq_OCSEL0_OCSRC (uint32_t parent) {
+static uint32_t calc_freq_OCSEL0_OCSRC (uint32_t parent) {
 	uint32_t id = CLK_NODE_OCSEL0_OCSRC;
 	uint32_t par;
 
@@ -206,14 +206,17 @@ uint32_t calc_freq_OCSEL0_OCSRC (uint32_t parent) {
 		par = CLK_NODE_PLL1_OBSCLK;
 		break;
 	case OCSEL_OCSRC_oscin:
-	default:
 		par = CLK_NODE_PLL_CLKMODE;
+		break;
+	case OCSEL_OCSRC_Disabled:
+	default:
+		par = CLK_NODE_INVALID;
 		break;
 	}
 	clk_nodes[id].parent = par;
 	return 0;
 }
-uint32_t do_change_OCSEL0_OCSRC (uint32_t parent) {
+static uint32_t do_change_OCSEL0_OCSRC (uint32_t parent) {
 	uint32_t id = CLK_NODE_OCSEL0_OCSRC;
 	uint32_t v;
 
@@ -243,15 +246,17 @@ uint32_t do_change_OCSEL0_OCSRC (uint32_t parent) {
 		v = OCSEL_OCSRC_PLL1obsclk;
 		break;
 	case CLK_NODE_PLL_CLKMODE:
-	default:
 		v = OCSEL_OCSRC_oscin;
 		break;
+	case CLK_NODE_INVALID:
+	default:
+		v = OCSEL_OCSRC_Disabled;
 	}
 	PLL0->OCSEL = FIELD_SET(PLL0->OCSEL, OCSEL_OCSRC_MASK, v);
 	return 0;
 }
 
-uint32_t calc_freq_OCSEL1_OCSRC (uint32_t parent) {
+static uint32_t calc_freq_OCSEL1_OCSRC (uint32_t parent) {
 	uint32_t id = CLK_NODE_OCSEL1_OCSRC;
 	uint32_t par;
 
@@ -273,7 +278,7 @@ uint32_t calc_freq_OCSEL1_OCSRC (uint32_t parent) {
 	clk_nodes[id].parent = par;
 	return 0;
 }
-uint32_t do_change_OCSEL1_OCSRC (uint32_t parent) {
+static uint32_t do_change_OCSEL1_OCSRC (uint32_t parent) {
 	uint32_t id = CLK_NODE_OCSEL1_OCSRC;
 	uint32_t v;
 
@@ -306,7 +311,7 @@ uint32_t do_change_OCSEL1_OCSRC (uint32_t parent) {
 
 static clk_node_t clk_nodes[] = {
 	// ID                  PARENT,       FLAG, MULT, DIV, CALC_FREQ, DO_CHANGE, PARENT_LIST
-	{ 0, 0, },
+	{ cnm(INVALID),      cm(INVALID),          0, 0, 0, },
 	{ cnm(PLL0_SYSCLK1), cm(PLL0_PLLEN),  REREAD, 0, 1, cfdc(PLL0_SYSCLK1), },
 	{ cnm(PLL0_SYSCLK2), cm(PLL0_PLLEN),  REREAD, 0, 2, cfdc(PLL0_SYSCLK2), },
 	{ cnm(PLL0_SYSCLK3), cm(PLL0_PLLEN),  REREAD, 0, 3, cfdc(PLL0_SYSCLK3), },
@@ -347,8 +352,12 @@ am18x_rt clk_node_init(void) {
 		clk_node_t* cni = clk_nodes + i;
 
 		cni->name += get_exec_base();
-		*(uint32_t*)&cni->calc_freq += get_exec_base();
-		*(uint32_t*)&cni->do_change += get_exec_base();
+		if (cni->calc_freq) {
+			*(uint32_t*)&cni->calc_freq += get_exec_base();
+		}
+		if (cni->do_change) {
+			*(uint32_t*)&cni->do_change += get_exec_base();
+		}
 		cni->flag |= CN_FLAG_RECALC;
 	}
 	return AM18X_OK;
