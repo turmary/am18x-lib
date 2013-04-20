@@ -1,6 +1,6 @@
 // tary, 0:22 2012/12/22
 #include "am18x_uart.h"
-#include "am18x_pll.h"
+#include "am18x_dclk.h"
 
 uint32_t uart_input_clock_frequency(UART_con_t* ucon) {
 	if (ucon == UART0) {

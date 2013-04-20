@@ -9,6 +9,8 @@
 #define F_OSCIN			24000000UL	//Hz
 extern uint32_t f_osc;
 
+#define _DCLK
+
 #define _PLL
 #define _PLL0
 #define _PLL1

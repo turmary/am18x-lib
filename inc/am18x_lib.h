@@ -33,4 +33,8 @@
 #include "am18x_pll.h"
 #endif
 
+#ifdef _DCLK
+#include "am18x_dclk.h"
+#endif
+
 #endif//__AM18X_LIB_H__
