@@ -6,47 +6,69 @@
 extern clk_node_t clk_nodes[];
 
 #define cfdc_pllx_sysclk_1_3(pll_nr, s_nr)					\
-static uint32_t calc_freq_PLL##pll_nr##_SYSCLK##s_nr (uint32_t parent) {		\
+static uint32_t calc_freq_PLL##pll_nr##_SYSCLK##s_nr (uint32_t parent) {	\
 	uint32_t id = CLK_NODE_PLL##pll_nr##_SYSCLK##s_nr;			\
-	uint32_t msk = XXXDIVx_RATIO_MASK;					\
+	uint32_t reg = PLL##pll_nr->PLLDIVxA[PLLDIVxA_IDX_##s_nr];		\
+	uint32_t msk = XXXDIVx_DxEN_MASK;					\
 										\
-	clk_nodes[id].divider = 1UL + __field_xget(PLL##pll_nr->PLLDIVxA[PLLDIVxA_IDX_##s_nr], msk);\
+	if (FIELD_GET(reg, msk) == XXXDIVx_DxEN_disable) {			\
+		clk_nodes[id].parent = CLK_NODE_INVALID;			\
+		return 0;							\
+	}									\
+	clk_nodes[id].parent = CLK_NODE_PLL##pll_nr##_PLLEN;			\
+	msk = XXXDIVx_RATIO_MASK;						\
+	clk_nodes[id].divider = 1UL + __field_xget(reg, msk);			\
 	return 0;								\
 }										\
-										\
-static uint32_t do_change_PLL##pll_nr##_SYSCLK##s_nr (uint32_t parent) {		\
+static uint32_t do_change_PLL##pll_nr##_SYSCLK##s_nr (uint32_t parent) {	\
 	uint32_t id = CLK_NODE_PLL##pll_nr##_SYSCLK##s_nr;			\
-	uint32_t msk = XXXDIVx_RATIO_MASK;					\
+	uint32_t msk = XXXDIVx_DxEN_MASK;					\
 	uint32_t reg, divider;							\
 										\
 	divider = clk_nodes[id].divider;					\
 	reg = PLL##pll_nr->PLLDIVxA[PLLDIVxA_IDX_##s_nr];			\
-	PLL##pll_nr->PLLDIVxA[PLLDIVxA_IDX_##s_nr] = FIELD_SET(reg, msk, XXXDIVx_RATIO_WR(divider));\
+	if (clk_nodes[id].parent == CLK_NODE_PLL##pll_nr##_PLLEN) {		\
+		reg = FIELD_SET(reg, msk, XXXDIVx_DxEN_enable);			\
+	} else if (clk_nodes[id].parent == CLK_NODE_INVALID) {			\
+		reg = FIELD_SET(reg, msk, XXXDIVx_DxEN_disable);		\
+	}									\
+	PLL##pll_nr->PLLDIVxA[PLLDIVxA_IDX_##s_nr] = reg;			\
 	return 0;								\
 }
 
 #define cfdc_pllx_sysclk_4_7(pll_nr, s_nr)					\
-static uint32_t calc_freq_PLL##pll_nr##_SYSCLK##s_nr (uint32_t parent) {		\
+static uint32_t calc_freq_PLL##pll_nr##_SYSCLK##s_nr (uint32_t parent) {	\
 	uint32_t id = CLK_NODE_PLL##pll_nr##_SYSCLK##s_nr;			\
-	uint32_t msk = XXXDIVx_RATIO_MASK;					\
+	uint32_t reg = PLL##pll_nr->PLLDIVxB[PLLDIVxB_IDX_##s_nr];		\
+	uint32_t msk = XXXDIVx_DxEN_MASK;					\
 										\
-	clk_nodes[id].divider = 1UL + __field_xget(PLL##pll_nr->PLLDIVxB[PLLDIVxB_IDX_##s_nr], msk);\
+	if (FIELD_GET(reg, msk) == XXXDIVx_DxEN_disable) {			\
+		clk_nodes[id].parent = CLK_NODE_INVALID;			\
+		return 0;							\
+	}									\
+	clk_nodes[id].parent = CLK_NODE_PLL##pll_nr##_PLLEN;			\
+	msk = XXXDIVx_RATIO_MASK;						\
+	clk_nodes[id].divider = 1UL + __field_xget(reg, msk);			\
 	return 0;								\
 }										\
-										\
-static uint32_t do_change_PLL##pll_nr##_SYSCLK##s_nr (uint32_t parent) {		\
+static uint32_t do_change_PLL##pll_nr##_SYSCLK##s_nr (uint32_t parent) {	\
 	uint32_t id = CLK_NODE_PLL##pll_nr##_SYSCLK##s_nr;			\
-	uint32_t msk = XXXDIVx_RATIO_MASK;					\
+	uint32_t msk = XXXDIVx_DxEN_MASK;					\
 	uint32_t reg, divider;							\
 										\
 	divider = clk_nodes[id].divider;					\
 	reg = PLL##pll_nr->PLLDIVxB[PLLDIVxB_IDX_##s_nr];			\
-	PLL##pll_nr->PLLDIVxB[PLLDIVxB_IDX_##s_nr] = FIELD_SET(reg, msk, XXXDIVx_RATIO_WR(divider));\
+	if (clk_nodes[id].parent == CLK_NODE_PLL##pll_nr##_PLLEN) {		\
+		reg = FIELD_SET(reg, msk, XXXDIVx_DxEN_enable);			\
+	} else if (clk_nodes[id].parent == CLK_NODE_INVALID) {			\
+		reg = FIELD_SET(reg, msk, XXXDIVx_DxEN_disable);		\
+	}									\
+	PLL##pll_nr->PLLDIVxB[PLLDIVxB_IDX_##s_nr] = reg;			\
 	return 0;								\
 }
 
 #define cfdc_switch(name, cntrl, r, m, vdis, ven, ndis, nen)			\
-static uint32_t calc_freq_##name (uint32_t parent) {					\
+static uint32_t calc_freq_##name (uint32_t parent) {				\
 	uint32_t id = CLK_NODE_##name;						\
 	if (FIELD_GET(XX##cntrl->XX##r,r##_##m) == r##_##vdis ) {		\
 		clk_nodes[id].parent = CLK_NODE_##ndis;				\
@@ -55,7 +77,7 @@ static uint32_t calc_freq_##name (uint32_t parent) {					\
 	}									\
 	return 0;								\
 }										\
-static uint32_t do_change_##name (uint32_t parent) {					\
+static uint32_t do_change_##name (uint32_t parent) {				\
 	uint32_t id = CLK_NODE_##name;						\
 	if (clk_nodes[id].parent != CLK_NODE_##ndis) {				\
 		XX##cntrl->XX##r = FIELD_SET(XX##cntrl->XX##r, r##_##m, r##_##ven);\
@@ -65,23 +87,55 @@ static uint32_t do_change_##name (uint32_t parent) {					\
 	return 0;								\
 }
 
-#define cfdc_pllx_xxxdiv(reg, pll_nr, mr)					\
-static uint32_t calc_freq_##reg##pll_nr (uint32_t parent) {				\
-	uint32_t id = CLK_NODE_##reg##pll_nr;					\
+#define cfdc_pllx_mult(r, pll_nr)						\
+static uint32_t calc_freq_##r##pll_nr (uint32_t parent) {			\
+	uint32_t id = CLK_NODE_##r##pll_nr;					\
 	uint32_t msk = XXXDIVx_RATIO_MASK;					\
 										\
-	clk_nodes[id].XX##mr = 1UL + __field_xget(PLL##pll_nr->XX##reg, msk);	\
+	clk_nodes[id].multiplier = 1UL + __field_xget(PLL##pll_nr->XX##r, msk);	\
 	return 0;								\
 }										\
-										\
-static uint32_t do_change_##reg##pll_nr (uint32_t parent) {				\
-	uint32_t id = CLK_NODE_##reg##pll_nr;					\
+static uint32_t do_change_##r##pll_nr (uint32_t parent) {			\
+	uint32_t id = CLK_NODE_##r##pll_nr;					\
 	uint32_t msk = XXXDIVx_RATIO_MASK;					\
 	uint32_t reg, rate;							\
 										\
-	rate = clk_nodes[id].XX##mr;						\
-	reg = PLL##pll_nr->XX##reg;						\
-	PLL##pll_nr->XX##reg = FIELD_SET(reg, msk, XXXDIVx_RATIO_WR(rate));	\
+	rate = clk_nodes[id].multiplier;					\
+	reg = PLL##pll_nr->XX##r;						\
+	PLL##pll_nr->XX##r = FIELD_SET(reg, msk, XXXDIVx_RATIO_WR(rate));	\
+	return 0;								\
+}
+
+#define cfdc_pllx_xxxdiv(r, pll_nr, par)					\
+static uint32_t calc_freq_##r##pll_nr (uint32_t parent) {			\
+	uint32_t id = CLK_NODE_##r##pll_nr;					\
+	uint32_t reg = PLL##pll_nr->XX##r;					\
+	uint32_t msk = XXXDIVx_DxEN_MASK;					\
+										\
+	if (FIELD_GET(reg, msk) == XXXDIVx_DxEN_disable) {			\
+		clk_nodes[id].parent = CLK_NODE_INVALID;			\
+		return 0;							\
+	}									\
+	clk_nodes[id].parent = CLK_NODE_##par;					\
+	msk = XXXDIVx_RATIO_MASK;						\
+	clk_nodes[id].divider = 1UL + __field_xget(reg, msk);			\
+	return 0;								\
+}										\
+static uint32_t do_change_##r##pll_nr (uint32_t parent) {			\
+	uint32_t id = CLK_NODE_##r##pll_nr;					\
+	uint32_t msk = XXXDIVx_DxEN_MASK;					\
+	uint32_t reg, divider;							\
+										\
+	divider = clk_nodes[id].divider;					\
+	reg = PLL##pll_nr->XX##r;						\
+	if (clk_nodes[id].parent == CLK_NODE_##par) {				\
+		reg = FIELD_SET(reg, msk, XXXDIVx_DxEN_enable);			\
+	} else if (clk_nodes[id].parent == CLK_NODE_INVALID) {			\
+		reg = FIELD_SET(reg, msk, XXXDIVx_DxEN_disable);		\
+	}									\
+	msk = XXXDIVx_RATIO_MASK;						\
+	reg = FIELD_SET(reg, msk, XXXDIVx_RATIO_WR(divider));			\
+	PLL##pll_nr->XX##r = reg;						\
 	return 0;								\
 }
 
@@ -114,15 +168,13 @@ cfdc_switch(PLL_EXTSRC,PLL0,PLLCTL,EXTCLKSRC_MASK,EXTCLKSRC_oscin,EXTCLKSRC_PLL1
 cfdc_switch(EMA_CLKSRC,SYSCFG0,CFGCHIP3,EMA_CLKSRC_MASK,EMA_CLKSRC_sysclk3,EMA_CLKSRC_pll_out,PLL0_SYSCLK3,DIV4_5X)
 cfdc_switch(ASYNC3,SYSCFG0,CFGCHIP3,ASYNC3_CLKSRC_MASK,ASYNC3_CLKSRC_pll0,ASYNC3_CLKSRC_pll1,PLL0_SYSCLK2,PLL1_SYSCLK2)
 cfdc_switch(DIV4_5X,SYSCFG0,CFGCHIP3,DIV45PENA_MASK,DIV45PENA_no,DIV45PENA_yes,INVALID,DIV4_5)
-#define XXdivider divider
-#define XXmultiplier multiplier
-cfdc_pllx_xxxdiv(PREDIV,0,divider)
-cfdc_pllx_xxxdiv(PLLM,0,multiplier)
-cfdc_pllx_xxxdiv(POSTDIV,0,divider)
-cfdc_pllx_xxxdiv(OSCDIV,0,divider)
-cfdc_pllx_xxxdiv(PLLM,1,multiplier)
-cfdc_pllx_xxxdiv(POSTDIV,1,divider)
-cfdc_pllx_xxxdiv(OSCDIV,1,divider)
+cfdc_pllx_mult(PLLM,0)
+cfdc_pllx_mult(PLLM,1)
+cfdc_pllx_xxxdiv(PREDIV,0,PLL_CLKMODE)
+cfdc_pllx_xxxdiv(POSTDIV,0,PLLM0)
+cfdc_pllx_xxxdiv(OSCDIV,0,OCSEL0_OCSRC)
+cfdc_pllx_xxxdiv(POSTDIV,1,PLLM1)
+cfdc_pllx_xxxdiv(OSCDIV,1,OCSEL1_OCSRC)
 
 uint32_t calc_freq_OCSEL0_OCSRC (uint32_t parent) {
 	uint32_t id = CLK_NODE_OCSEL0_OCSRC;
@@ -164,6 +216,7 @@ uint32_t calc_freq_OCSEL0_OCSRC (uint32_t parent) {
 uint32_t do_change_OCSEL0_OCSRC (uint32_t parent) {
 	uint32_t id = CLK_NODE_OCSEL0_OCSRC;
 	uint32_t v;
+
 	switch (clk_nodes[id].parent) {
 	case CLK_NODE_PLL0_SYSCLK1:
 		v = OCSEL_OCSRC_PLLsysclkx(1);
@@ -223,6 +276,7 @@ uint32_t calc_freq_OCSEL1_OCSRC (uint32_t parent) {
 uint32_t do_change_OCSEL1_OCSRC (uint32_t parent) {
 	uint32_t id = CLK_NODE_OCSEL1_OCSRC;
 	uint32_t v;
+
 	switch (clk_nodes[id].parent) {
 	case CLK_NODE_PLL1_SYSCLK1:
 		v = OCSEL_OCSRC_PLLsysclkx(1);
@@ -288,8 +342,6 @@ clk_node_t clk_nodes[] = {
 
 am18x_rt clk_node_init(void) {
 	int i;
-
-	pll_cmd(PLL1, PLL_CMD_ENABLE_PLL1_DIVS, 0);
 
 	for (i = 0; i < countof(clk_nodes); i++) {
 		clk_node_t* cni = clk_nodes + i;

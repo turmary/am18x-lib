@@ -1,7 +1,5 @@
 // tary, 5:40 2013/4/17
 #include "am18x_lib.h"
-#include "arm920t.h"
-#include "systick.h"
 #include "auxlib.h"
 #include "uart.h"
 
@@ -41,7 +39,15 @@ int main(int argc, char* argv[]) {
 	clk_node_tree();
 
 	pllconf->pllm = 25;
+	#if 0
 	pll_conf(PLL0, pllconf);
+	// important setting
+	pll_cmd(PLL1, PLL_CMD_ENABLE_PLL1_DIVS, 0);
+	#else
+	// important setting
+	pll_cmd(PLL1, PLL_CMD_ENABLE_PLL1_DIVS, 0);
+	pll_conf(PLL0, pllconf);
+	#endif
 	// clk_node_set_parent(CLK_NODE_PLL0_PLLEN, CLK_NODE_PLL_EXTSRC);
 	clk_node_set_parent(CLK_NODE_EMA_CLKSRC, CLK_NODE_DIV4_5X);
 	clk_node_set_parent(CLK_NODE_OCSEL0_OCSRC, CLK_NODE_PLL1_OBSCLK);
@@ -55,7 +61,9 @@ int main(int argc, char* argv[]) {
 	clk_node_set_parent(CLK_NODE_DIV4_5X, CLK_NODE_DIV4_5);
 	clk_node_set_parent(CLK_NODE_PLL1_OBSCLK, CLK_NODE_OSCDIV1);
 	clk_node_set_parent(CLK_NODE_ASYNC3, CLK_NODE_PLL1_SYSCLK2);
+	clk_node_set_parent(CLK_NODE_OSCDIV1, CLK_NODE_OCSEL1_OCSRC);
 	uart_init();
+
 	// ********** tree 4 **********
 	printk("\n\n");
 	clk_node_tree();
