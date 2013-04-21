@@ -134,9 +134,9 @@ typedef enum { AM18X_FALSE = 0, AM18X_TRUE = !AM18X_FALSE} am18x_bool;
 #define countof(x)			(sizeof(x) / sizeof(x[0]))
 #define BIT(x)				(0x1UL << (x))
 #define BIT_DEF(r,of,b,bdis,ben)		\
-	r_##b##_##MASK = (0x1UL << (of)),	\
-	r_##b##_##bdis = (0x0UL << (of)),	\
-	r_##b##_##ben  = (0x1UL << (of))
+	r##_##b##_##MASK = (0x1UL << (of)),	\
+	r##_##b##_##bdis = (0x0UL << (of)),	\
+	r##_##b##_##ben  = (0x1UL << (of))
 
 
 #endif//__AM18X_TYPE_H__

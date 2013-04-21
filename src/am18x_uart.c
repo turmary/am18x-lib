@@ -9,7 +9,10 @@ uint32_t uart_input_clock_frequency(UART_con_t* ucon) {
 	if (ucon == UART1) {
 		return dev_get_freq(DCLK_ID_UART1);
 	}
-	return dev_get_freq(DCLK_ID_UART2);
+	if (ucon == UART2) {
+		return dev_get_freq(DCLK_ID_UART2);
+	}
+	return 0UL;
 }
 
 static inline uint32_t uart_get_divisor(UART_con_t* ucon, uint32_t baud_rate) {

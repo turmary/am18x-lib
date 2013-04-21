@@ -1,15 +1,21 @@
 // tary, 22:05 2013/3/6
 #include "am18x_timer.h"
+#include "am18x_dclk.h"
 
 uint32_t timer_internal_clock_frequency(TIMER_con_t* tcon) {
-	// from PLL0.AUXCLK
-	// 6.3.7 I/O Domains
-	// They are fed the AUXCLK directly from the oscillator input
-	if (tcon == TIMER0 || tcon == TIMER1) {
-		return F_OSCIN;
+	if (tcon == TIMER0) {
+		return dev_get_freq(DCLK_ID_TIMER64P0);
 	}
-	// from ASYNC3 ( PLL0.SYSCLK2 or PLL1.SYSCLK2 )
-	return F_OSCIN / 2UL;
+	if (tcon == TIMER1) {
+		return dev_get_freq(DCLK_ID_TIMER64P1);
+	}
+	if (tcon == TIMER2) {
+		return dev_get_freq(DCLK_ID_TIMER64P2);
+	}
+	if (tcon == TIMER3) {
+		return dev_get_freq(DCLK_ID_TIMER64P3);
+	}
+	return 0UL;
 }
 
 am18x_rt timer_conf(TIMER_con_t* tcon, const timer_conf_t* conf) {

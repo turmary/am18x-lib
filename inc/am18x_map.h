@@ -17,6 +17,8 @@
 #define _RS(b,a)	(((b) - (a) - 0x4UL) >> 2)
 
 typedef struct {
+#define MPU1_PROGxMPxAR_MASK		0xFFFFFC00UL
+#define MPU2_PROGxMPxAR_MASK		0xfFFF0000UL
 	vuint32_t	MPSAR;
 	vuint32_t	MPEAR;
 // n = 0..11

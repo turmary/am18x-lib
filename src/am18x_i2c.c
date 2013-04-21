@@ -1,5 +1,6 @@
 // tary, 22:02 2013/3/13
 #include "am18x_i2c.h"
+#include "am18x_dclk.h"
 
 // 22.2.2 Clock Generation
 #define PrescaledModuleClockLow			(6700000UL)
@@ -7,14 +8,13 @@
 
 // static inline
 uint32_t i2c_input_clock_frequency(I2C_con_t* icon) {
-	// from PLL0.AUXCLK
-	// 6.3.7 I/O Domains
-	// They are fed the AUXCLK directly from the oscillator input
 	if (icon == I2C0) {
-		return F_OSCIN;
+		return dev_get_freq(DCLK_ID_I2C0);
 	}
-	// from PLL0.SYSCLK4
-	return F_OSCIN / 4UL;
+	if (icon == I2C1) {
+		return dev_get_freq(DCLK_ID_I2C1);
+	}
+	return 0UL;
 }
 
 static inline uint32_t ipsc_to_d(uint32_t ipsc) {
@@ -50,7 +50,8 @@ uint32_t i2c_get_serial_clock(I2C_con_t* icon) {
 #define I2C_UNRESET(ic) { ic->ICMDR = FIELD_SET(ic->ICMDR, ICMDR_IRS_MASK, ICMDR_IRS_none); }
 
 am18x_rt i2c_set_serial_clock(I2C_con_t* icon, uint32_t freq) {
-	uint32_t msk, ipsc, scale_freq;
+	uint32_t ipsc, scale_freq;
+	// uint32_t msk;
 
 	if (icon == I2C0) {
 		ipsc = 1;
