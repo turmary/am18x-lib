@@ -20,13 +20,13 @@ static const pll_conf_t pllconf[1] = {
 }
 };
 
-kv_t reset_sources[] = {
+static kv_t reset_sources[] = {
 	KV(PLL_RESET_SOFTWARE),
 	KV(PLL_RESET_EXTERNAL),
 	KV(PLL_RESET_POWER_ON),
 };
 
-int check_delay(void) {
+static int check_delay(void) {
 	uint32_t start_minutes, stop_minutes;
 
 	start_minutes = systick_elapsed();

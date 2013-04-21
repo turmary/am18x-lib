@@ -39,7 +39,7 @@ typedef struct {
 #define CONFIG_ASSUME_ALLOWED_MASK	(0x1UL << 0)
 #define CONFIG_ASSUME_ALLOWED_no	(0x0UL << 0)
 #define CONFIG_ASSUME_ALLOWED_yes	(0x1UL << 0)
-	vuint32_t	CONFIG;
+	vcuint32_t	CONFIG;
 	uint32_t	RESERVED0[_RS(0x010,0x004)];
 	vuint32_t	IRAWSTAT;
 	vuint32_t	IENSTAT;
@@ -51,11 +51,9 @@ typedef struct {
 #define FXD_MPEAR_VAL			0xB0007FFFUL
 	MPU_range_t	FXD;
 	uint32_t	RESERVED2[_RS(0x200,0x10C)];
-#define MPU1_PROGx_CNT			6
-#define MPU2_PROGx_CNT			12
 	MPU_range_t	PROGx[1];
 	uint32_t	RESERVED3[_RS(0x300,0x20C)];
-	vuint32_t	FLTADDRR;
+	vcuint32_t	FLTADDRR;
 #define FLTSTAT_MSTID_MASK		(0xFFUL << 16)
 #define FLTSTAT_PRIVID_MASK		(0xFUL << 9)
 #define FLTSTAT_TYPE_MASK		(0x3FUL << 0)
@@ -68,8 +66,8 @@ typedef struct {
 #define FLTSTAT_TYPE_CacheWriteBack	(0x12UL << 0)
 #define FLTSTAT_TYPE_SupervisorRead	(0x20UL << 0)
 #define FLTSTAT_TYPE_CacheLineFill	(0x3FUL << 0)
-	vuint32_t	FLTSTAT;
-	vuint32_t	FLTCLR;
+	vcuint32_t	FLTSTAT;
+	vcuint32_t	FLTCLR;
 } MPU_con_t;
 
 enum {

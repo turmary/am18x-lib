@@ -88,6 +88,10 @@ am18x_rt pll_conf(PLL_con_t* pcon, const pll_conf_t* conf) {
 	//    Program the POSTDIV, as needed.
 	pcon->PLLM = FIELD_SET(0, PLLM_MASK, PLLM_WR(conf->pllm));
 	msk = XXXDIVx_DxEN_MASK | XXXDIVx_RATIO_MASK;
+	if (pcon == PLL0) {
+		v = XXXDIVx_DxEN_enable | XXXDIVx_RATIO_WR(conf->prediv);
+		pcon->PREDIV = FIELD_SET(0, msk, v);
+	}
 	v = XXXDIVx_DxEN_enable | XXXDIVx_RATIO_WR(conf->postdiv);
 	pcon->POSTDIV = FIELD_SET(0, msk, v);
 
