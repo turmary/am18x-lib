@@ -7,6 +7,8 @@ DEFS =
 
 CINS = ../include
 
+LINK_SCRIPT = ../prj/am18x.ld
+
 DEBUG += -gdwarf-2
 
 ARCH = -mcpu=arm926ej-s
@@ -33,7 +35,7 @@ ASFLAGS += -Wa,-ahdlns=$(<:.S=.lst)
 LDFLAGS += $(DEBUG)
 LDFLAGS += -static -nostdlib
 LDFLAGS += -Wl,-Map=$(TARGET).map
-LDFLAGS += -Wl,-T../prj/am18x.ld
+LDFLAGS += -Wl,-T$(LINK_SCRIPT)
 
 COBJ = $(CSRC:.c=.o)
 AOBJ = $(ASRC:.S=.o)
@@ -94,22 +96,22 @@ ${AIS_UART}: bin
 %.sym: %.elf
 	$(NM) -n $< > $@
 
-%.elf: $(OBJS)
+%.elf: $(OBJS) $(LINK_SCRIPT) $(MAKEFILE_LIST)
 	$(CC) $(ALL_CFLAGS) $(OBJS) --output $@ $(LDFLAGS)
 
-$(COBJ) : %.o : %.c
+$(COBJ) : %.o : %.c $(MAKEFILE_LIST)
 	$(CC) -c $(ALL_CFLAGS) $< -o $@
 	@echo ""
 
-%.i : %.c
+%.i : %.c $(MAKEFILE_LIST)
 	$(CC) -E $(ALL_CFLAGS) $< -o $@
 	@echo ""
 
-$(AOBJ) : %.o : %.S
+$(AOBJ) : %.o : %.S $(MAKEFILE_LIST)
 	$(CC) -c $(ALL_ASFLAGS) $< -o $@
 	@echo ""
 
-%.i : %.S
+%.i : %.S $(MAKEFILE_LIST)
 	$(CC) -E $(ALL_ASFLAGS) $< -o $@
 	@echo ""
 
