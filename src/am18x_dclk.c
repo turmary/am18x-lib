@@ -1,6 +1,5 @@
 // tary, 19:05 2013/4/20
 #include "am18x_dclk.h"
-#include "am18x_pll.h"
 #include "auxlib.h"
 
 static clk_node_t clk_nodes[];
@@ -79,11 +78,14 @@ static uint32_t calc_freq_##name (uint32_t parent) {				\
 }										\
 static uint32_t do_change_##name (uint32_t parent) {				\
 	uint32_t id = CLK_NODE_##name;						\
-	if (clk_nodes[id].parent != CLK_NODE_##ndis) {				\
-		XX##cntrl->XX##r = FIELD_SET(XX##cntrl->XX##r, r##_##m, r##_##ven);\
+	uint32_t reg = XX##cntrl->XX##r;					\
+	uint32_t v;								\
+	if (clk_nodes[id].parent == CLK_NODE_##ndis) {				\
+		v = r##_##vdis;							\
 	} else {								\
-		XX##cntrl->XX##r = FIELD_SET(XX##cntrl->XX##r, r##_##m, r##_##vdis);\
+		v = r##_##ven;							\
 	}									\
+	XX##cntrl->XX##r = FIELD_SET(reg, r##_##m, v);				\
 	return 0;								\
 }
 

@@ -37,4 +37,8 @@
 #include "am18x_dclk.h"
 #endif
 
+#ifdef _MPU
+#include "am18x_mpu.h"
+#endif
+
 #endif//__AM18X_LIB_H__

@@ -114,7 +114,7 @@ am18x_rt pll_conf(PLL_con_t* pcon, const pll_conf_t* conf) {
 	// 9. Set the PLLEN bit in PLLCTL to 1 (removes PLL from bypass mode)
 	msk = PLLCTL_PLLEN_MASK;
 	pcon->PLLCTL = FIELD_SET(pcon->PLLCTL, msk, PLLCTL_PLLEN_yes);
-	
+
 	return AM18X_OK;
 }
 

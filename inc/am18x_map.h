@@ -17,29 +17,69 @@
 #define _RS(b,a)	(((b) - (a) - 0x4UL) >> 2)
 
 typedef struct {
-	vuint32_t	PROGx_MPSAR;
-	vuint32_t	PROGx_MPEAR;
-	vuint32_t	PROGx_MPPA;
+	vuint32_t	MPSAR;
+	vuint32_t	MPEAR;
+// n = 0..11
+#define PROGxMPPA_AIDn_MASK(n)		(0x1UL << (10 + (n)))
+#define PROGxMPPA_AIDn_denied(n)	(0x1UL << (10 + (n)))
+#define PROGxMPPA_AIDn_granted(n)	(0x1UL << (10 + (n)))
+	vuint32_t	MPPA;
 	uint32_t	RESERVED0;
 } MPU_range_t;
 
 typedef struct {
+#define MPU_REVID			0x4E810101UL
 	vcuint32_t	REVID;
+#define CONFIG_ADDR_WIDTH_MASK		(0xFFUL << 24)
+#define CONFIG_NUM_FIXED_MASK		(0xFUL << 20)
+#define CONFIG_NUM_PROG_MASK		(0xFUL << 16)
+#define CONFIG_NUM_AIDS_MASK		(0xFUL << 12)
+#define CONFIG_ASSUME_ALLOWED_MASK	(0x1UL << 0)
+#define CONFIG_ASSUME_ALLOWED_no	(0x0UL << 0)
+#define CONFIG_ASSUME_ALLOWED_yes	(0x1UL << 0)
 	vuint32_t	CONFIG;
-	uint32_t	RESERVED0[2];
+	uint32_t	RESERVED0[_RS(0x010,0x004)];
 	vuint32_t	IRAWSTAT;
 	vuint32_t	IENSTAT;
 	vuint32_t	IENSET;
 	vuint32_t	IENCLR;
-	uint32_t	RESERVED1[56];
+	uint32_t	RESERVED1[_RS(0x100,0x01C)];
+	// only valid in MPU2
+#define FXD_MPSAR_VAL			0xB0000000UL
+#define FXD_MPEAR_VAL			0xB0007FFFUL
 	MPU_range_t	FXD;
-	uint32_t	RESERVED2[60];
-	MPU_range_t	range[1];
-	uint32_t	RESERVED3[60];
+	uint32_t	RESERVED2[_RS(0x200,0x10C)];
+#define MPU1_PROGx_CNT			6
+#define MPU2_PROGx_CNT			12
+	MPU_range_t	PROGx[1];
+	uint32_t	RESERVED3[_RS(0x300,0x20C)];
 	vuint32_t	FLTADDRR;
+#define FLTSTAT_MSTID_MASK		(0xFFUL << 16)
+#define FLTSTAT_PRIVID_MASK		(0xFUL << 9)
+#define FLTSTAT_TYPE_MASK		(0x3FUL << 0)
+#define FLTSTAT_TYPE_NoFault		(0x0UL << 0)
+#define FLTSTAT_TYPE_UserExecute	(0x1UL << 0)
+#define FLTSTAT_TYPE_UserWrite		(0x2UL << 0)
+#define FLTSTAT_TYPE_UserRead		(0x4UL << 0)
+#define FLTSTAT_TYPE_SupervisorExecute	(0x8UL << 0)
+#define FLTSTAT_TYPE_SupervisorWrite	(0x10UL << 0)
+#define FLTSTAT_TYPE_CacheWriteBack	(0x12UL << 0)
+#define FLTSTAT_TYPE_SupervisorRead	(0x20UL << 0)
+#define FLTSTAT_TYPE_CacheLineFill	(0x3FUL << 0)
 	vuint32_t	FLTSTAT;
 	vuint32_t	FLTCLR;
 } MPU_con_t;
+
+enum {
+	BIT_DEF(PROGxMPPA,9,AIDX,denied,granted),
+	BIT_DEF(PROGxMPPA,5,SR,denied,allowed),
+	BIT_DEF(PROGxMPPA,4,SW,denied,allowed),
+	BIT_DEF(PROGxMPPA,3,SX,denied,allowed),
+	BIT_DEF(PROGxMPPA,2,UR,denied,allowed),
+	BIT_DEF(PROGxMPPA,1,UW,denied,allowed),
+	BIT_DEF(PROGxMPPA,0,UX,denied,allowed),
+	BIT_DEF(FLTCLR,0,CLEAR,none,fault),
+};
 
 typedef struct {
 #define PLL0_REVID			0x44813C00UL
@@ -221,6 +261,7 @@ typedef enum {
 
 
 typedef struct {
+#define SYSCFG0_REVID			0x4E840102UL
 	vcuint32_t	REVID;
 	uint32_t	RESERVED0[5];
 	vuint32_t	INTEVAL;
@@ -378,16 +419,6 @@ typedef struct {
 	vuint32_t	EOI;
 	vcuint32_t	FLTADDRR;
 #define FLTSTAT_ID_MASK			(0xFFUL << 24)
-#define FLTSTAT_MSTID_MASK		(0xFFUL << 16)
-#define FLTSTAT_PRIVID_MASK		(0xFUL << 9)
-#define FLTSTAT_TYPE_MASK		(0x3FUL << 0)
-#define FLTSTAT_TYPE_None		0x0UL
-#define FLTSTAT_TYPE_UserExec		0x1UL
-#define FLTSTAT_TYPE_UserWrite		0x2UL
-#define FLTSTAT_TYPE_UserRead		0x4UL
-#define FLTSTAT_TYPE_SupervisorExec	0x8UL
-#define FLTSTAT_TYPE_SupervisorWrite	0x10UL
-#define FLTSTAT_TYPE_SupervisorRead	0x20UL
 	vcuint32_t	FLTSTAT;
 	uint32_t	RESERVED4[5];
 // TODO, Master Priority X
@@ -1157,6 +1188,8 @@ typedef struct {
 #define UART0_BASE			0x01C42000UL
 #define UART1_BASE			0x01D0C000UL
 #define UART2_BASE			0x01D0D000UL
+#define MPU1_BASE			0x01E14000UL
+#define MPU2_BASE			0x01E15000UL
 #define PLL1_BASE			0x01E1A000UL
 #define PSC1_BASE			0x01E27000UL
 #define I2C1_BASE			0x01E28000UL
@@ -1173,6 +1206,12 @@ typedef struct {
 /*----------------------------------------------------------------------------*/
 
 #ifndef __MEM_REMAP
+#ifdef _MPU1
+	#define MPU1			((MPU_con_t*)MPU1_BASE)
+#endif
+#ifdef _MPU2
+	#define MPU2			((MPU_con_t*)MPU2_BASE)
+#endif
 #ifdef _PLL0
 	#define PLL0			((PLL_con_t*)PLL0_BASE)
 #endif
@@ -1223,6 +1262,12 @@ typedef struct {
 #endif
 
 #else//__MEM_REMAP
+#ifdef _MPU1
+	_EXTERN MPU_con_t		*MPU1;
+#endif
+#ifdef _MPU2
+	_EXTERN MPU_con_t		*MPU2;
+#endif
 #ifdef _PLL0
 	_EXTERN PLL_con_t		*PLL0;
 #endif
