@@ -166,6 +166,17 @@ unsigned arm_read_cp15_fault_address(void);
 #define CP15_C7_DrainWriteBuffer	c7, c10, 4
 #define CP15_C7_WaitForInterrupt	c7, c0, 4
 
+#ifndef __ASSEMBLY__
+static inline int arm_wfi(void) {
+	asm volatile(
+	"mov	r0, #0\n"
+	"mcr	p15, 0, r0, c7, c0, 4\n"	/* wait for interrupt */
+	::: "r0"
+	);
+	return 0;
+}
+#endif
+
 #define CP15_C7_MVA_MASK		0xFFFFFFE0
 #define CP15_C7_IndexIdx_MASK		(0x3F << 26)
 #define CP15_C7_IndexIdx_X(x)		((x) << 26)

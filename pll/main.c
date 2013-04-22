@@ -6,7 +6,7 @@
 #include "uart.h"
 
 const uint32_t f_osc = F_OSCIN;
-const int32_t delay_count = 284 * 1000;
+static const int32_t delay_count = 284 * 1000;
 
 static const pll_conf_t pllconf[1] = {
 {
