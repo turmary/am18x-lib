@@ -22,8 +22,8 @@ int uart_init(void) {
 }
 
 int __putchar(int c) {
-	while (AM18X_FALSE == uart_state(UART2, STATE_TX_EMPTY));
 	uart_write_byte(UART2, c);
+	while (AM18X_FALSE == uart_state(UART2, STATE_TX_EMPTY));
 	return c;
 }
 

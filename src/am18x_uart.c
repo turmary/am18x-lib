@@ -123,9 +123,12 @@ am18x_bool uart_state(const UART_con_t* ucon, uart_state_type_t type) {
 	am18x_bool r;
 
 	r = AM18X_FALSE;
-	switch(type) {
+	switch (type) {
 	case STATE_TX_EMPTY:
-	// BugFix:
+		if (FIELD_GET(ucon->LSR, LSR_TEMT_MASK) == LSR_TEMT_yes) {
+			r = AM18X_TRUE;
+		}
+		break;
 	case STATE_TX_BUF_EMPTY:
 		if (FIELD_GET(ucon->LSR, LSR_THRE_MASK) == LSR_THRE_yes) {
 			r = AM18X_TRUE;
