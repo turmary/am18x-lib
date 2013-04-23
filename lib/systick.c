@@ -22,7 +22,7 @@ int systick_init(unsigned period) {
 		240000UL,
 	}};
 
-	tconf->period = F_OSCIN * period / 1000;
+	tconf->period = timer_input_freq(TIMER_NR) * period / 1000;
 	inner_period = period;
 
 	r = timer_conf(TIMER_NR, tconf);

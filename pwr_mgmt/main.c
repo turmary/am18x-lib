@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
 	clk_node_recalc();
 	uart_init();
 	printk("pll enabled counter = %d\n", one_second_counter(AM18X_FALSE));
-	pll_cmd(PLL0, PLL_CMD_BYPASS, 0);
+	pll_cmd(PLL0, PLL_CMD_POWER_DOWN, 0);
 	clk_node_recalc();
 	uart_init();
 	printk("pll bypass  counter = %d\n", one_second_counter(AM18X_FALSE));

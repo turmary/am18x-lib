@@ -48,7 +48,7 @@ typedef struct {
 	uint32_t	period;
 } timer_conf_t;
 
-uint32_t timer_internal_clock_frequency(TIMER_con_t* tcon);
+uint32_t timer_input_freq(TIMER_con_t* tcon);
 am18x_rt timer_conf(TIMER_con_t* tcon, const timer_conf_t* conf);
 am18x_rt timer_cmd(TIMER_con_t* tcon, timer_cmd_t cmd, uint32_t arg);
 uint32_t timer_get_count(TIMER_con_t* tcon);

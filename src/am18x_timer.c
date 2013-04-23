@@ -2,7 +2,7 @@
 #include "am18x_timer.h"
 #include "am18x_dclk.h"
 
-uint32_t timer_internal_clock_frequency(TIMER_con_t* tcon) {
+uint32_t timer_input_freq(TIMER_con_t* tcon) {
 	if (tcon == TIMER0) {
 		return dev_get_freq(DCLK_ID_TIMER64P0);
 	}
