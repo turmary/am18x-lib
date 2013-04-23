@@ -400,7 +400,7 @@ static uint32_t clk_node_calc_freq_inner(uint32_t id) {
 	return freq;
 }
 
-am18x_rt clk_node_recalc_freq(void) {
+am18x_rt clk_node_recalc(void) {
 	int i;
 
 	for (i = CLK_NODE_INVALID + 1; i < CLK_NODE_CNT; i++) {
@@ -426,7 +426,7 @@ am18x_rt clk_node_output(void) {
 	#define ONE_MEGA	1000000
 	int i;
 
-	clk_node_recalc_freq();
+	clk_node_recalc();
 
 	for (i = CLK_NODE_INVALID + 1; i < CLK_NODE_CNT; i++) {
 		uint32_t f = clk_node_get_freq(i);
@@ -492,7 +492,7 @@ static uint32_t clk_node_tree_innner(uint32_t id, int level) {
 am18x_rt clk_node_tree(void) {
 	int i;
 
-	clk_node_recalc_freq();
+	clk_node_recalc();
 
 	for (i = CLK_NODE_INVALID + 1; i < CLK_NODE_CNT; i++) {
 		clk_node_t* cni = clk_nodes + i;

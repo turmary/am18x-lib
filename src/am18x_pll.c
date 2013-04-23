@@ -1,6 +1,9 @@
 // tary, 21:18 2013/4/15
 #include "am18x_pll.h"
 
+#define PLL0_DIV_CNT		7
+#define PLL1_DIV_CNT		3
+
 // PLL0 plldivn = 1..7
 // PLL1 plldivn = 1..3
 am18x_rt pll_changing_sysclk_dividers(PLL_con_t* pcon, uint32_t plldivn, uint32_t divider) {
@@ -11,12 +14,12 @@ am18x_rt pll_changing_sysclk_dividers(PLL_con_t* pcon, uint32_t plldivn, uint32_
 
 	// 2. Program the RATIO field in PLLDIVn
 	msk = XXXDIVx_RATIO_MASK;
-	if (plldivn < 4) {
+	if (plldivn <= PLL1_DIV_CNT) {
 		idx = PLLDIVxA_IDX_1 + plldivn - 1;
 		reg = pcon->PLLDIVxA[idx];
 		reg = FIELD_SET(reg, XXXDIVx_DxEN_MASK, XXXDIVx_DxEN_enable);
 		pcon->PLLDIVxA[idx] = FIELD_SET(reg, msk, XXXDIVx_RATIO_WR(divider));
-	} else if (plldivn < 8) {
+	} else if (plldivn <= PLL0_DIV_CNT) {
 		idx = PLLDIVxB_IDX_4 + plldivn - 4;
 		reg = pcon->PLLDIVxB[idx];
 		reg = FIELD_SET(reg, XXXDIVx_DxEN_MASK, XXXDIVx_DxEN_enable);
@@ -32,11 +35,52 @@ am18x_rt pll_changing_sysclk_dividers(PLL_con_t* pcon, uint32_t plldivn, uint32_
 	return AM18X_OK;
 }
 
-am18x_rt pll_conf(PLL_con_t* pcon, const pll_conf_t* conf) {
+am18x_rt pll_get_conf(const PLL_con_t* pcon, pll_conf_t* conf) {
+	uint32_t msk, v;
+	int i;
+
+	conf->prediv = 1UL + __field_xget(pcon->PREDIV, XXXDIVx_RATIO_MASK);
+	conf->pllm = 1UL + __field_xget(pcon->PLLM, PLLM_MASK);
+	conf->postdiv = 1UL + __field_xget(pcon->POSTDIV, XXXDIVx_RATIO_MASK);
+
+	for (i = 0; i < PLL0_DIV_CNT; i++) {
+		if (i < PLL1_DIV_CNT) {
+			v = pcon->PLLDIVxA[PLLDIVxA_IDX_1 + i];
+			conf->plldiv[i] = 1UL + __field_xget(v, XXXDIVx_RATIO_MASK);
+		} else if (pcon == PLL0) {
+			v = pcon->PLLDIVxB[PLLDIVxB_IDX_4 + i - PLL1_DIV_CNT];
+			conf->plldiv[i] = 1UL + __field_xget(v, XXXDIVx_RATIO_MASK);
+		}
+	}
+
+	conf->cflag = 0;
+
+	msk = PLLCTL_EXTCLKSRC_MASK;
+	v = PLLCTL_EXTCLKSRC_PLL1sysclk3;
+	if (pcon == PLL0 && FIELD_GET(pcon->PLLCTL, msk) == v) {
+		conf->cflag |= PLL_CFLAG_EXT_CLK_PLL1;
+	}
+
+	msk = PLLCTL_CLKMODE_MASK;
+	v = PLLCTL_CLKMODE_wave;
+	if (pcon == PLL0 && FIELD_GET(pcon->PLLCTL, msk) == v) {
+		conf->cflag |= PLL_CFLAG_REF_SQUARE;
+	}
+
+	msk = PLLCTL_PLLPWRDN_MASK;
+	v = PLLCTL_PLLPWRDN_yes;
+	if (FIELD_GET(pcon->PLLCTL, msk) == v) {
+		conf->cflag |= PLL_CFLAG_POWER_DOWN;
+	}
+
+	return AM18X_OK;
+}
+
+am18x_rt pll_set_conf(PLL_con_t* pcon, const pll_conf_t* conf) {
 	uint32_t msk, v;
 
 	// 1. Program the CLKMODE bit in PLLC0 PLLCTL
-	if (pcon == PLL0 && (conf->cflag & PLL_CFLAG_FROM_POWER_DOWN)) {
+	if (pcon == PLL0 && (conf->cflag & PLL_CFLAG_FROM_POWERON)) {
 		msk = PLLCTL_CLKMODE_MASK;
 		if (conf->cflag & PLL_CFLAG_REF_SQUARE) {
 			v = PLLCTL_CLKMODE_wave;
@@ -79,8 +123,8 @@ am18x_rt pll_conf(PLL_con_t* pcon, const pll_conf_t* conf) {
 	pcon->PLLCTL = FIELD_SET(pcon->PLLCTL, msk, PLLCTL_PLLRST_asserted);
 
 	// 4. Clear the PLLPWRDN bit in PLLCTL to 0
-	if (conf->cflag & PLL_CFLAG_FROM_POWER_DOWN) {
-		msk = PLLCTL_PLLPWRDN_MASK;
+	msk = PLLCTL_PLLPWRDN_MASK;
+	if (FIELD_GET(pcon->PLLCTL, msk) == PLLCTL_PLLPWRDN_yes) {
 		pcon->PLLCTL = FIELD_SET(pcon->PLLCTL, msk, PLLCTL_PLLPWRDN_no);
 	}
 
@@ -97,8 +141,8 @@ am18x_rt pll_conf(PLL_con_t* pcon, const pll_conf_t* conf) {
 
 	// 6. If desired, program PLLDIVn registers to change
 	//    the SYSCLKn divide values
-	for (v = 0; v < 7; v++) {
-		if (pcon == PLL1 && v >= 3) break;
+	for (v = 0; v < PLL0_DIV_CNT; v++) {
+		if (pcon == PLL1 && v >= PLL1_DIV_CNT) break;
 		pll_changing_sysclk_dividers(pcon, v + 1, conf->plldiv[v]);
 	}
 
@@ -137,11 +181,25 @@ am18x_rt pll_cmd(PLL_con_t* pcon, uint32_t cmd, uint32_t arg) {
 	case PLL_CMD_ENABLE_PLL1_DIVS:
 		if (pcon != PLL1) break;
 		msk = XXXDIVx_DxEN_MASK;
-		for (i = 0; i < 3; i++) {
+		for (i = 0; i < PLL1_DIV_CNT; i++) {
 			int idx = PLLDIVxA_IDX_1 + i;
 			reg = pcon->PLLDIVxA[idx];
 			pcon->PLLDIVxA[idx] = FIELD_SET(reg, msk, XXXDIVx_DxEN_enable);
 		}
+		break;
+
+	case PLL_CMD_POWER_DOWN:
+		msk = PLLCTL_PLLEN_MASK;
+		if (FIELD_GET(pcon->PLLCTL, msk) == PLLCTL_PLLEN_yes) {
+			pcon->PLLCTL = FIELD_SET(pcon->PLLCTL, msk, PLLCTL_PLLEN_no);
+		}
+		msk = PLLCTL_PLLPWRDN_MASK;
+		pcon->PLLCTL = FIELD_SET(pcon->PLLCTL, msk, PLLCTL_PLLPWRDN_yes);
+		break;
+
+	case PLL_CMD_BYPASS:
+		msk = PLLCTL_PLLEN_MASK;
+		pcon->PLLCTL = FIELD_SET(pcon->PLLCTL, msk, PLLCTL_PLLEN_no);		
 		break;
 
 	default:

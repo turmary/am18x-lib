@@ -16,7 +16,7 @@ static const pll_conf_t pllconf[1] = {
 	.plldiv = { 1, 2, 3, 4, 3, 1, 6, },
 	.cflag = PLL_CFLAG_EXT_CLK_OSCIN |
 		PLL_CFLAG_REF_CRYSTAL    |
-		PLL_CFLAG_FROM_POWER_DOWN,
+		PLL_CFLAG_FROM_POWERON,
 }
 };
 
@@ -59,8 +59,8 @@ int main(int argc, char* argv[]) {
 
 	check_delay();
 
-	pll_conf(PLL0, pllconf);
-	clk_node_recalc_freq();
+	pll_set_conf(PLL0, pllconf);
+	clk_node_recalc();
 	uart_init();
 
 	printk("After dll opened\n");

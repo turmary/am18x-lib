@@ -10,13 +10,16 @@ typedef enum {
 	PLL_CFLAG_EXT_CLK_PLL1  = BIT(0),
 	PLL_CFLAG_REF_CRYSTAL = 0x0,
 	PLL_CFLAG_REF_SQUARE  = BIT(1),
-	PLL_CFLAG_FROM_NORMAL = 0x0,
-	PLL_CFLAG_FROM_POWER_DOWN = BIT(2),
+	PLL_CFLAG_POWER_NORM = 0x0,
+	PLL_CFLAG_POWER_DOWN = BIT(2),
+	PLL_CFLAG_FROM_POWERON = BIT(3),
 } PLL_CFLAG_flag_t;
 
 typedef enum {
 	PLL_CMD_SOFT_RESET,
 	PLL_CMD_ENABLE_PLL1_DIVS,
+	PLL_CMD_POWER_DOWN,
+	PLL_CMD_BYPASS,
 } pll_cmd_t;
 
 typedef enum {
@@ -34,7 +37,8 @@ typedef struct {
 } pll_conf_t;
 
 am18x_rt pll_changing_sysclk_dividers(PLL_con_t* pcon, uint32_t plldivn, uint32_t divider);
-am18x_rt pll_conf(PLL_con_t* pcon, const pll_conf_t* conf);
+am18x_rt pll_get_conf(const PLL_con_t* pcon, pll_conf_t* conf);
+am18x_rt pll_set_conf(PLL_con_t* pcon, const pll_conf_t* conf);
 am18x_rt pll_cmd(PLL_con_t* pcon, uint32_t cmd, uint32_t arg);
 pll_reset_t pll_get_reset(void);
 

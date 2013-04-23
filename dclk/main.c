@@ -13,7 +13,7 @@ static pll_conf_t pllconf[1] = {
 	.plldiv = { 1, 2, 3, 4, 3, 1, 6, },
 	.cflag = PLL_CFLAG_EXT_CLK_OSCIN |
 		PLL_CFLAG_REF_CRYSTAL    |
-		PLL_CFLAG_FROM_POWER_DOWN|
+		PLL_CFLAG_FROM_POWERON   |
 		PLL_CFLAG_EXT_CLK_PLL1,
 }
 };
@@ -31,8 +31,8 @@ int main(int argc, char* argv[]) {
 	clk_node_tree();
 
 	pllconf->pllm = 7;
-	pll_conf(PLL1, pllconf);
-	clk_node_recalc_freq();
+	pll_set_conf(PLL1, pllconf);
+	clk_node_recalc();
 
 	// ********** tree 2 **********
 	printk("\n\n");
@@ -41,12 +41,12 @@ int main(int argc, char* argv[]) {
 	pllconf->pllm = 25;
 	// important setting
 	// pll_cmd(PLL1, PLL_CMD_ENABLE_PLL1_DIVS, 0);
-	pll_conf(PLL0, pllconf);
+	pll_set_conf(PLL0, pllconf);
 
 	// clk_node_set_parent(CLK_NODE_PLL0_PLLEN, CLK_NODE_PLL_EXTSRC);
 	clk_node_set_parent(CLK_NODE_EMA_CLKSRC, CLK_NODE_DIV4_5X);
 	clk_node_set_parent(CLK_NODE_OCSEL0_OCSRC, CLK_NODE_PLL1_OBSCLK);
-	clk_node_recalc_freq();
+	clk_node_recalc();
 	uart_init();
 
 	// ********** tree 3 **********
