@@ -29,6 +29,8 @@ extern const uint32_t f_osc;
 
 #define _AINTC
 
+#define _GPIO
+
 #define _I2C
 #define _I2C0
 #define _I2C1

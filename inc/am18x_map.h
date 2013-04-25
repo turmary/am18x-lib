@@ -691,6 +691,57 @@ typedef struct {
 } AINTC_con_t;
 
 typedef struct {
+#define XXX_GPkPj_MASK(j)		(0x1UL << (j))
+#define DIR_GPkPj_output(j)		(0x0UL << (j))
+#define DIR_GPkPj_input(j)		(0x1UL << (j))
+	vuint32_t	DIR;
+#define OUT_DATA_GPkPj_low(j)		(0x0UL << (j))
+#define OUT_DATA_GPkPj_high(j)		(0x1UL << (j))
+	vuint32_t	OUT_DATA;
+#define SET_DATA_GPkPj_none(j)		(0x0UL << (j))
+#define SET_DATA_GPkPj_high(j)		(0x1UL << (j))
+	vuint32_t	SET_DATA;
+#define CLR_DATA_GPkPj_none(j)		(0x0UL << (j))
+#define CLR_DATA_GPkPj_low(j)		(0x1UL << (j))
+	vuint32_t	CLR_DATA;
+#define IN_DATA_GPkPj_low(j)		(0x0UL << (j))
+#define IN_DATA_GPkPj_high(j)		(0x1UL << (j))
+	vuint32_t	IN_DATA;
+#define SET_RIS_TRIG_none(j)		(0x0UL << (j))
+#define SET_RIS_TRIG_enable(j)		(0x1UL << (j))
+	vuint32_t	SET_RIS_TRIG;
+#define CLR_RIS_TRIG_none(j)		(0x0UL << (j))
+#define CLR_RIS_TRIG_disable(j)		(0x1UL << (j))
+	vuint32_t	CLR_RIS_TRIG;
+#define SET_FAL_TRIG_none(j)		(0x0UL << (j))
+#define SET_FAL_TRIG_disable(j)		(0x1UL << (j))
+	vuint32_t	SET_FAL_TRIG;
+#define CLR_FAL_TRIG_none(j)		(0x0UL << (j))
+#define CLR_FAL_TRIG_disable(j)		(0x1UL << (j))
+	vuint32_t	CLR_FAL_TRIG;
+#define INTSTAT_none(j)			(0x0UL << (j))
+#define INTSTAT_pending(j)		(0x1UL << (j))
+	vuint32_t	INTSTAT;
+} GPIO_pair_t;
+
+typedef struct {
+#define GPIO_REVID			0x44830105UL
+	vcuint32_t	REVID;
+	uint32_t	RESERVED0;
+#define BIT_ENx_MASK(x)			(0x1UL << (x))
+#define BIT_ENx_no(x)			(0x0UL << (x))
+#define BIT_ENx_yes(x)			(0x1UL << (x))
+	vuint32_t	BINTEN;
+	uint32_t	RESERVED1;
+#define GPIO_BANKS_0_1			0
+#define GPIO_BANKS_2_3			1
+#define GPIO_BANKS_4_5			2
+#define GPIO_BANKS_6_7			3
+#define GPIO_BANKS_8			4
+	GPIO_pair_t	BANKS[5];
+} GPIO_con_t;
+
+typedef struct {
 #define ICOAR_OADDR_MASK		(0x3FFUL << 0)
 #define ICOAR_OADDR_VAL(x)		((0x3FFUL & (x)) << 0)
 	vuint32_t	ICOAR;
@@ -1191,6 +1242,7 @@ typedef struct {
 #define MPU1_BASE			0x01E14000UL
 #define MPU2_BASE			0x01E15000UL
 #define PLL1_BASE			0x01E1A000UL
+#define GPIOCON_BASE			0x01E26000UL
 #define PSC1_BASE			0x01E27000UL
 #define I2C1_BASE			0x01E28000UL
 #define SYSCFG1_BASE			0x01E2C000UL
@@ -1232,6 +1284,9 @@ typedef struct {
 #endif
 #ifdef _AINTC
 	#define AINTC			((AINTC_con_t*)AINTC_BASE)
+#endif
+#ifdef _GPIO
+	#define GPIOCON			((GPIO_con_t*)GPIOCON_BASE)
 #endif
 #ifdef _I2C0
 	#define I2C0 			((I2C_con_t*)I2C0_BASE)
@@ -1288,6 +1343,9 @@ typedef struct {
 #endif
 #ifdef _AINTC
 	_EXTERN AINTC_con_t		*AINTC;
+#endif
+#ifdef _GPIO
+	_EXTERN GPIO_con_t		*GPIOCON;
 #endif
 #ifdef _I2C0
 	_EXTERN I2C_con_t		*I2C0;
