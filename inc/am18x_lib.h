@@ -41,4 +41,8 @@
 #include "am18x_mpu.h"
 #endif
 
+#ifdef _GPIO
+#include "am18x_gpio.h"
+#endif
+
 #endif//__AM18X_LIB_H__

@@ -1,5 +1,4 @@
 // tary, 0:56 2013/4/26
-
 #include "am18x_gpio.h"
 #include "am18x_syscfg.h"
 
@@ -207,13 +206,35 @@ am18x_rt gpio_set_output1(gpio_bank_t bank, gpio_pin_t pin, gpio_level_t level) 
 
 gpio_level_t gpio_get_output1(gpio_bank_t bank, gpio_pin_t pin) {
 	reg_and_of(OUT,_DATA);
+
 	if (FIELD_GET(reg, XXX_GPkPj_MASK(of)) == IN_DATA_GPkPj_low(of)) {
 		return GPIO_LOW;
 	}
 	return GPIO_HIGH;	
 }
 
-gpio_pins_t gpio_get_inputs(gpio_bank_t bank, gpio_pins_t pins);
-am18x_rt gpio_set_outputs(gpio_bank_t bank, gpio_pins_t pins, gpio_pins_t levels);
-/* get levels last output */
-gpio_pins_t gpio_get_outputs(gpio_bank_t bank, gpio_pins_t pins);
+gpio_pins_t gpio_get_inputs(gpio_bank_t bank, gpio_pins_t pins) {
+	uint32_t reg, of = reg_offset(bank);
+
+	reg = gcon->BANKS[pair_nr(bank)].IN_DATA;
+	reg = FIELD_GET(reg, pins << of);
+	return reg >> of;
+}
+
+am18x_rt gpio_set_outputs(gpio_bank_t bank, gpio_pins_t pins, gpio_pins_t levels) {
+	uint32_t reg, of = reg_offset(bank);
+
+	pins <<= of;
+	levels <<= of;
+	reg = gcon->BANKS[pair_nr(bank)].OUT_DATA;
+	gcon->BANKS[pair_nr(bank)].OUT_DATA = FIELD_SET(reg, pins, levels);
+	return AM18X_OK;
+}
+
+gpio_pins_t gpio_get_outputs(gpio_bank_t bank, gpio_pins_t pins) {
+	uint32_t reg, of = reg_offset(bank);
+
+	reg = gcon->BANKS[pair_nr(bank)].OUT_DATA;
+	reg = FIELD_GET(reg, pins << of);
+	return reg >> of;
+}
