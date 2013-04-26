@@ -65,3 +65,7 @@ am18x_rt syscfg_pinmux(uint32_t mux, uint32_t pos, uint32_t val) {
 
 	return AM18X_OK;
 }
+
+int32_t syscfg_bootmode(void) {
+	return __field_xget(SYSCFG0->BOOTCFG, BOOTCFG_BOOTMODE_MASK);
+}
