@@ -4,6 +4,9 @@ TARGET = main
 MAKEFLAGS += 
 
 DEFS = 
+ifeq ($(MAKECMDGOALS),run)
+DEFS += -D_M_BOOT_DELAY
+endif
 
 CINS = ../include
 

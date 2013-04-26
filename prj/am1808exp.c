@@ -31,7 +31,8 @@ int low_level_init(void) {
 	}
 */
 
-	// delay(284091 * 3);
-
+#ifdef _M_BOOT_DELAY
+	delay(284091 * 3);
+#endif
 	return AM18X_OK;
 }
