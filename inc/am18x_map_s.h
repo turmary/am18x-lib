@@ -1,6 +1,33 @@
 #define __AM18X_MAP_H__
 #define _EXTERN		extern
 #define _RS(b,a)	(((b) - (a) - 0x4) >> 2)
+#define MPU1_PROGxMPxAR_MASK		0xFFFFFC00
+#define MPU2_PROGxMPxAR_MASK		0xfFFF0000
+#define PROGxMPPA_AIDn_MASK(n)		(0x1 << (10 + (n)))
+#define PROGxMPPA_AIDn_denied(n)	(0x1 << (10 + (n)))
+#define PROGxMPPA_AIDn_granted(n)	(0x1 << (10 + (n)))
+#define MPU_REVID			0x4E810101
+#define CONFIG_ADDR_WIDTH_MASK		(0xFF << 24)
+#define CONFIG_NUM_FIXED_MASK		(0xF << 20)
+#define CONFIG_NUM_PROG_MASK		(0xF << 16)
+#define CONFIG_NUM_AIDS_MASK		(0xF << 12)
+#define CONFIG_ASSUME_ALLOWED_MASK	(0x1 << 0)
+#define CONFIG_ASSUME_ALLOWED_no	(0x0 << 0)
+#define CONFIG_ASSUME_ALLOWED_yes	(0x1 << 0)
+#define FXD_MPSAR_VAL			0xB0000000
+#define FXD_MPEAR_VAL			0xB0007FFF
+#define FLTSTAT_MSTID_MASK		(0xFF << 16)
+#define FLTSTAT_PRIVID_MASK		(0xF << 9)
+#define FLTSTAT_TYPE_MASK		(0x3F << 0)
+#define FLTSTAT_TYPE_NoFault		(0x0 << 0)
+#define FLTSTAT_TYPE_UserExecute	(0x1 << 0)
+#define FLTSTAT_TYPE_UserWrite		(0x2 << 0)
+#define FLTSTAT_TYPE_UserRead		(0x4 << 0)
+#define FLTSTAT_TYPE_SupervisorExecute	(0x8 << 0)
+#define FLTSTAT_TYPE_SupervisorWrite	(0x10 << 0)
+#define FLTSTAT_TYPE_CacheWriteBack	(0x12 << 0)
+#define FLTSTAT_TYPE_SupervisorRead	(0x20 << 0)
+#define FLTSTAT_TYPE_CacheLineFill	(0x3F << 0)
 #define PLL0_REVID			0x44813C00
 #define PLL1_REVID			0x44814400
 #define RSTYPE_PLLSWRST_MASK		(0x1 << 2)
@@ -41,6 +68,7 @@
 #define OCSEL_OCSRC_oscin		(0x14 << 0)
 #define OCSEL_OCSRC_PLLsysclkx(x)	((0x16 + (x)) << 0)
 #define OCSEL_OCSRC_PLL1obsclk		(0x1E << 0)
+#define OCSEL_OCSRC_Disabled		(0x1F << 0)
 #define PLLM_MASK			(0x1F << 0)
 #define PLLM_WR(m)			(((m) - 0x1) << 0)
 #define XXXDIVx_DxEN_MASK		(0x1 << 15)
@@ -86,6 +114,7 @@
 #define PLLDIVxB_IDX_6			0x2
 #define PLLDIVxB_IDX_7			0x3
 #define MODULE_NR_PER_PSC	32
+#define PSC_REVID			0x44825A00
 #define PTCMD_GO1			(0x1 << 1)
 #define PTCMD_GO0			(0x1 << 0)
 #define PTSTAT_GO1_MASK			(0x1 << 1)
@@ -171,6 +200,26 @@
 #define MDCTLx_STATE_SyncReset		(0x1 << 0)
 #define MDCTLx_STATE_Disable		(0x2 << 0)
 #define MDCTLx_STATE_Enable		(0x3 << 0)
+#define SYSCFG0_REVID			0x4E840102
+#define BOOTCFG_BOOTMODE_MASK		0x001F
+#define BOOTCFG_BOOTMODE_I2C0EEPROM	0x00
+#define BOOTCFG_BOOTMODE_I2C0SLAVE	0x01
+#define BOOTCFG_BOOTMODE_NOR		0x02
+#define BOOTCFG_BOOTMODE_HPI		0x04
+#define BOOTCFG_BOOTMODE_I2C1EEPROM	0x06
+#define BOOTCFG_BOOTMODE_I2C1SLAVE	0x07
+#define BOOTCFG_BOOTMODE_SPI0EEPROM	0x08
+#define BOOTCFG_BOOTMODE_SPI1EEPROM	0x09
+#define BOOTCFG_BOOTMODE_SPI0FLASH	0x0A
+#define BOOTCFG_BOOTMODE_SPI1FLASH	0x0C
+#define BOOTCFG_BOOTMODE_NAND8		0x0E
+#define BOOTCFG_BOOTMODE_NAND16		0x10
+#define BOOTCFG_BOOTMODE_SPI0SLAVE	0x12
+#define BOOTCFG_BOOTMODE_SPI1SLAVE	0x13
+#define BOOTCFG_BOOTMODE_UART2		0x14
+#define BOOTCFG_BOOTMODE_UART0		0x16
+#define BOOTCFG_BOOTMODE_UART1		0x17
+#define BOOTCFG_BOOTMODE_EMU		0x1E
 #define KICK0R_UNLOCK			0x83E70B13
 #define KICK0R_LOCK			0x00000000
 #define KICK1R_UNLOCK			0x95A4F1E0
@@ -196,16 +245,6 @@
 #define IENCLR_PROTERR_EN_enable	(0x1 << 0)
 #define EOI_EOIVECT_MASK		(0xFF << 0)
 #define FLTSTAT_ID_MASK			(0xFF << 24)
-#define FLTSTAT_MSTID_MASK		(0xFF << 16)
-#define FLTSTAT_PRIVID_MASK		(0xF << 9)
-#define FLTSTAT_TYPE_MASK		(0x3F << 0)
-#define FLTSTAT_TYPE_None		0x0
-#define FLTSTAT_TYPE_UserExec		0x1
-#define FLTSTAT_TYPE_UserWrite		0x2
-#define FLTSTAT_TYPE_UserRead		0x4
-#define FLTSTAT_TYPE_SupervisorExec	0x8
-#define FLTSTAT_TYPE_SupervisorWrite	0x10
-#define FLTSTAT_TYPE_SupervisorRead	0x20
 #define CFGCHIP0_PLL_MASTER_LOCK_MASK	(0x1 << 4)
 #define CFGCHIP0_PLL_MASTER_LOCK_no	(0x0 << 4)
 #define CFGCHIP0_PLL_MASTER_LOCK_yes	(0x1 << 4)
@@ -285,6 +324,36 @@
 #define HIER_FIQ_MASK			(0x1 << 0)
 #define HIER_FIQ_disabled		(0x0 << 0)
 #define HIER_FIQ_enabled		(0x1 << 0)
+#define XXX_GPkPj_MASK(j)		(0x1 << (j))
+#define DIR_GPkPj_output(j)		(0x0 << (j))
+#define DIR_GPkPj_input(j)		(0x1 << (j))
+#define OUT_DATA_GPkPj_low(j)		(0x0 << (j))
+#define OUT_DATA_GPkPj_high(j)		(0x1 << (j))
+#define SET_DATA_GPkPj_none(j)		(0x0 << (j))
+#define SET_DATA_GPkPj_high(j)		(0x1 << (j))
+#define CLR_DATA_GPkPj_none(j)		(0x0 << (j))
+#define CLR_DATA_GPkPj_low(j)		(0x1 << (j))
+#define IN_DATA_GPkPj_low(j)		(0x0 << (j))
+#define IN_DATA_GPkPj_high(j)		(0x1 << (j))
+#define SET_RIS_TRIG_none(j)		(0x0 << (j))
+#define SET_RIS_TRIG_enable(j)		(0x1 << (j))
+#define CLR_RIS_TRIG_none(j)		(0x0 << (j))
+#define CLR_RIS_TRIG_disable(j)		(0x1 << (j))
+#define SET_FAL_TRIG_none(j)		(0x0 << (j))
+#define SET_FAL_TRIG_disable(j)		(0x1 << (j))
+#define CLR_FAL_TRIG_none(j)		(0x0 << (j))
+#define CLR_FAL_TRIG_disable(j)		(0x1 << (j))
+#define INTSTAT_none(j)			(0x0 << (j))
+#define INTSTAT_pending(j)		(0x1 << (j))
+#define GPIO_REVID			0x44830105
+#define BIT_ENx_MASK(x)			(0x1 << (x))
+#define BIT_ENx_no(x)			(0x0 << (x))
+#define BIT_ENx_yes(x)			(0x1 << (x))
+#define GPIO_BANKS_0_1			0
+#define GPIO_BANKS_2_3			1
+#define GPIO_BANKS_4_5			2
+#define GPIO_BANKS_6_7			3
+#define GPIO_BANKS_8			4
 #define ICOAR_OADDR_MASK		(0x3FF << 0)
 #define ICOAR_OADDR_VAL(x)		((0x3FF & (x)) << 0)
 #define ICIMR_AAS_MASK			(0x1 << 6)
@@ -715,12 +784,17 @@
 #define UART0_BASE			0x01C42000
 #define UART1_BASE			0x01D0C000
 #define UART2_BASE			0x01D0D000
+#define MPU1_BASE			0x01E14000
+#define MPU2_BASE			0x01E15000
 #define PLL1_BASE			0x01E1A000
+#define GPIOCON_BASE			0x01E26000
 #define PSC1_BASE			0x01E27000
 #define I2C1_BASE			0x01E28000
 #define SYSCFG1_BASE			0x01E2C000
 #define TIMER2_BASE			0x01F0C000
 #define TIMER3_BASE			0x01F0D000
+#define ARMlocalROM_BASE		0xFFFD0000
+#define ARMLocalROM_SIZE		0x00010000
 #define AINTC_BASE			0xFFFEE000
 #define ARMlocalRAM_BASE		0xFFFF0000
 #define ARMLocalRAM_SIZE		0x00002000

@@ -18,7 +18,7 @@
 
 typedef struct {
 #define MPU1_PROGxMPxAR_MASK		0xFFFFFC00UL
-#define MPU2_PROGxMPxAR_MASK		0xfFFF0000UL
+#define MPU2_PROGxMPxAR_MASK		0xFFFF0000UL
 	vuint32_t	MPSAR;
 	vuint32_t	MPEAR;
 // n = 0..11
@@ -261,7 +261,7 @@ typedef enum {
 
 
 typedef struct {
-#define SYSCFG0_REVID			0x4E840102UL
+#define PSC_REVID			0x44825A00UL
 	vcuint32_t	REVID;
 	uint32_t	RESERVED0[5];
 	vuint32_t	INTEVAL;
@@ -378,6 +378,7 @@ typedef struct {
 } PSC_con_t;
 
 typedef struct {
+#define SYSCFG0_REVID			0x4E840102UL
 	vcuint32_t	REVID;
 	uint32_t	RESERVED0;
 	vcuint32_t	DIEIDRx[4];
