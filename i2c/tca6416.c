@@ -1,10 +1,8 @@
 // tary, 23:04 2013/3/25
 #include "am18x_lib.h"
-#include "auxlib.h"
 #include "tca6416.h"
-
-#define I2C0_SCL			4,8,2
-#define I2C0_SDA			4,12,2
+#include "auxlib.h"
+#include "i2c_inf.h"
 
 // 1015526A_AM1808_Baseboard_Schematic.pdf
 // Page 14, IO EXPANDER
@@ -42,62 +40,6 @@ typedef enum {
 	CONFIGURATION_PORT_1,
 } TCA6416_reg_t;
 
-static i2c_conf_t iconf[1] = {{
-	TCA6416_SPEED,
-	TCA6416_ADDR,
-	I2C_BITMODE_7BIT,
-	I2C_OPERMODE_Master_transmitter,
-}};
-
-static int i2c_read(I2C_con_t* bus, uint16_t dev, uint8_t* bytes, uint32_t cnt) {
-	int i;
-
-	iconf->opermode = I2C_OPERMODE_Master_receiver;
-	iconf->addr = dev;
-	i2c_conf(bus, iconf);
-
-	i2c_cmd(bus, I2C_CMD_SET_CNT, cnt);
-	i2c_cmd(bus, I2C_CMD_WAIT_FREE, 0);
-	i2c_cmd(bus, I2C_CMD_BUS_START, 0);
-	i2c_cmd(bus, I2C_CMD_WAIT_BUSY, 0);
-
-	for (i = 0; i < cnt; i++) {
-		// dump_regs_word("I2C0", (uint32_t)bus, sizeof(I2C_con_t));
-		i2c_cmd(bus, I2C_CMD_WAIT_RX, 0);
-		bytes[i] = i2c_get_rx(bus);
-	}
-
-	i2c_cmd(bus, I2C_CMD_WAIT_ARDY, 0);
-	i2c_cmd(bus, I2C_CMD_BUS_STOP, 0);
-	i2c_cmd(bus, I2C_CMD_WAIT_SLAVE, 0);
-
-	return 0;
-}
-
-static int i2c_write(I2C_con_t* bus, uint16_t dev, cuint8_t* bytes, uint32_t cnt) {
-	int i;
-
-	iconf->opermode = I2C_OPERMODE_Master_transmitter;
-	iconf->addr = dev;
-	i2c_conf(bus, iconf);
-
-	i2c_cmd(bus, I2C_CMD_SET_CNT, cnt);
-	i2c_cmd(bus, I2C_CMD_WAIT_FREE, 0);
-	i2c_cmd(bus, I2C_CMD_BUS_START, 0);
-	i2c_cmd(bus, I2C_CMD_WAIT_BUSY, 0);
-
-	for (i = 0; i < cnt; i++) {
-		// dump_regs_word("I2C0", (uint32_t)bus, sizeof(I2C_con_t));
-		i2c_cmd(bus, I2C_CMD_WAIT_TX, 0);
-		i2c_set_tx(bus, bytes[i]);
-	}
-
-	i2c_cmd(bus, I2C_CMD_BUS_STOP, 0);
-	i2c_cmd(bus, I2C_CMD_WAIT_SLAVE, 0);
-
-	return 0;
-}
-
 static inline int tca6416_reg_write(uint8_t reg, uint16_t val) {
 	uint8_t bytes[3];
 
@@ -126,8 +68,7 @@ static inline int tca6416_reg_read(uint8_t reg) {
 int tca6416_conf(uint16_t dir) {
 	int i;
 
-	syscfg_pinmux(I2C0_SCL);
-	syscfg_pinmux(I2C0_SDA);
+	i2c_init(TCA6416_BUS, TCA6416_SPEED);
 
 	for (i = 0; i < 8 ; i += 2) {
 		printk("[0x%.2X] = 0x%.4X\n", i, tca6416_reg_read(i));
