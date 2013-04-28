@@ -500,7 +500,7 @@ typedef struct {
 typedef enum {
 	AINTC_COMMTX = 0,		// 0
 	AINTC_COMMRX,
-	AINTC_MINT,
+	AINTC_NINT,
 	AINTC_PRU_EVTOUT0,
 	AINTC_PRU_EVTOUT1,
 

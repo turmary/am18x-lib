@@ -2,6 +2,7 @@
 #include "am18x_lib.h"
 #include "arm920t.h"
 #include "systick.h"
+#include "tps6507x.h"
 #include "auxlib.h"
 #include "uart.h"
 
@@ -58,19 +59,33 @@ int main(int argc, char* argv[]) {
 	pll_conf_t pllconf[1];
 	const char* title = "\nam18x library for power management!\n";
 	uint32_t r;
+	int i;
 
 	arm_intr_enable();
+	systick_start();
 
 	printk(title);
 	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);
+
+	tps6507x_conf();
+
+	for (i = 0; i < 2 * 120; i++) {
+		r = tps6507x_get_adc(i & 0x01);
+		r = r * 1000 * 6 / 0x400UL;
+		if (i & 0x01) {
+			printk("power ac  ");
+		} else {
+			printk("power sys ");
+		}
+		printk(" voltage: %.4d mV\n", r);
+		systick_sleep(500);
+	}
 
 	#if 0
 	// arm clock off don't work
 	arm_clock_off_and_on();
 	printk("%s() complete!\n", "arm_clock_off_and_on");
 	#endif
-
-	systick_start();
 
 	printk("one second counter\n");
 	pll_get_conf(PLL0, pllconf);
