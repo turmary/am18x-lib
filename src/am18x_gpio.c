@@ -20,7 +20,7 @@ static inline int reg_offset(gpio_bank_t bank) {
 	return 0;
 }
 
-am18x_rt gpio_set_mux(gpio_bank_t bank, gpio_pin_t pin, am18x_bool is_out) {
+am18x_rt gpio_set_mux(gpio_bank_t bank, gpio_pin_t pin, gpio_dir_t dir) {
 	uint32_t mux, pos, val;
 
 	mux = (uint32_t)-1;
@@ -182,7 +182,7 @@ am18x_rt gpio_set_mux(gpio_bank_t bank, gpio_pin_t pin, am18x_bool is_out) {
 	{
 	reg_and_of(D,IR);
 	gcon->BANKS[pair_nr(bank)].DIR = __field_xset(reg, XXX_GPkPj_MASK(of), 
-		is_out? DIR_GPkPj_output(0): DIR_GPkPj_input(0));
+		(dir == GPIO_DIR_INPUT)? DIR_GPkPj_input(0): DIR_GPkPj_output(0));
 	}
 	return AM18X_OK;
 }

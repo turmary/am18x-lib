@@ -17,10 +17,10 @@ int main(int argc, char* argv[]) {
 	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);
 
 	psc_state_transition(PSC_GPIO, PSC_STATE_ENABLE);
-	gpio_set_mux(GPIO_BANK7, GPIO_PIN_1, AM18X_FALSE);
-	gpio_set_mux(GPIO_BANK7, GPIO_PIN_2, AM18X_FALSE);
-	gpio_set_mux(GPIO_BANK7, GPIO_PIN_3, AM18X_FALSE);
-	gpio_set_mux(GPIO_BANK7, GPIO_PIN_4, AM18X_FALSE);
+	gpio_set_mux(GPIO_BANK7, GPIO_PIN_1, GPIO_DIR_INPUT);
+	gpio_set_mux(GPIO_BANK7, GPIO_PIN_2, GPIO_DIR_INPUT);
+	gpio_set_mux(GPIO_BANK7, GPIO_PIN_3, GPIO_DIR_INPUT);
+	gpio_set_mux(GPIO_BANK7, GPIO_PIN_4, GPIO_DIR_INPUT);
 
 	for (i = 0; i < 2 * 120; i++) {
 		printk("BOOT[4:1] = 0x%.4X\n", 

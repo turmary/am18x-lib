@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
 	#if 0
 	// tps65070 power_on pin don't work
 	psc_state_transition(PSC_GPIO, PSC_STATE_ENABLE);
-	gpio_set_mux(GPIO_BANK2, GPIO_PIN_2, AM18X_TRUE);
+	gpio_set_mux(GPIO_BANK2, GPIO_PIN_2, GPIO_DIR_OUTPUT);
 	gpio_set_output1(GPIO_BANK2, GPIO_PIN_2, GPIO_LOW);
 	#endif
 

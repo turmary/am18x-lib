@@ -61,9 +61,14 @@ typedef enum {
 	GPIO_PINS_ALL = BIT(16) - 1,
 } gpio_pins_cell_t;
 
+typedef enum {
+	GPIO_DIR_INPUT,
+	GPIO_DIR_OUTPUT,
+} gpio_dir_t;
+
 typedef uint32_t			gpio_pins_t;
 
-am18x_rt gpio_set_mux(gpio_bank_t bank, gpio_pin_t pin, am18x_bool is_out);
+am18x_rt gpio_set_mux(gpio_bank_t bank, gpio_pin_t pin, gpio_dir_t dir);
 
 gpio_level_t gpio_get_input1(gpio_bank_t bank, gpio_pin_t pin);
 am18x_rt gpio_set_output1(gpio_bank_t bank, gpio_pin_t pin, gpio_level_t level);
