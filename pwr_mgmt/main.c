@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
 	tps6507x_conf();
 	tps6507x_dump_regs();
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < 4; i++) {
 		if (i & 0x01) {
 			r = tps6507x_get_adc(PWR_TYPE_AC);
 			printk("power ac  ");
@@ -96,6 +96,14 @@ int main(int argc, char* argv[]) {
 		systick_sleep(100);
 	}
 
+	for (i = 0; i < countof(kv_powers); i++) {
+		r = tps6507x_get_output(kv_powers[i].key);
+		printk("%-5s voltage: %.4d mV\n", kv_powers[i].val, r);
+	}
+
+	tps6507x_set_output(PWR_TYPE_DCDC3, 1300);
+	tps6507x_set_output(PWR_TYPE_LDO1, 1600);
+	tps6507x_set_output(PWR_TYPE_LDO2, 1250);
 	for (i = 0; i < countof(kv_powers); i++) {
 		r = tps6507x_get_output(kv_powers[i].key);
 		printk("%-5s voltage: %.4d mV\n", kv_powers[i].val, r);

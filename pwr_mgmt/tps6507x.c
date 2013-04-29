@@ -92,6 +92,7 @@ static const uint16_t dcdcx_voltage[] = {
 	2550, 2600, 2650, 2700,
 	2750, 2800, 2850, 2900,
 	3000, 3100, 3200, 3300, // 3000 + 100 * (i - 28)
+	0, 0,
 };
 
 static const uint16_t ldo1_voltage[] = {
@@ -99,6 +100,7 @@ static const uint16_t ldo1_voltage[] = {
 	1300, 1350, 1400, 1500,
 	1600, 1800, 2500, 2750,
 	2800, 3000, 3100, 3200,
+	0, 0,
 };
 
 static inline int tps6507x_reg_write(uint8_t reg, uint8_t val) {
@@ -183,10 +185,10 @@ int tps6507x_get_adc(pwr_type_t pt) {
 	return r;
 }
 
-int tps6507x_get_output(pwr_type_t pt) {
-	uint32_t msk;
+static uint16_t* pwrtyp2voltages(pwr_type_t pt, int* pr, uint8_t* pm) {
 	uint16_t* voltages;
-	int reg, v;
+	uint8_t msk;
+	int reg;
 
 	msk = DEFDCDCX_OUTVOLT_MASK;
 	voltages = dcdcx_voltage;
@@ -209,12 +211,48 @@ int tps6507x_get_output(pwr_type_t pt) {
 		reg = TPS6507X_REG_DEFLDO2;
 		break;
 	default:
+		return NULL;
+	}
+	if (pr != NULL) {
+		*pr = reg;
+	}
+	if (pm != NULL) {
+		*pm = msk;
+	}
+	return voltages;
+}
+
+int tps6507x_get_output(pwr_type_t pt) {
+	uint16_t* voltages;
+	uint8_t msk;
+	int reg, v;
+
+	if ((voltages = pwrtyp2voltages(pt, &reg, &msk)) == NULL) {
 		return 0;
 	}
 
 	v = tps6507x_reg_read(reg);
 	v = __field_xget(v, msk);
 	return voltages[v];
+}
+
+int tps6507x_set_output(pwr_type_t pt, uint16_t voltage) {
+	uint16_t* voltages;
+	uint8_t msk;
+	int i, reg, v;
+
+	if ((voltages = pwrtyp2voltages(pt, &reg, &msk)) == NULL) {
+		return -1;
+	}
+
+	for (i = 0; voltages[i] != 0 && voltages[i] <= voltage; i++) {
+	}
+	if (--i < 0) i = 0;
+
+	v = tps6507x_reg_read(reg);
+	v = __field_xset(v, msk, i);
+	tps6507x_reg_write(reg, v);
+	return 0;
 }
 
 int tps6507x_power_switch(pwr_type_t pt, am18x_bool on_noff) {
@@ -255,17 +293,5 @@ int tps6507x_power_switch(pwr_type_t pt, am18x_bool on_noff) {
 	v = FIELD_SET(v, msk, f);
 	tps6507x_reg_write(reg, v);
 
-	return 0;
-}
-
-int tps6507x_read(void) {
-	uint8_t v;
-
-	v = tps6507x_reg_read(TPS6507X_REG_PPATH1);
-	return v;
-}
-
-int tps6507x_write(uint8_t val) {
-	tps6507x_reg_write(TPS6507X_REG_PPATH1, val);
 	return 0;
 }
