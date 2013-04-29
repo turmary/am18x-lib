@@ -4,7 +4,15 @@
 
 #include "am18x_lib.h"
 
+typedef enum {
+	PWR_TYPE_AC,
+	PWR_TYPE_USB,
+	PWR_TYPE_SYS,
+} pwr_type_t;
+
 int tps6507x_conf(void);
-int tps6507x_get_adc(int is_ac);
+int tps6507x_dump_regs(void);
+int tps6507x_get_adc(pwr_type_t pt);
+int tps6507x_power_switch(pwr_type_t pt, am18x_bool on_noff);
 
 #endif//__TPS6507X_H__

@@ -59,6 +59,10 @@ enum {
 	BIT_DEF(ADCONFIG,6,Start,no,yes),
 	BIT_DEF(ADCONFIG,5,End,no,yes),
 	BIT_DEF(ADCONFIG,4,Vref,disable,enable),
+	BIT_DEF(PPATH1,7,USBPresent,no,yes),
+	BIT_DEF(PPATH1,6,ACPresent,no,yes),
+	BIT_DEF(PPATH1,5,USBPower,enable,disable),
+	BIT_DEF(PPATH1,4,ACPower,enable,disable),
 };
 
 static inline int tps6507x_reg_write(uint8_t reg, uint8_t val) {
@@ -82,10 +86,8 @@ static inline int tps6507x_reg_read(uint8_t reg) {
 	return bytes[0];
 }
 
-int tps6507x_conf(void) {
+int tps6507x_dump_regs(void) {
 	int i;
-
-	i2c_init(TPS6507X_BUS, TPS6507X_SPEED);
 
 	for (i = 1; i < TPS6507X_REG_CNT ; i++) {
 		printk("[0x%.2X] = 0x%.2X\n", i, tps6507x_reg_read(i));
@@ -93,10 +95,21 @@ int tps6507x_conf(void) {
 	return 0;
 }
 
-int tps6507x_get_adc(int is_ac) {
-	uint16_t r;
+int tps6507x_conf(void) {
+	i2c_init(TPS6507X_BUS, TPS6507X_SPEED);
+	return 0;
+}
+
+int tps6507x_get_adc(pwr_type_t pt) {
 	uint32_t msk;
+	uint16_t r;
 	uint8_t v;
+
+	if (pt != PWR_TYPE_AC
+	 && pt != PWR_TYPE_SYS
+	) {
+		return -1;
+	}
 
 	// Set Bit AD ENABLE = 1 to provide power to the ADC
 	msk = ADCONFIG_Enable_MASK;
@@ -107,7 +120,7 @@ int tps6507x_get_adc(int is_ac) {
 	// Set input select for the ADC in register ADCONFIG to 011X
 	v = tps6507x_reg_read(TPS6507X_REG_ADCONFIG);
 	msk = ADCONFIG_SELECT_MASK;
-	if (is_ac) {
+	if (pt == PWR_TYPE_AC) {
 		v = FIELD_SET(v, msk, ADCONFIG_SELECT_ac);
 	} else {
 		v = FIELD_SET(v, msk, ADCONFIG_SELECT_sys);
@@ -132,6 +145,26 @@ int tps6507x_get_adc(int is_ac) {
 	r = __field_xset(r, 0x0300UL, v);
 
 	return r;
+}
+
+int tps6507x_power_switch(pwr_type_t pt, am18x_bool on_noff) {
+	uint32_t msk;
+	uint8_t v, f;
+
+	if (pt == PWR_TYPE_AC) {
+		msk = PPATH1_ACPower_MASK;
+		f = on_noff? PPATH1_ACPower_enable: PPATH1_ACPower_disable;
+	} else if (pt == PWR_TYPE_USB) {
+		msk = PPATH1_USBPower_MASK;
+		f = on_noff? PPATH1_USBPower_enable: PPATH1_USBPower_disable;
+	} else {
+		return -1;
+	}
+	v = tps6507x_reg_read(TPS6507X_REG_PPATH1);
+	v = FIELD_SET(v, msk, f);
+	tps6507x_reg_write(TPS6507X_REG_PPATH1, v);
+
+	return 0;
 }
 
 int tps6507x_read(void) {

@@ -69,14 +69,17 @@ int main(int argc, char* argv[]) {
 
 	tps6507x_conf();
 
-	for (i = 0; i < 2 * 120; i++) {
-		r = tps6507x_get_adc(i & 0x01);
-		r = r * 1000 * 6 / 0x400UL;
+	tps6507x_dump_regs();
+
+	for (i = 0; i < 10; i++) {
 		if (i & 0x01) {
+			r = tps6507x_get_adc(PWR_TYPE_AC);
 			printk("power ac  ");
 		} else {
+			r = tps6507x_get_adc(PWR_TYPE_SYS);
 			printk("power sys ");
 		}
+		r = r * 1000 * 6 / 0x400UL;
 		printk(" voltage: %.4d mV\n", r);
 		systick_sleep(500);
 	}
@@ -109,6 +112,13 @@ int main(int argc, char* argv[]) {
 	gpio_set_mux(GPIO_BANK2, GPIO_PIN_2, AM18X_TRUE);
 	gpio_set_output1(GPIO_BANK2, GPIO_PIN_2, GPIO_LOW);
 	#endif
+
+	// power off worked
+	printk("power off usb\n");
+	tps6507x_power_switch(PWR_TYPE_USB, AM18X_FALSE);
+	printk("power off ac\n");
+	tps6507x_power_switch(PWR_TYPE_AC, AM18X_FALSE);
+	tps6507x_dump_regs();
 
 	return 0;
 }
