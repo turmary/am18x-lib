@@ -8,6 +8,11 @@ typedef enum {
 	PWR_TYPE_AC,
 	PWR_TYPE_USB,
 	PWR_TYPE_SYS,
+	PWR_TYPE_DCDC1,
+	PWR_TYPE_DCDC2,
+	PWR_TYPE_DCDC3,
+	PWR_TYPE_LDO1,
+	PWR_TYPE_LDO2,
 } pwr_type_t;
 
 int tps6507x_conf(void);

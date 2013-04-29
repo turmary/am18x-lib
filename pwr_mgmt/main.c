@@ -68,7 +68,6 @@ int main(int argc, char* argv[]) {
 	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);
 
 	tps6507x_conf();
-
 	tps6507x_dump_regs();
 
 	for (i = 0; i < 10; i++) {
@@ -113,12 +112,27 @@ int main(int argc, char* argv[]) {
 	gpio_set_output1(GPIO_BANK2, GPIO_PIN_2, GPIO_LOW);
 	#endif
 
+	printk("power off DCDC1\n");
+	systick_sleep(100);
+	tps6507x_power_switch(PWR_TYPE_DCDC1, AM18X_FALSE);
+
+	printk("power off LDO1\n");
+	systick_sleep(100);
+	tps6507x_power_switch(PWR_TYPE_LDO1, AM18X_FALSE);
+
+	printk("power off DCDC3\n");
+	systick_sleep(100);
+	tps6507x_power_switch(PWR_TYPE_DCDC3, AM18X_FALSE);
+
+	tps6507x_dump_regs();
+
+	#if 0
 	// power off worked
 	printk("power off usb\n");
 	tps6507x_power_switch(PWR_TYPE_USB, AM18X_FALSE);
 	printk("power off ac\n");
 	tps6507x_power_switch(PWR_TYPE_AC, AM18X_FALSE);
-	tps6507x_dump_regs();
+	#endif
 
 	return 0;
 }

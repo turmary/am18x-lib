@@ -55,14 +55,19 @@ typedef enum {
 } TPS6507X_reg_t;
 
 enum {
-	BIT_DEF(ADCONFIG,7,Enable,no,yes),
-	BIT_DEF(ADCONFIG,6,Start,no,yes),
-	BIT_DEF(ADCONFIG,5,End,no,yes),
-	BIT_DEF(ADCONFIG,4,Vref,disable,enable),
 	BIT_DEF(PPATH1,7,USBPresent,no,yes),
 	BIT_DEF(PPATH1,6,ACPresent,no,yes),
 	BIT_DEF(PPATH1,5,USBPower,enable,disable),
 	BIT_DEF(PPATH1,4,ACPower,enable,disable),
+	BIT_DEF(ADCONFIG,7,Enable,no,yes),
+	BIT_DEF(ADCONFIG,6,Start,no,yes),
+	BIT_DEF(ADCONFIG,5,End,no,yes),
+	BIT_DEF(ADCONFIG,4,Vref,disable,enable),
+	BIT_DEF(CON_CTRL1,4,DCDC1,disable,enable),
+	BIT_DEF(CON_CTRL1,3,DCDC2,disable,enable),
+	BIT_DEF(CON_CTRL1,2,DCDC3,disable,enable),
+	BIT_DEF(CON_CTRL1,1,LDO1,disable,enable),
+	BIT_DEF(CON_CTRL1,0,LDO2,disable,enable),
 };
 
 static inline int tps6507x_reg_write(uint8_t reg, uint8_t val) {
@@ -149,20 +154,41 @@ int tps6507x_get_adc(pwr_type_t pt) {
 
 int tps6507x_power_switch(pwr_type_t pt, am18x_bool on_noff) {
 	uint32_t msk;
-	uint8_t v, f;
+	uint8_t reg, v, f;
 
 	if (pt == PWR_TYPE_AC) {
+		reg = TPS6507X_REG_PPATH1;
 		msk = PPATH1_ACPower_MASK;
 		f = on_noff? PPATH1_ACPower_enable: PPATH1_ACPower_disable;
 	} else if (pt == PWR_TYPE_USB) {
+		reg = TPS6507X_REG_PPATH1;
 		msk = PPATH1_USBPower_MASK;
 		f = on_noff? PPATH1_USBPower_enable: PPATH1_USBPower_disable;
+	} else if (pt == PWR_TYPE_DCDC1) {
+		reg = TPS6507X_REG_CON_CTRL1;
+		msk = CON_CTRL1_DCDC1_MASK;
+		f = on_noff? CON_CTRL1_DCDC1_enable: CON_CTRL1_DCDC1_disable;
+	} else if (pt == PWR_TYPE_LDO1) {
+		reg = TPS6507X_REG_CON_CTRL1;
+		msk = CON_CTRL1_LDO1_MASK;
+		f = on_noff? CON_CTRL1_LDO1_enable: CON_CTRL1_LDO1_disable;
+	} else if (pt == PWR_TYPE_LDO2
+	  || pt == PWR_TYPE_DCDC2
+	  || pt == PWR_TYPE_DCDC3
+	) {
+		reg = TPS6507X_REG_CON_CTRL1;
+		msk = CON_CTRL1_LDO2_MASK;
+		msk |= CON_CTRL1_DCDC2_MASK;
+		msk |= CON_CTRL1_DCDC3_MASK;
+		f = on_noff? CON_CTRL1_LDO2_enable: CON_CTRL1_LDO2_disable;
+		f |= on_noff? CON_CTRL1_DCDC2_enable: CON_CTRL1_DCDC2_disable;
+		f |= on_noff? CON_CTRL1_DCDC3_enable: CON_CTRL1_DCDC3_disable;
 	} else {
 		return -1;
 	}
-	v = tps6507x_reg_read(TPS6507X_REG_PPATH1);
+	v = tps6507x_reg_read(reg);
 	v = FIELD_SET(v, msk, f);
-	tps6507x_reg_write(TPS6507X_REG_PPATH1, v);
+	tps6507x_reg_write(reg, v);
 
 	return 0;
 }
