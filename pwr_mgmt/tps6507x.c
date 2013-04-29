@@ -39,6 +39,9 @@ typedef enum {
 	TPS6507X_REG_CON_CTRL2,
 	TPS6507X_REG_CON_CTRL3,
 
+// apply to DEFDCDC1, DEFDCDC2_LOW, DEFDCDC2_HIGH
+// DEFDCDC3_LOW, DEFDCDC3_HIGH, DEFLDO2
+#define DEFDCDCX_OUTVOLT_MASK		0x3FUL
 	TPS6507X_REG_DEFDCDC1,		// 0x10
 	TPS6507X_REG_DEFDCDC2_LOW,
 	TPS6507X_REG_DEFDCDC2_HIGH,
@@ -46,6 +49,7 @@ typedef enum {
 
 	TPS6507X_REG_DEFDCDC3_HIGH,	// 0x14
 	TPS6507X_REG_DEFSLEW,
+#define LDO_CTRL1_OUTVOLT_MASK		0x0FUL
 	TPS6507X_REG_LDO_CTRL1,
 	TPS6507X_REG_DEFLDO2,
 
@@ -68,6 +72,33 @@ enum {
 	BIT_DEF(CON_CTRL1,2,DCDC3,disable,enable),
 	BIT_DEF(CON_CTRL1,1,LDO1,disable,enable),
 	BIT_DEF(CON_CTRL1,0,LDO2,disable,enable),
+};
+
+static const uint16_t dcdcx_voltage[] = {
+	 725,  750,  775,  800,	// 725 + 25 * i
+	 825,  850,  875,  900,
+	 925,  950,  975, 1000,
+	1025, 1050, 1075, 1100,
+	1125, 1150, 1175, 1200,
+	1225, 1250, 1275, 1300,
+	1325, 1350, 1375, 1400,
+	1425, 1450, 1475, 1500,
+
+	1550, 1600, 1650, 1700, // 1550 + 50 * (i - 16)
+	1750, 1800, 1850, 1900,
+	1950, 2000, 2050, 2100,
+	2150, 2200, 2250, 2300,
+	2350, 2400, 2450, 2500,
+	2550, 2600, 2650, 2700,
+	2750, 2800, 2850, 2900,
+	3000, 3100, 3200, 3300, // 3000 + 100 * (i - 28)
+};
+
+static const uint16_t ldo1_voltage[] = {
+	1000, 1100, 1200, 1250,
+	1300, 1350, 1400, 1500,
+	1600, 1800, 2500, 2750,
+	2800, 3000, 3100, 3200,
 };
 
 static inline int tps6507x_reg_write(uint8_t reg, uint8_t val) {
@@ -150,6 +181,40 @@ int tps6507x_get_adc(pwr_type_t pt) {
 	r = __field_xset(r, 0x0300UL, v);
 
 	return r;
+}
+
+int tps6507x_get_output(pwr_type_t pt) {
+	uint32_t msk;
+	uint16_t* voltages;
+	int reg, v;
+
+	msk = DEFDCDCX_OUTVOLT_MASK;
+	voltages = dcdcx_voltage;
+	switch (pt) {
+	case PWR_TYPE_DCDC1:
+		reg = TPS6507X_REG_DEFDCDC1;
+		break;
+	case PWR_TYPE_DCDC2:
+		reg = TPS6507X_REG_DEFDCDC2_HIGH;
+		break;
+	case PWR_TYPE_DCDC3:
+		reg = TPS6507X_REG_DEFDCDC3_HIGH;
+		break;
+	case PWR_TYPE_LDO1:
+		reg = TPS6507X_REG_LDO_CTRL1;
+		msk = LDO_CTRL1_OUTVOLT_MASK;
+		voltages = ldo1_voltage;
+		break;
+	case PWR_TYPE_LDO2:
+		reg = TPS6507X_REG_DEFLDO2;
+		break;
+	default:
+		return 0;
+	}
+
+	v = tps6507x_reg_read(reg);
+	v = __field_xget(v, msk);
+	return voltages[v];
 }
 
 int tps6507x_power_switch(pwr_type_t pt, am18x_bool on_noff) {

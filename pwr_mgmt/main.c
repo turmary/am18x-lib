@@ -55,11 +55,24 @@ static uint32_t arm_clock_off_and_on(void) {
 	return 0;
 }
 
+#define KV_X(x)		{ PWR_TYPE_##x, #x }
+kv_t kv_powers[] = {
+	KV_X(DCDC1),
+	KV_X(DCDC2),
+	KV_X(DCDC3),
+	KV_X(LDO1),
+	KV_X(LDO2),
+};
+
 int main(int argc, char* argv[]) {
 	pll_conf_t pllconf[1];
 	const char* title = "\nam18x library for power management!\n";
 	uint32_t r;
 	int i;
+
+	for (i = 0; i < countof(kv_powers); i++) {
+		kv_powers[i].val += get_exec_base();
+	}
 
 	arm_intr_enable();
 	systick_start();
@@ -80,7 +93,12 @@ int main(int argc, char* argv[]) {
 		}
 		r = r * 1000 * 6 / 0x400UL;
 		printk(" voltage: %.4d mV\n", r);
-		systick_sleep(500);
+		systick_sleep(100);
+	}
+
+	for (i = 0; i < countof(kv_powers); i++) {
+		r = tps6507x_get_output(kv_powers[i].key);
+		printk("%-5s voltage: %.4d mV\n", kv_powers[i].val, r);
 	}
 
 	#if 0
