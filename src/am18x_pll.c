@@ -199,7 +199,22 @@ am18x_rt pll_cmd(PLL_con_t* pcon, uint32_t cmd, uint32_t arg) {
 
 	case PLL_CMD_BYPASS:
 		msk = PLLCTL_PLLEN_MASK;
-		pcon->PLLCTL = FIELD_SET(pcon->PLLCTL, msk, PLLCTL_PLLEN_no);		
+		pcon->PLLCTL = FIELD_SET(pcon->PLLCTL, msk, PLLCTL_PLLEN_no);
+		for (i = 0; i < 456 * 4 / 12; i++) {
+			asm volatile ("nop");
+		}
+		break;
+
+	case PLL_CMD_CHG_MULT:
+		pcon->PLLM = FIELD_SET(0, PLLM_MASK, PLLM_WR(arg));
+		for (i = 0; i < 456 * ( 2000 * (pcon->PREDIV + 1) / 2) / 12; i++) {
+			asm volatile ("nop");
+		}
+		break;
+
+	case PLL_CMD_UNBYPASS:
+		msk = PLLCTL_PLLEN_MASK;
+		pcon->PLLCTL = FIELD_SET(pcon->PLLCTL, msk, PLLCTL_PLLEN_yes);
 		break;
 
 	default:

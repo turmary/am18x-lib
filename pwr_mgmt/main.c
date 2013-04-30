@@ -64,21 +64,44 @@ kv_t kv_powers[] = {
 	KV_X(LDO2),
 };
 
-int main(int argc, char* argv[]) {
+static int wfi_test(void) {
 	pll_conf_t pllconf[1];
-	const char* title = "\nam18x library for power management!\n";
-	uint32_t r;
-	int i;
 
-	for (i = 0; i < countof(kv_powers); i++) {
-		kv_powers[i].val += get_exec_base();
-	}
+	printk("one second counter\n");
+	pll_get_conf(PLL0, pllconf);
+	// pllconf->cflag |= PLL_CFLAG_FROM_POWERON;
+	pll_set_conf(PLL0, pllconf);
+	clk_node_recalc();
+	uart_init();
+	printk("pll enabled counter = %d\n", one_second_counter(AM18X_FALSE));
+	pll_cmd(PLL0, PLL_CMD_POWER_DOWN, 0);
+	clk_node_recalc();
+	uart_init();
+	printk("pll bypass  counter = %d\n", one_second_counter(AM18X_FALSE));
 
-	arm_intr_enable();
-	systick_start();
+	printk("one second counter\n");
+	printk("without wfi counter = %d\n", one_second_counter(AM18X_FALSE));
+	printk("with    wfi counter = %d\n", one_second_counter(AM18X_TRUE));
+	return 0;
+}
 
-	printk(title);
-	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);
+static int poweron_pin_test(void) {
+	// tps65070 power_on pin don't work
+	psc_state_transition(PSC_GPIO, PSC_STATE_ENABLE);
+	gpio_set_mux(GPIO_BANK2, GPIO_PIN_2, GPIO_DIR_OUTPUT);
+	gpio_set_output1(GPIO_BANK2, GPIO_PIN_2, GPIO_LOW);
+	return 0;
+}
+
+static int arm_clock_off_test(void) {
+	// arm clock off don't work
+	arm_clock_off_and_on();
+	printk("%s() complete!\n", "arm_clock_off_and_on");
+	return 0;
+}
+
+static int pmu_init(void) {
+	int i, r;
 
 	tps6507x_conf();
 	tps6507x_dump_regs();
@@ -108,36 +131,10 @@ int main(int argc, char* argv[]) {
 		r = tps6507x_get_output(kv_powers[i].key);
 		printk("%-5s voltage: %.4d mV\n", kv_powers[i].val, r);
 	}
+	return 0;
+}
 
-	#if 0
-	// arm clock off don't work
-	arm_clock_off_and_on();
-	printk("%s() complete!\n", "arm_clock_off_and_on");
-	#endif
-
-	printk("one second counter\n");
-	pll_get_conf(PLL0, pllconf);
-	// pllconf->cflag |= PLL_CFLAG_FROM_POWERON;
-	pll_set_conf(PLL0, pllconf);
-	clk_node_recalc();
-	uart_init();
-	printk("pll enabled counter = %d\n", one_second_counter(AM18X_FALSE));
-	pll_cmd(PLL0, PLL_CMD_POWER_DOWN, 0);
-	clk_node_recalc();
-	uart_init();
-	printk("pll bypass  counter = %d\n", one_second_counter(AM18X_FALSE));
-
-	printk("one second counter\n");
-	printk("without wfi counter = %d\n", one_second_counter(AM18X_FALSE));
-	printk("with    wfi counter = %d\n", one_second_counter(AM18X_TRUE));
-
-	#if 0
-	// tps65070 power_on pin don't work
-	psc_state_transition(PSC_GPIO, PSC_STATE_ENABLE);
-	gpio_set_mux(GPIO_BANK2, GPIO_PIN_2, GPIO_DIR_OUTPUT);
-	gpio_set_output1(GPIO_BANK2, GPIO_PIN_2, GPIO_LOW);
-	#endif
-
+static int pmu_power_off_test(void) {
 	printk("power off DCDC1\n");
 	systick_sleep(100);
 	tps6507x_power_switch(PWR_TYPE_DCDC1, AM18X_FALSE);
@@ -150,8 +147,6 @@ int main(int argc, char* argv[]) {
 	systick_sleep(100);
 	tps6507x_power_switch(PWR_TYPE_DCDC3, AM18X_FALSE);
 
-	tps6507x_dump_regs();
-
 	#if 0
 	// power off worked
 	printk("power off usb\n");
@@ -159,6 +154,34 @@ int main(int argc, char* argv[]) {
 	printk("power off ac\n");
 	tps6507x_power_switch(PWR_TYPE_AC, AM18X_FALSE);
 	#endif
+
+	tps6507x_dump_regs();
+	return 0;
+}
+
+int main(int argc, char* argv[]) {
+	const char* title = "\nam18x library for power management!\n";
+	int i;
+
+	for (i = 0; i < countof(kv_powers); i++) {
+		kv_powers[i].val += get_exec_base();
+	}
+
+	arm_intr_enable();
+	systick_start();
+
+	printk(title);
+	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);
+
+	pmu_init();
+
+	// arm_clock_off_test();
+
+	wfi_test();
+
+	// poweron_pin_test();
+
+	pmu_power_off_test();
 
 	return 0;
 }

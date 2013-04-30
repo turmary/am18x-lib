@@ -20,6 +20,8 @@ typedef enum {
 	PLL_CMD_ENABLE_PLL1_DIVS,
 	PLL_CMD_POWER_DOWN,
 	PLL_CMD_BYPASS,
+	PLL_CMD_CHG_MULT,
+	PLL_CMD_UNBYPASS,
 } pll_cmd_t;
 
 typedef enum {
