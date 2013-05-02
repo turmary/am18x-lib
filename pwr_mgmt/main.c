@@ -124,14 +124,128 @@ static int pmu_init(void) {
 		printk("%-5s voltage: %.4d mV\n", kv_powers[i].val, r);
 	}
 
-	tps6507x_set_output(PWR_TYPE_DCDC3, 1300);
-	tps6507x_set_output(PWR_TYPE_LDO1, 1600);
-	tps6507x_set_output(PWR_TYPE_LDO2, 1250);
+	printk("Setting output voltages\n");
+	// tps6507x_set_output(PWR_TYPE_DCDC3, 1300);
+	// tps6507x_set_output(PWR_TYPE_LDO1, 1600);
+
+	// am1808.pdf
+	// 4.2 Recommanded Operating Conditions
+	// Internal RAM Supply Voltage
+	// 456MHz versions 1.3V
+	tps6507x_set_output(PWR_TYPE_LDO2, 1300);
 	for (i = 0; i < countof(kv_powers); i++) {
 		r = tps6507x_get_output(kv_powers[i].key);
 		printk("%-5s voltage: %.4d mV\n", kv_powers[i].val, r);
 	}
 	return 0;
+}
+
+// am1808.pdf
+// 4.2 Recommanded Operating Conditions
+// Operating Frequency
+typedef struct {
+	uint32_t	freq;
+	uint16_t	volt;
+} opp_t;
+
+static opp_t opps[] = {
+	{F_OSCIN,     1000},
+	{100000000UL, 1000},
+	{200000000UL, 1100},
+	{375000000UL, 1200},
+	{456000000UL, 1300},
+};
+
+static int abs(int x) {
+	return x > 0? x: -x;
+}
+
+static int dvfs_get_opp(void) {
+	int i, volt;
+
+	if (pll_cmd(PLL0, PLL_CMD_IS_ENABLE, 0) != AM18X_OK) {
+		return 0;
+	}
+
+	volt = tps6507x_get_output(PWR_TYPE_DCDC3);
+	for (i = 1; i < countof(opps); i++) {
+		if (abs(volt - opps[i].volt) < 50) {
+			break;
+		}
+	}
+
+	if (i >= countof(opps)) {
+		i--;
+	}
+	return i;
+}
+
+#define _1K		1000UL
+#define _1M		1000000UL
+
+static int dvfs_set_opp(int opp) {
+	pll_conf_t pcf[1];
+	int l_opp;
+
+	l_opp = dvfs_get_opp();
+	if (opp == l_opp) {
+		return 0;
+	}
+
+	if (opp == 0) {
+		pll_cmd(PLL0, PLL_CMD_POWER_DOWN, 0);
+		tps6507x_set_output(PWR_TYPE_DCDC3, opps[opp].volt);
+		clk_node_recalc();
+		uart_init();
+		return 0;
+	}
+
+	if (opp > l_opp) {
+		tps6507x_set_output(PWR_TYPE_DCDC3, opps[opp].volt);		
+	}
+	pll_get_conf(PLL0, pcf);
+	pcf->pllm = opps[opp].freq * pcf->prediv * pcf->postdiv / F_OSCIN;
+	// am1808.pdf
+	// Page 79,
+	// The multiplier values must be chosen such that the PLL output
+	// frequency is between 300 and 600 MHz
+	if (F_OSCIN * pcf->pllm * pcf->prediv > 600 * _1M) {
+		pcf->pllm /= 2;
+		pcf->postdiv /= 2;
+	}
+	pll_set_conf(PLL0, pcf);
+	if (opp < l_opp) {
+		tps6507x_set_output(PWR_TYPE_DCDC3, opps[opp].volt);		
+	}
+
+	clk_node_recalc();
+	uart_init();
+	return 0;
+}
+
+static int dvfs_test(void) {
+	int cnt = 0;
+
+	while (cnt++ < 5 * 5 / 2) {
+		dvfs_set_opp(cnt % countof(opps));
+		printk("Current OPerating Point: %5d mV\n", opps[dvfs_get_opp()].volt);
+		printk("Current Frequency:   %9d Hz\n", dev_get_freq(DCLK_ID_ARM));
+		#if 0
+		if (dvfs_get_opp() == countof(opps) - 1) {
+			clk_node_tree();
+			break;
+		}
+		#endif
+		systick_sleep(200);
+	}
+	while (cnt-- > 0) {
+		dvfs_set_opp(cnt % countof(opps));
+		printk("Current OPerating Point: %5d mV\n", opps[dvfs_get_opp()].volt);
+		printk("Current Frequency:   %9d Hz\n", dev_get_freq(DCLK_ID_ARM));
+		systick_sleep(200);
+	}
+
+	return cnt;
 }
 
 static int pmu_power_off_test(void) {
@@ -175,9 +289,11 @@ int main(int argc, char* argv[]) {
 
 	pmu_init();
 
-	// arm_clock_off_test();
+	dvfs_test();
 
 	wfi_test();
+
+	// arm_clock_off_test();
 
 	// poweron_pin_test();
 

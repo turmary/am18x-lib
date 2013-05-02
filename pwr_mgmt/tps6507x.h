@@ -7,7 +7,11 @@
 typedef enum {
 	// adc && switch
 	PWR_TYPE_AC,
+
+	// switch
 	PWR_TYPE_USB,
+
+	// adc
 	PWR_TYPE_SYS,
 
 	// output && switch
