@@ -22,6 +22,7 @@ typedef enum {
 	PLL_CMD_BYPASS,
 	PLL_CMD_CHG_MULT,
 	PLL_CMD_UNBYPASS,
+	PLL_CMD_IS_ENABLE,
 } pll_cmd_t;
 
 typedef enum {

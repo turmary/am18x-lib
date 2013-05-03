@@ -39,7 +39,10 @@ am18x_rt pll_get_conf(const PLL_con_t* pcon, pll_conf_t* conf) {
 	uint32_t msk, v;
 	int i;
 
-	conf->prediv = 1UL + __field_xget(pcon->PREDIV, XXXDIVx_RATIO_MASK);
+	conf->prediv = 1UL;
+	if (pcon == PLL0) {
+		conf->prediv += __field_xget(pcon->PREDIV, XXXDIVx_RATIO_MASK);
+	}
 	conf->pllm = 1UL + __field_xget(pcon->PLLM, PLLM_MASK);
 	conf->postdiv = 1UL + __field_xget(pcon->POSTDIV, XXXDIVx_RATIO_MASK);
 
@@ -215,6 +218,17 @@ am18x_rt pll_cmd(PLL_con_t* pcon, uint32_t cmd, uint32_t arg) {
 	case PLL_CMD_UNBYPASS:
 		msk = PLLCTL_PLLEN_MASK;
 		pcon->PLLCTL = FIELD_SET(pcon->PLLCTL, msk, PLLCTL_PLLEN_yes);
+		break;
+
+	case PLL_CMD_IS_ENABLE:
+		msk = PLLCTL_PLLPWRDN_MASK;
+		if (FIELD_GET(pcon->PLLCTL, msk) != PLLCTL_PLLPWRDN_no) {
+			return AM18X_ERR;
+		}
+		msk = PLLCTL_PLLEN_MASK;
+		if (FIELD_GET(pcon->PLLCTL, msk) != PLLCTL_PLLEN_yes) {
+			return AM18X_ERR;
+		}
 		break;
 
 	default:
