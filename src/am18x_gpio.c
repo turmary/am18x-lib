@@ -160,11 +160,13 @@ am18x_rt gpio_set_mux(gpio_bank_t bank, gpio_pin_t pin, gpio_dir_t dir) {
 		if (GPIO_PIN_7 <= pin && pin <= GPIO_PIN_7) {
 			mux = 2;
 			pos = pin;
+			val = 4;
 		} else
 	// PINMUX03[7..2] = (GP8[1..6], value = 4)
 		if (GPIO_PIN_1 <= pin && pin <= GPIO_PIN_6) {
 			mux = 3;
 			pos = GPIO_PIN_8 - pin;
+			val = 4;
 		} else
 	// PINMUX19[7..7] = (GP8[0], value = 8)
 		if (GPIO_PIN_0 <= pin && pin <= GPIO_PIN_0) {

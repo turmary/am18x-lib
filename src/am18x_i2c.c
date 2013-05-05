@@ -7,7 +7,7 @@
 #define PrescaledModuleClockHigh		(13300000UL)
 
 // static inline
-uint32_t i2c_input_clock_frequency(I2C_con_t* icon) {
+uint32_t i2c_input_freq(I2C_con_t* icon) {
 	if (icon == I2C0) {
 		return dev_get_freq(DCLK_ID_I2C0);
 	}
@@ -33,7 +33,7 @@ static inline uint32_t ipsc_to_d(uint32_t ipsc) {
 uint32_t i2c_get_serial_clock(I2C_con_t* icon) {
 	uint32_t freq, scale_freq, ipsc, divider;
 
-	freq = i2c_input_clock_frequency(icon);
+	freq = i2c_input_freq(icon);
 
 	ipsc = FIELD_XGET(icon->ICPSC, ICPSC_IPSC_MASK);
 
@@ -59,7 +59,7 @@ am18x_rt i2c_set_serial_clock(I2C_con_t* icon, uint32_t freq) {
 		ipsc = 0;
 	}
 
-	scale_freq = i2c_input_clock_frequency(icon) / (ipsc + 1);
+	scale_freq = i2c_input_freq(icon) / (ipsc + 1);
 
 	// msk = ICMDR_IRS_MASK;
 	// icon->ICMDR = FIELD_SET(icon->ICMDR, msk, ICMDR_IRS_reset);

@@ -185,8 +185,8 @@ int tps6507x_get_adc(pwr_type_t pt) {
 	return r;
 }
 
-static uint16_t* pwrtyp2voltages(pwr_type_t pt, int* pr, uint8_t* pm) {
-	uint16_t* voltages;
+static const uint16_t* pwrtyp2voltages(pwr_type_t pt, int* pr, uint8_t* pm) {
+	const uint16_t* voltages;
 	uint8_t msk;
 	int reg;
 
@@ -223,7 +223,7 @@ static uint16_t* pwrtyp2voltages(pwr_type_t pt, int* pr, uint8_t* pm) {
 }
 
 int tps6507x_get_output(pwr_type_t pt) {
-	uint16_t* voltages;
+	const uint16_t* voltages;
 	uint8_t msk;
 	int reg, v;
 
@@ -237,7 +237,7 @@ int tps6507x_get_output(pwr_type_t pt) {
 }
 
 int tps6507x_set_output(pwr_type_t pt, uint16_t voltage) {
-	uint16_t* voltages;
+	const uint16_t* voltages;
 	uint8_t msk;
 	int i, reg, v;
 

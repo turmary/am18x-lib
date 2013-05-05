@@ -2,7 +2,7 @@
 #define _EXTERN		extern
 #define _RS(b,a)	(((b) - (a) - 0x4) >> 2)
 #define MPU1_PROGxMPxAR_MASK		0xFFFFFC00
-#define MPU2_PROGxMPxAR_MASK		0xfFFF0000
+#define MPU2_PROGxMPxAR_MASK		0xFFFF0000
 #define PROGxMPPA_AIDn_MASK(n)		(0x1 << (10 + (n)))
 #define PROGxMPPA_AIDn_denied(n)	(0x1 << (10 + (n)))
 #define PROGxMPPA_AIDn_granted(n)	(0x1 << (10 + (n)))

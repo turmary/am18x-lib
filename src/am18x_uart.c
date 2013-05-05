@@ -2,7 +2,7 @@
 #include "am18x_uart.h"
 #include "am18x_dclk.h"
 
-uint32_t uart_input_clock_frequency(UART_con_t* ucon) {
+uint32_t uart_input_freq(UART_con_t* ucon) {
 	if (ucon == UART0) {
 		return dev_get_freq(DCLK_ID_UART0);
 	}
@@ -23,7 +23,7 @@ static inline uint32_t uart_get_divisor(UART_con_t* ucon, uint32_t baud_rate) {
 		samp_clk = 13;
 	}
 
-	return uart_input_clock_frequency(ucon) / (samp_clk * baud_rate);
+	return uart_input_freq(ucon) / (samp_clk * baud_rate);
 }
 
 am18x_rt uart_init_conf(uart_conf_t* conf) {

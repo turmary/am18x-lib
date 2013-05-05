@@ -209,7 +209,7 @@ static int dvfs_set_opp(int opp) {
 	// Page 79,
 	// The multiplier values must be chosen such that the PLL output
 	// frequency is between 300 and 600 MHz
-	if (F_OSCIN * pcf->pllm * pcf->prediv > 600 * _1M) {
+	if (F_OSCIN * pcf->pllm / pcf->prediv > 600 * _1M) {
 		pcf->pllm /= 2;
 		pcf->postdiv /= 2;
 	}
