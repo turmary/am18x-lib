@@ -45,4 +45,8 @@
 #include "am18x_gpio.h"
 #endif
 
+#ifdef _PRU
+#include "am18x_pru.h"
+#endif
+
 #endif//__AM18X_LIB_H__

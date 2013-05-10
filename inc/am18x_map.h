@@ -710,6 +710,45 @@ typedef struct {
 	vcuint32_t	HIPVRx[2];
 } AINTC_con_t;
 
+// refer to 
+// http://processors.wiki.ti.com/index.php/Programmable_Realtime_Unit
+typedef struct {
+#define CONTROL_PCRESETVAL_MASK		(0xFFFFUL << 16)
+	vuint32_t	CONTROL;
+#define STATUS_PCOUNTER_MASK		0x0000FFFFUL
+	vcuint32_t	STATUS;
+#define WAKEUP_ENABLES_MASK(x)		(0x1UL << (x))
+#define WAKEUP_ENABLES_no(x)		(0x0UL << (x))
+#define WAKEUP_ENABLES_yes(x)		(0x1UL << (x))
+	vuint32_t	WAKEUP;
+	vuint32_t	CYCLECNT;
+	vcuint32_t	STALLCNT;
+	uint32_t	RESERVED0[_RS(0x020, 0x010)];
+// C25[8 - 11]
+#define CONTABBLKIDX0_C25_MASK		(0xFUL << 16)
+// C24[8 - 11]
+#define CONTABBLKIDX0_C24_MASK		(0xFUL << 0)
+	vuint32_t	CONTABBLKIDX0;
+	uint32_t	RESERVED1;
+#define CONTABPROPTR_C29_MASK		(0xFFFFUL << 16)
+#define CONTABPROPTR_C28_MASK		(0xFFFFUL << 0)
+#define CONTABPROPTR_C31_MASK		(0xFFFFUL << 16)
+#define CONTABPROPTR_C30_MASK		(0xFFFFUL << 0)
+	vuint32_t	CONTABPROPTR[2];
+	uint32_t	RESERVED2[_RS(0x400, 0x02C)];
+	vuint32_t	INTGPR[32];
+	vcuint32_t	INTCTER[32];
+} PRU_con_t;
+
+enum {
+	BIT_DEF(CONTROL,15,RUNSTATE,halted,running),
+	BIT_DEF(CONTROL,8,SINGLESTEP,no,yes),
+	BIT_DEF(CONTROL,3,COUNTENABLE,no,yes),
+	BIT_DEF(CONTROL,2,SLEEPING,no,yes),
+	BIT_DEF(CONTROL,1,ENABLE,no,yes),
+	BIT_DEF(CONTROL,0,SOFTRESET,yes,no),
+};
+
 typedef struct {
 #define XXX_GPkPj_MASK(j)		(0x1UL << (j))
 #define DIR_GPkPj_output(j)		(0x0UL << (j))
@@ -1256,6 +1295,17 @@ typedef struct {
 #define TIMER0_BASE			0x01C20000UL
 #define TIMER1_BASE			0x01C21000UL
 #define I2C0_BASE			0x01C22000UL
+#define PRU_DataRAM0_BASE		0x01C30000UL
+#define PRU_DataRAM0_SIZE		0x00000200UL
+#define PRU_DataRAM1_BASE		0x01C32000UL
+#define PRU_DataRAM1_SIZE		0x00000200UL
+#define PRU_INTC_BASE			0x01C34000UL
+#define PRU0_BASE			0x01C37000UL
+#define PRU1_BASE			0x01C37800UL
+#define PRU_InstRAM0_BASE		0x01C38000UL
+#define PRU_InstRAM0_SIZE		0x00001000UL
+#define PRU_InstRAM1_BASE		0x01C3C000UL
+#define PRU_InstRAM1_SIZE		0x00001000UL
 #define UART0_BASE			0x01C42000UL
 #define UART1_BASE			0x01D0C000UL
 #define UART2_BASE			0x01D0D000UL
@@ -1307,6 +1357,12 @@ typedef struct {
 #endif
 #ifdef _AINTC
 	#define AINTC			((AINTC_con_t*)AINTC_BASE)
+#endif
+#ifdef _PRU0
+	#define PRU0			((PRU_con_t*)PRU0_BASE)
+#endif
+#ifdef _PRU1
+	#define PRU1			((PRU_con_t*)PRU1_BASE)
 #endif
 #ifdef _GPIO
 	#define GPIOCON			((GPIO_con_t*)GPIOCON_BASE)
@@ -1366,6 +1422,12 @@ typedef struct {
 #endif
 #ifdef _AINTC
 	_EXTERN AINTC_con_t		*AINTC;
+#endif
+#ifdef _PRU0
+	_EXTERN PRU_con_t		*PRU0;
+#endif
+#ifdef _PRU1
+	_EXTERN PRU_con_t		*PRU1;
 #endif
 #ifdef _GPIO
 	_EXTERN GPIO_con_t		*GPIOCON;

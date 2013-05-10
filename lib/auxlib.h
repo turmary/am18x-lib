@@ -33,6 +33,7 @@ int puts(const char* s);
 int printk(const char* s, ...);
 int sscanf(const char* buf, const char* fmt, ...);
 int sprintf(char * buf, const char *fmt, ...);
+size_t strlen(const char* s);
 int strcmp(const char* ss, const char* sd);
 int memset(void* dst, int pattern, size_t size);
 int memcpy(char* dst, const char* src, size_t size);

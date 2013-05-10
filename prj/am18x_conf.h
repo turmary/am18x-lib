@@ -29,6 +29,10 @@ extern const uint32_t f_osc;
 
 #define _AINTC
 
+#define _PRU
+#define _PRU0
+#define _PRU1
+
 #define _GPIO
 
 #define _I2C
