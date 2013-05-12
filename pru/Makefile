@@ -6,5 +6,5 @@ PRU_FILE=uart_puts
 main.c: ${PRU_FILE}.h
 
 ${PRU_FILE}.h: ${PRU_FILE}.p
-	../tools/pasm -c -Cpru_code $<
+	../tools/pasm -c -L -Cpru_code $<
 	mv ${PRU_FILE}_bin.h ${PRU_FILE}.h

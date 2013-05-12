@@ -5,6 +5,7 @@
 #include "tps6507x.h"
 #include "auxlib.h"
 #include "uart.h"
+#include "psc_config.h"
 
 const uint32_t f_osc = F_OSCIN;
 
@@ -27,6 +28,7 @@ static uint32_t one_second_counter(am18x_bool with_wfi) {
 // The following sequence should be executed by the ARM within
 // the ARM Clock Stop Request interrupt ISR
 static void arm_clock_off_isr(void) {
+	// printk("%s()\n", __func__);
 	// 1. Check for completion of all ARM master requests
 	// (the ARM polls transfer completion statuses of all
 	// Master peripherals).
@@ -43,15 +45,36 @@ static void arm_clock_off_isr(void) {
 
 // should be executed by other master as dsp, pru, etc.
 static uint32_t arm_clock_off_and_on(void) {
+	PRU_con_t* pru = PRU0;
+	am18x_rt r;
+	uint32_t* pram;
+
 	// 1. The ARM must have the ARM Clock Stop Request interrupt
 	// enabled and the associated interrupt serive routine (ISR)
 	// set up before the folloing ARM clock shutdown procedure.
 	isr_set_hander(AINTC_ARMCLKSTOPREQ, arm_clock_off_isr);
 	aintc_sys_enable(AINTC_ARMCLKSTOPREQ);
 
-	psc_state_transition(PSC_ARM, PSC_STATE_DISABLE);
+	psc_state_transition(PSC_PRU, PSC_STATE_ENABLE);
 
-	psc_state_transition(PSC_ARM, PSC_STATE_ENABLE);
+	// psc_state_transition(PSC_ARM, PSC_STATE_DISABLE);
+	// psc_state_transition(PSC_ARM, PSC_STATE_ENABLE);
+	pru_cmd(pru, PRU_CMD_ENABLE, 0);
+
+	pram = (uint32_t*)PRU_DataRAM0_BASE;
+	pram[0] = 2;
+	pram[1] = ((0) << 24)	|
+		((0) << 16)	|
+		((PSC_ARM) << 8)|
+		((MDSTATx_STATE_Disable) << 0);
+	pram[2] = ((0) << 24)	|
+		((0) << 16)	|
+		((PSC_ARM) << 8)|
+		((MDSTATx_STATE_Enable) << 0);
+	pru_load(pru, (const uint32_t*)pru_code, countof(pru_code));
+
+	pru_cmd(pru, PRU_CMD_RUN, 0);
+	while ((r = pru_cmd(pru, PRU_CMD_IS_HALT, 0)) != AM18X_OK);
 	return 0;
 }
 
@@ -287,13 +310,13 @@ int main(int argc, char* argv[]) {
 	printk(title);
 	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);
 
+	arm_clock_off_test();
+
 	pmu_init();
 
 	dvfs_test();
 
 	wfi_test();
-
-	// arm_clock_off_test();
 
 	// poweron_pin_test();
 
