@@ -102,5 +102,10 @@
 .assign PscCtlParams, R8, *, pscParams
 .assign Global, R1, *, global
 
+#define DLY_CNT		R10
+#define CHIPSIG_ADDR	0x01C14174
+#define CHIPSIG_R	R10
+#define CHIPSIG_V	R11
+
 
 #endif // _PRU_PSC_CONFIG_HP_

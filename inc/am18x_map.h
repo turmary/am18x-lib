@@ -446,6 +446,9 @@ typedef struct {
 	uint32_t	RESERVED5;
 	vuint32_t	PINMUXx[20];
 	vuint32_t	SUSPSRC;
+#define CHIPSIG_X_MASK(i)		(0x1UL << (i))
+#define CHIPSIG_X_assert(i)		(0x1UL << (i))
+#define CHIPSIG_X_clear(i)		(0x1UL << (i))
 	vuint32_t	CHIPSIG;
 	vuint32_t	CHIPSIG_CLR;
 #define CFGCHIP0_PLL_MASTER_LOCK_MASK	(0x1UL << 4)
