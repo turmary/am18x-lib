@@ -4,6 +4,7 @@
 #include "am18x_lib.h"
 
 #define KV(x)		{ offsetof(AINTC_con_t, x), #x }
+#define KVS(x)		{ sizeof (x), #x }
 typedef struct {
 	int	offset;
 	char*	name;
@@ -33,6 +34,14 @@ kv_t aintc_kv[] = {
 	KV(HIPVRx),
 };
 
+kv_t edma_kv[] = {
+	KVS(PaRAM_con_t),
+	KVS(EDMA3CC_CH_t),
+	KVS(EDMA3CC_con_t),
+	KVS(EDMA3TC_fifo_t),
+	KVS(EDMA3TC_con_t),
+};
+
 int main(int argc, char* argv[]) {
 	const char* title = "\nAINTC_con_t members offset test program!\n";
 	int i;
@@ -45,6 +54,10 @@ int main(int argc, char* argv[]) {
 
 	for (i = 0; i < countof(aintc_kv); i++) {
 		printf("[%2d] %-20s =[0x%.8X]\n", i, aintc_kv[i].name, aintc_kv[i].offset);
+	}
+
+	for (i = 0; i < countof(edma_kv); i++) {
+		printf("[%2d] %-20s =[0x%.8X]\n", i, edma_kv[i].name, edma_kv[i].offset);
 	}
 
 	return 0;

@@ -753,6 +753,167 @@ enum {
 };
 
 typedef struct {
+#define OPT_PRIVID_MASK			(0xFUL << 24)
+#define OPT_PRIVID_X(x)			(((x) & 0xFUL) << 24)
+#define OPT_TCC_MASK			(0x3FUL << 12)
+#define OPT_TCC_X(x)			(((x) & 0x3FUL) << 12)
+#define OPT_FWID_MASK			(0x7UL << 8)
+#define OPT_FWID_8b			(0x0UL << 8)
+#define OPT_FWID_16b			(0x1UL << 8)
+#define OPT_FWID_32b			(0x2UL << 8)
+#define OPT_FWID_64b			(0x3UL << 8)
+#define OPT_FWID_128b			(0x4UL << 8)
+#define OPT_FWID_256b			(0x5UL << 8)
+	vuint32_t	OPT;
+	vuint32_t	SRC;
+#define PARAM_BCNT_MASK			(0xFFFFUL << 16)
+#define PARAM_ACNT_MASK			(0xFFFFUL << 0)
+	vuint32_t	A_B_CNT;
+	vuint32_t	DST;
+#define PARAM_DSTBIDX_MASK		(0xFFFFUL << 16)
+#define PARAM_SRCBIDX_MASK		(0xFFFFUL << 0)
+	vuint32_t	SRC_DST_BIDX;
+#define PARAM_BCNTRLD_MASK		(0xFFFFUL << 16)
+#define PARAM_LINK_MASK			(0xFFFFUL << 0)
+	vuint32_t	LINK_BCNTRLD;
+#define PARAM_DSTCIDX_MASK		(0xFFFFUL << 16)
+#define PARAM_SRCCIDX_MASK		(0xFFFFUL << 0)
+	vuint32_t	SRC_DST_CIDX;
+#define PARAM_CCNT_MASK			(0xFFFFUL << 0)
+	vuint32_t	CCNT;
+} PaRAM_con_t;
+
+enum {
+	BIT_DEF(OPT,23,ITCCHEN,no,yes),
+	BIT_DEF(OPT,22,TCCHEN,no,yes),
+	BIT_DEF(OPT,21,ITCINTEN,no,yes),
+	BIT_DEF(OPT,20,TCINTEN,no,yes),
+	BIT_DEF(OPT,3,STATIC,no,yes),
+	BIT_DEF(OPT,2,SYNCDIM,Async,ABsync),
+	BIT_DEF(OPT,1,DAM,INCR,CONST),
+	BIT_DEF(OPT,0,SAM,INCR,CONST),
+};
+
+typedef struct {
+	vuint32_t	ER;
+	uint32_t	RESERVED0;
+	vuint32_t	ECR;
+	uint32_t	RESERVED1;
+	vuint32_t	ESR;
+	uint32_t	RESERVED2;
+	vuint32_t	CER;
+	uint32_t	RESERVED3;
+	vuint32_t	EER;
+	uint32_t	RESERVED4;
+	vuint32_t	EECR;
+	uint32_t	RESERVED5;
+	vuint32_t	EESR;
+	uint32_t	RESERVED6;
+	vuint32_t	SER;
+	uint32_t	RESERVED7;
+	vuint32_t	SECR;
+	uint32_t	RESERVED8[_RS(0x50,0x40)];
+	vuint32_t	IER;
+	uint32_t	RESERVED9;
+	vuint32_t	IECR;
+	uint32_t	RESERVED10;
+	vuint32_t	IESR;
+	uint32_t	RESERVED11;
+	vuint32_t	IPR;
+	uint32_t	RESERVED12;
+	vuint32_t	ICR;
+	uint32_t	RESERVED13;
+	vuint32_t	IEVAL;
+	uint32_t	RESERVED14;
+	vuint32_t	QER;
+	vuint32_t	QEER;
+	vuint32_t	QEECR;
+	vuint32_t	QEESR;
+	vuint32_t	QSER;
+	vuint32_t	QSECR;
+} EDMA3CC_CH_t;
+
+typedef struct {
+	vcuint32_t	REVID;
+	vuint32_t	CCCFG;
+	uint32_t	RESERVED0[_RS(0x200,0x004)];
+	vuint32_t	QCHMAPx[8];
+	uint32_t	RESERVED1[_RS(0x240,0x21C)];
+	vuint32_t	DMAQNUMx[4];
+	uint32_t	RESERVED2[_RS(0x260,0x24C)];
+	vuint32_t	QDMAQNUM;
+	uint32_t	RESERVED3[_RS(0x284,0x260)];
+	vuint32_t	QUEPRI;
+	uint32_t	RESERVED4[_RS(0x300,0x284)];
+	vuint32_t	EMR;
+	uint32_t	RESERVED5;
+	vuint32_t	EMCR;
+	uint32_t	RESERVED6;
+	vuint32_t	QEMR;
+	vuint32_t	QEMCR;
+	vuint32_t	CCERR;
+	vuint32_t	CCERRCLR;
+	vuint32_t	EEVAL;
+	uint32_t	RESERVED7[_RS(0x340,0x320)];
+	vuint32_t	DRAEx[8];
+	uint32_t	RESERVED8[_RS(0x380,0x35C)];
+	vuint32_t	QRAEx[4];
+	uint32_t	RESERVED9[_RS(0x400,0x38C)];
+	vuint32_t	Q0Ex[16];
+	vuint32_t	Q1Ex[16];
+	uint32_t	RESERVED10[_RS(0x600,0x47C)];
+	vuint32_t	QSTATx[2];
+	uint32_t	RESERVED11[_RS(0x620,0x604)];
+	vuint32_t	QWMTHRA;
+	uint32_t	RESERVED12[_RS(0x640,0x620)];
+	vuint32_t	CCSTAT;
+	uint32_t	RESERVED13[_RS(0x1000,0x640)];
+	EDMA3CC_CH_t	Global;
+	uint32_t	RESERVED14[_RS(0x2000,0x1094)];
+	EDMA3CC_CH_t	Region0;
+	uint32_t	RESERVED15[_RS(0x2200,0x2094)];
+	EDMA3CC_CH_t	Region1;
+	uint32_t	RESERVED16[_RS(0x4000,0x2294)];
+	vuint32_t	PaRAM[1024];
+} EDMA3CC_con_t;
+
+typedef struct {
+	vuint32_t	OPT;
+	vuint32_t	SRC;
+	vuint32_t	CNT;
+	vuint32_t	DST;
+	vuint32_t	BIDX;
+	vuint32_t	MPPRXY;
+	// only valid for Source Active (SA)
+	vuint32_t	CNTRLD;
+	vuint32_t	SRCBREF;
+	vuint32_t	DSTBREF;
+	uint32_t	RESERVED0[_RS(0x40,0x20)];
+} EDMA3TC_fifo_t;
+
+typedef struct {
+	vcuint32_t	REVID;
+	vuint32_t	TCCFG;
+	uint32_t	RESERVED0[_RS(0x100,0x004)];
+	vuint32_t	TCSTAT;
+	uint32_t	RESERVED1[_RS(0x120,0x100)];
+	vuint32_t	ERRSTAT;
+	vuint32_t	ERREN;
+	vuint32_t	ERRCLR;
+	vuint32_t	ERRDET;
+	vuint32_t	ERRCMD;
+	uint32_t	RESERVED2[_RS(0x140,0x130)];
+	vuint32_t	RDRATE;
+	uint32_t	RESERVED3[_RS(0x240,0x140)];
+	EDMA3TC_fifo_t	SAx[1];
+	vuint32_t	DFCNTRLD;
+	vuint32_t	DFSRCBREF;
+	vuint32_t	DFDSTBREF;
+	uint32_t	RESERVED5[_RS(0x300,0x288)];
+	EDMA3TC_fifo_t	DFx[4];
+} EDMA3TC_con_t;
+
+typedef struct {
 #define XXX_GPkPj_MASK(j)		(0x1UL << (j))
 #define DIR_GPkPj_output(j)		(0x0UL << (j))
 #define DIR_GPkPj_input(j)		(0x1UL << (j))
