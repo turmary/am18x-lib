@@ -245,6 +245,9 @@
 #define IENCLR_PROTERR_EN_enable	(0x1 << 0)
 #define EOI_EOIVECT_MASK		(0xFF << 0)
 #define FLTSTAT_ID_MASK			(0xFF << 24)
+#define CHIPSIG_X_MASK(i)		(0x1 << (i))
+#define CHIPSIG_X_assert(i)		(0x1 << (i))
+#define CHIPSIG_X_clear(i)		(0x1 << (i))
 #define CFGCHIP0_PLL_MASTER_LOCK_MASK	(0x1 << 4)
 #define CFGCHIP0_PLL_MASTER_LOCK_no	(0x0 << 4)
 #define CFGCHIP0_PLL_MASTER_LOCK_yes	(0x1 << 4)
@@ -252,6 +255,10 @@
 #define CFGCHIP0_EDMA30TCxDBS_16B(x)	(0x0 << (2*(x)))
 #define CFGCHIP0_EDMA30TCxDBS_32B(x)	(0x1 << (2*(x)))
 #define CFGCHIP0_EDMA30TCxDBS_64B(x)	(0x2 << (2*(x)))
+#define CFGCHIP1_EDMA31TC0DBS_MASK	(0x3 << 13)
+#define CFGCHIP1_EDMA31TC0DBS_16B	(0x0 << 13)
+#define CFGCHIP1_EDMA31TC0DBS_32B	(0x1 << 13)
+#define CFGCHIP1_EDMA31TC0DBS_64B	(0x2 << 13)
 #define CFGCHIP3_RMII_SEL_MASK		(0x1 << 8)
 #define CFGCHIP3_RMII_SEL_mii		(0x0 << 8)
 #define CFGCHIP3_RMII_SEL_rmii		(0x1 << 8)
@@ -324,6 +331,141 @@
 #define HIER_FIQ_MASK			(0x1 << 0)
 #define HIER_FIQ_disabled		(0x0 << 0)
 #define HIER_FIQ_enabled		(0x1 << 0)
+#define CONTROL_PCRESETVAL_MASK		(0xFFFF << 16)
+#define STATUS_PCOUNTER_MASK		0x0000FFFF
+#define WAKEUP_ENABLES_MASK(x)		(0x1 << (x))
+#define WAKEUP_ENABLES_no(x)		(0x0 << (x))
+#define WAKEUP_ENABLES_yes(x)		(0x1 << (x))
+#define CONTABBLKIDX0_C25_MASK		(0xF << 16)
+#define CONTABBLKIDX0_C24_MASK		(0xF << 0)
+#define CONTABPROPTR_C29_MASK		(0xFFFF << 16)
+#define CONTABPROPTR_C28_MASK		(0xFFFF << 0)
+#define CONTABPROPTR_C31_MASK		(0xFFFF << 16)
+#define CONTABPROPTR_C30_MASK		(0xFFFF << 0)
+#define OPT_PRIVID_MASK			(0xF << 24)
+#define OPT_PRIVID_X(x)			(((x) & 0xF) << 24)
+#define OPT_TCC_MASK			(0x3F << 12)
+#define OPT_TCC_X(x)			(((x) & 0x3F) << 12)
+#define OPT_FWID_MASK			(0x7 << 8)
+#define OPT_FWID_8b			(0x0 << 8)
+#define OPT_FWID_16b			(0x1 << 8)
+#define OPT_FWID_32b			(0x2 << 8)
+#define OPT_FWID_64b			(0x3 << 8)
+#define OPT_FWID_128b			(0x4 << 8)
+#define OPT_FWID_256b			(0x5 << 8)
+#define PARAM_BCNT_MASK			(0xFFFF << 16)
+#define PARAM_ACNT_MASK			(0xFFFF << 0)
+#define PARAM_DSTBIDX_MASK		(0xFFFF << 16)
+#define PARAM_SRCBIDX_MASK		(0xFFFF << 0)
+#define PARAM_BCNTRLD_MASK		(0xFFFF << 16)
+#define PARAM_LINK_MASK			(0xFFFF << 0)
+#define PARAM_DSTCIDX_MASK		(0xFFFF << 16)
+#define PARAM_SRCCIDX_MASK		(0xFFFF << 0)
+#define PARAM_CCNT_MASK			(0xFFFF << 0)
+#define ExR_En_MASK(n)			(0x1 << (n))
+#define ExR_En_none(n)			(0x0 << (n))
+#define ExR_En_asserted(n)		(0x1 << (n))
+#define ExR_En_clear(n)			(0x1 << (n))
+#define ExR_En_set(n)			(0x1 << (n))
+#define CER_En_MASK(n)			(0x1 << (n))
+#define CER_En_none(n)			(0x0 << (n))
+#define CER_En_prioritized(n)		(0x1 << (n))
+#define EExR_En_MASK(n)			(0x1 << (n))
+#define EExR_En_no(n)			(0x0 << (n))
+#define EExR_En_yes(n)			(0x1 << (n))
+#define EExR_En_clear(n)		(0x1 << (n))
+#define EExR_En_set(n)			(0x1 << (n))
+#define SExR_En_MASK(n)			(0x1 << (n))
+#define SExR_En_none(n)			(0x0 << (n))
+#define SExR_En_stored(n)		(0x1 << (n))
+#define SExR_En_clear(n)		(0x1 << (n))
+#define IExR_En_MASK(n)			(0x1 << (n))
+#define IExR_En_disabled(n)		(0x0 << (n))
+#define IExR_En_enabled(n)		(0x1 << (n))
+#define IExR_En_clear(n)		(0x1 << (n))
+#define IExR_En_set(n)			(0x1 << (n))
+#define IxR_En_MASK(n)			(0x1 << (n))
+#define IxR_En_none(n)			(0x0 << (n))
+#define IxR_En_pending(n)		(0x1 << (n))
+#define IxR_En_clear(n)			(0x1 << (n))
+#define QER_En_MASK(n)			(0x1 << (n))
+#define QER_En_none(n)			(0x0 << (n))
+#define QER_En_prioritized(n)		(0x1 << (n))
+#define QEExR_En_MASK(n)		(0x1 << (n))
+#define QEExR_En_disabled(n)		(0x0 << (n))
+#define QEExR_En_enabled(n)		(0x1 << (n))
+#define QEExR_En_clear(n)		(0x1 << (n))
+#define QEExR_En_set(n)			(0x1 << (n))
+#define QSExR_En_MASK(n)		(0x1 << (n))
+#define QSExR_En_none(n)		(0x0 << (n))
+#define QSExR_En_stored(n)		(0x1 << (n))
+#define QSExR_En_clear(n)		(0x1 << (n))
+#define EDMA3CC_REVID			0x40015300
+#define CCCFG_NUM_REGN_MASK		(0x3 << 20)
+#define CCCFG_NUM_EVQUE_MASK		(0x7 << 16)
+#define CCCFG_NUM_PAENTRY_MASK		(0x7 << 12)
+#define CCCFG_NUM_INTCH_MASK		(0x7 << 8)
+#define CCCFG_NUM_QDMACH_MASK		(0x7 << 4)
+#define CCCFG_NUM_DMACH_MASK		(0x7 << 0)
+#define QCHMAP_PAENTRY_MASK		(0x7F << 5)
+#define QCHMAP_TRWORD_MASK		(0x7 << 2)
+#define DMAQNUM_IDX(n)			((n) >> 3)
+#define DMAQNUM_En_MASK(n)		(0x7 << (((n) & 0x7) << 2))
+#define QDMAQNUM_En_MASK(n)		(0x7 << (((n) & 0x7) << 2))
+#define EMxR_En_MASK(n)			(0x1 << (n))
+#define EMxR_En_none(n)			(0x0 << (n))
+#define EMxR_En_missed(n)		(0x1 << (n))
+#define EMxR_En_clear(n)		(0x1 << (n))
+#define QEMxR_En_MASK(n)		(0x1 << (n))
+#define QEMxR_En_none(n)		(0x0 << (n))
+#define QEMxR_En_missed(n)		(0x1 << (n))
+#define QEMxR_En_clear(n)		(0x1 << (n))
+#define DRAE_IDX(r)			((r) << 1)
+#define DRAE_En_MASK(n)			(0x1 << (n))
+#define DRAE_En_none(n)			(0x0 << (n))
+#define DRAE_En_allow(n)		(0x1 << (n))
+#define QRAE_En_MASK(n)			(0x1 << (n))
+#define QRAE_En_none(n)			(0x0 << (n))
+#define QRAE_En_allow(n)		(0x1 << (n))
+#define QyEx_ETYPE_MASK			(0x3 << 6)
+#define QyEx_ETYPE_ER			(0x0 << 6)
+#define QyEx_ETYPE_ESR			(0x1 << 6)
+#define QyEx_ETYPE_CER			(0x2 << 6)
+#define QyEx_ETYPE_QER			(0x3 << 6)
+#define QyEx_ENUM_MASK			(0x1F << 0)
+#define QSTAT_WM_MASK			(0x1F << 16)
+#define QSTAT_WM_isLegal(x)		(0 <= (x) && (x) <= 10)
+#define QSTAT_NUMVAL_MASK		(0x1F << 8)
+#define QSTAT_NUMVAL_isLegal(x)		(0 <= (x) && (x) <= 10)
+#define QSTAT_STRTPTR_MASK		(0xF << 0)
+#define QWMTHRA_Q1_MASK			(0x1F << 8)
+#define QWMTHRA_Q0_MASK			(0x1F << 0)
+#define CCSTAT_COMPACTV_MASK		(0x3F << 8)
+#define EDMA3TC_REVID			0x40003B00
+#define TCCFG_DREGDEPTH_MASK		(0x3 << 8)
+#define TCCFG_BUSWIDTH_MASK		(0x3 << 4)
+#define TCCFG_FIFOSIZE_MASK		(0x7 << 0)
+#define TCSTAT_DFSTRTPTR_MASK		(0x3 << 11)
+#define TCSTAT_DSTACTV_MASK		(0x7 << 4)
+#define ERRDET_TCC_MASK			(0x3F << 8)
+#define ERRDET_STAT_MASK		(0xF << 0)
+#define ERRDET_STAT_NoError		(0x0 << 0)
+#define ERRDET_STAT_ReadAddressing	(0x1 << 0)
+#define ERRDET_STAT_ReadPrivilege	(0x2 << 0)
+#define ERRDET_STAT_ReadTimeout		(0x3 << 0)
+#define ERRDET_STAT_ReadData		(0x4 << 0)
+#define ERRDET_STAT_ReadExclusive	(0x7 << 0)
+#define ERRDET_STAT_WriteAddressing	(0x9 << 0)
+#define ERRDET_STAT_WritePrivilege	(0xA << 0)
+#define ERRDET_STAT_WriteTimeout	(0xB << 0)
+#define ERRDET_STAT_WriteData		(0xC << 0)
+#define ERRDET_STAT_WriteExclusive	(0xF << 0)
+#define RDRATE_X_MASK			(0x7 << 0)
+#define RDRATE_X_AsFast			(0x0 << 0)
+#define RDRATE_X_4cycles		(0x1 << 0)
+#define RDRATE_X_8cycles		(0x2 << 0)
+#define RDRATE_X_16cycles		(0x3 << 0)
+#define RDRATE_X_32cycles		(0x4 << 0)
 #define XXX_GPkPj_MASK(j)		(0x1 << (j))
 #define DIR_GPkPj_output(j)		(0x0 << (j))
 #define DIR_GPkPj_input(j)		(0x1 << (j))
@@ -775,12 +917,26 @@
 #define MDR_OSM_SEL_MASK		(0x1 << 0)
 #define MDR_OSM_SEL_16x			(0x0 << 0)
 #define MDR_OSM_SEL_13x			(0x1 << 0)
+#define EDMA3_0CC0_BASE			0x01C00000
+#define EDMA3_0TC0_BASE			0x01C08000
+#define EDMA3_0TC1_BASE			0x01C08400
 #define PSC0_BASE			0x01C10000
 #define PLL0_BASE			0x01C11000
 #define SYSCFG0_BASE			0x01C14000
 #define TIMER0_BASE			0x01C20000
 #define TIMER1_BASE			0x01C21000
 #define I2C0_BASE			0x01C22000
+#define PRU_DataRAM0_BASE		0x01C30000
+#define PRU_DataRAM0_SIZE		0x00000200
+#define PRU_DataRAM1_BASE		0x01C32000
+#define PRU_DataRAM1_SIZE		0x00000200
+#define PRU_INTC_BASE			0x01C34000
+#define PRU0_BASE			0x01C37000
+#define PRU1_BASE			0x01C37800
+#define PRU_InstRAM0_BASE		0x01C38000
+#define PRU_InstRAM0_SIZE		0x00001000
+#define PRU_InstRAM1_BASE		0x01C3C000
+#define PRU_InstRAM1_SIZE		0x00001000
 #define UART0_BASE			0x01C42000
 #define UART1_BASE			0x01D0C000
 #define UART2_BASE			0x01D0D000
@@ -791,10 +947,12 @@
 #define PSC1_BASE			0x01E27000
 #define I2C1_BASE			0x01E28000
 #define SYSCFG1_BASE			0x01E2C000
+#define EDMA3_1CC0_BASE			0x01E30000
+#define EDMA3_1TC0_BASE			0x01E38000
 #define TIMER2_BASE			0x01F0C000
 #define TIMER3_BASE			0x01F0D000
-#define ARMlocalROM_BASE		0xFFFD0000
+#define ARMLocalROM_BASE		0xFFFD0000
 #define ARMLocalROM_SIZE		0x00010000
 #define AINTC_BASE			0xFFFEE000
-#define ARMlocalRAM_BASE		0xFFFF0000
+#define ARMLocalRAM_BASE		0xFFFF0000
 #define ARMLocalRAM_SIZE		0x00002000

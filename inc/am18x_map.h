@@ -460,6 +460,10 @@ typedef struct {
 #define CFGCHIP0_EDMA30TCxDBS_32B(x)	(0x1UL << (2*(x)))
 #define CFGCHIP0_EDMA30TCxDBS_64B(x)	(0x2UL << (2*(x)))
 	vuint32_t	CFGCHIP0;
+#define CFGCHIP1_EDMA31TC0DBS_MASK	(0x3UL << 13)
+#define CFGCHIP1_EDMA31TC0DBS_16B	(0x0UL << 13)
+#define CFGCHIP1_EDMA31TC0DBS_32B	(0x1UL << 13)
+#define CFGCHIP1_EDMA31TC0DBS_64B	(0x2UL << 13)
 	vuint32_t	CFGCHIP1;
 	vuint32_t	CFGCHIP2;
 #define CFGCHIP3_RMII_SEL_MASK		(0x1UL << 8)
@@ -764,6 +768,7 @@ typedef struct {
 #define OPT_FWID_64b			(0x3UL << 8)
 #define OPT_FWID_128b			(0x4UL << 8)
 #define OPT_FWID_256b			(0x5UL << 8)
+#define OPT_PRI_MASK			(0x7UL << 4)
 	vuint32_t	OPT;
 	vuint32_t	SRC;
 #define PARAM_BCNT_MASK			(0xFFFFUL << 16)
@@ -781,7 +786,7 @@ typedef struct {
 	vuint32_t	SRC_DST_CIDX;
 #define PARAM_CCNT_MASK			(0xFFFFUL << 0)
 	vuint32_t	CCNT;
-} PaRAM_con_t;
+} PaRAM_entry_t;
 
 enum {
 	BIT_DEF(OPT,23,ITCCHEN,no,yes),
@@ -795,78 +800,172 @@ enum {
 };
 
 typedef struct {
-	vuint32_t	ER;
+// n = 0..31
+#define ExR_En_MASK(n)			(0x1UL << (n))
+#define ExR_En_none(n)			(0x0UL << (n))
+#define ExR_En_asserted(n)		(0x1UL << (n))
+#define ExR_En_clear(n)			(0x1UL << (n))
+#define ExR_En_set(n)			(0x1UL << (n))
+	vcuint32_t	ER;
 	uint32_t	RESERVED0;
 	vuint32_t	ECR;
 	uint32_t	RESERVED1;
 	vuint32_t	ESR;
 	uint32_t	RESERVED2;
-	vuint32_t	CER;
+// n = 0..31
+#define CER_En_MASK(n)			(0x1UL << (n))
+#define CER_En_none(n)			(0x0UL << (n))
+#define CER_En_prioritized(n)		(0x1UL << (n))
+	vcuint32_t	CER;
 	uint32_t	RESERVED3;
-	vuint32_t	EER;
+// n = 0..31
+#define EExR_En_MASK(n)			(0x1UL << (n))
+#define EExR_En_no(n)			(0x0UL << (n))
+#define EExR_En_yes(n)			(0x1UL << (n))
+#define EExR_En_clear(n)		(0x1UL << (n))
+#define EExR_En_set(n)			(0x1UL << (n))
+	vcuint32_t	EER;
 	uint32_t	RESERVED4;
 	vuint32_t	EECR;
 	uint32_t	RESERVED5;
 	vuint32_t	EESR;
 	uint32_t	RESERVED6;
-	vuint32_t	SER;
+// n = 0..31
+#define SExR_En_MASK(n)			(0x1UL << (n))
+#define SExR_En_none(n)			(0x0UL << (n))
+#define SExR_En_stored(n)		(0x1UL << (n))
+#define SExR_En_clear(n)		(0x1UL << (n))
+	vcuint32_t	SER;
 	uint32_t	RESERVED7;
 	vuint32_t	SECR;
 	uint32_t	RESERVED8[_RS(0x50,0x40)];
-	vuint32_t	IER;
+// n = 0..31
+#define IExR_En_MASK(n)			(0x1UL << (n))
+#define IExR_En_disabled(n)		(0x0UL << (n))
+#define IExR_En_enabled(n)		(0x1UL << (n))
+#define IExR_En_clear(n)		(0x1UL << (n))
+#define IExR_En_set(n)			(0x1UL << (n))
+	vcuint32_t	IER;
 	uint32_t	RESERVED9;
 	vuint32_t	IECR;
 	uint32_t	RESERVED10;
 	vuint32_t	IESR;
 	uint32_t	RESERVED11;
-	vuint32_t	IPR;
+// n = 0..31
+#define IxR_En_MASK(n)			(0x1UL << (n))
+#define IxR_En_none(n)			(0x0UL << (n))
+#define IxR_En_pending(n)		(0x1UL << (n))
+#define IxR_En_clear(n)			(0x1UL << (n))
+	vcuint32_t	IPR;
 	uint32_t	RESERVED12;
 	vuint32_t	ICR;
 	uint32_t	RESERVED13;
 	vuint32_t	IEVAL;
 	uint32_t	RESERVED14;
-	vuint32_t	QER;
-	vuint32_t	QEER;
+// n = 0..7
+#define QER_En_MASK(n)			(0x1UL << (n))
+#define QER_En_none(n)			(0x0UL << (n))
+#define QER_En_prioritized(n)		(0x1UL << (n))
+	vcuint32_t	QER;
+// n = 0..7
+#define QEExR_En_MASK(n)		(0x1UL << (n))
+#define QEExR_En_disabled(n)		(0x0UL << (n))
+#define QEExR_En_enabled(n)		(0x1UL << (n))
+#define QEExR_En_clear(n)		(0x1UL << (n))
+#define QEExR_En_set(n)			(0x1UL << (n))
+	vcuint32_t	QEER;
 	vuint32_t	QEECR;
 	vuint32_t	QEESR;
-	vuint32_t	QSER;
+// n = 0..7
+#define QSExR_En_MASK(n)		(0x1UL << (n))
+#define QSExR_En_none(n)		(0x0UL << (n))
+#define QSExR_En_stored(n)		(0x1UL << (n))
+#define QSExR_En_clear(n)		(0x1UL << (n))
+	vcuint32_t	QSER;
 	vuint32_t	QSECR;
 } EDMA3CC_CH_t;
 
 typedef struct {
+#define EDMA3CC_REVID			0x40015300UL
 	vcuint32_t	REVID;
-	vuint32_t	CCCFG;
+#define CCCFG_NUM_REGN_MASK		(0x3UL << 20)
+#define CCCFG_NUM_EVQUE_MASK		(0x7UL << 16)
+#define CCCFG_NUM_PAENTRY_MASK		(0x7UL << 12)
+#define CCCFG_NUM_INTCH_MASK		(0x7UL << 8)
+#define CCCFG_NUM_QDMACH_MASK		(0x7UL << 4)
+#define CCCFG_NUM_DMACH_MASK		(0x7UL << 0)
+	vcuint32_t	CCCFG;
 	uint32_t	RESERVED0[_RS(0x200,0x004)];
+#define QCHMAP_PAENTRY_MASK		(0x7FUL << 5)
+#define QCHMAP_TRWORD_MASK		(0x7UL << 2)
 	vuint32_t	QCHMAPx[8];
 	uint32_t	RESERVED1[_RS(0x240,0x21C)];
+// n = 0..31
+#define DMAQNUM_IDX(n)			((n) >> 3)
+#define DMAQNUM_En_MASK(n)		(0x7UL << (((n) & 0x7UL) << 2))
 	vuint32_t	DMAQNUMx[4];
 	uint32_t	RESERVED2[_RS(0x260,0x24C)];
+// n = 0..7
+#define QDMAQNUM_En_MASK(n)		(0x7UL << (((n) & 0x7UL) << 2))
 	vuint32_t	QDMAQNUM;
 	uint32_t	RESERVED3[_RS(0x284,0x260)];
 	vuint32_t	QUEPRI;
 	uint32_t	RESERVED4[_RS(0x300,0x284)];
-	vuint32_t	EMR;
+// n = 0..31
+#define EMxR_En_MASK(n)			(0x1UL << (n))
+#define EMxR_En_none(n)			(0x0UL << (n))
+#define EMxR_En_missed(n)		(0x1UL << (n))
+#define EMxR_En_clear(n)		(0x1UL << (n))
+	vcuint32_t	EMR;
 	uint32_t	RESERVED5;
 	vuint32_t	EMCR;
 	uint32_t	RESERVED6;
-	vuint32_t	QEMR;
+// n = 0..7
+#define QEMxR_En_MASK(n)		(0x1UL << (n))
+#define QEMxR_En_none(n)		(0x0UL << (n))
+#define QEMxR_En_missed(n)		(0x1UL << (n))
+#define QEMxR_En_clear(n)		(0x1UL << (n))
+	vcuint32_t	QEMR;
 	vuint32_t	QEMCR;
-	vuint32_t	CCERR;
+	vcuint32_t	CCERR;
 	vuint32_t	CCERRCLR;
 	vuint32_t	EEVAL;
 	uint32_t	RESERVED7[_RS(0x340,0x320)];
+#define DRAE_IDX(r)			((r) << 1)
+// n = 0..31
+#define DRAE_En_MASK(n)			(0x1UL << (n))
+#define DRAE_En_none(n)			(0x0UL << (n))
+#define DRAE_En_allow(n)		(0x1UL << (n))
 	vuint32_t	DRAEx[8];
 	uint32_t	RESERVED8[_RS(0x380,0x35C)];
+// n = 0..7
+#define QRAE_En_MASK(n)			(0x1UL << (n))
+#define QRAE_En_none(n)			(0x0UL << (n))
+#define QRAE_En_allow(n)		(0x1UL << (n))
 	vuint32_t	QRAEx[4];
 	uint32_t	RESERVED9[_RS(0x400,0x38C)];
-	vuint32_t	Q0Ex[16];
-	vuint32_t	Q1Ex[16];
+#define QyEx_ETYPE_MASK			(0x3UL << 6)
+#define QyEx_ETYPE_ER			(0x0UL << 6)
+#define QyEx_ETYPE_ESR			(0x1UL << 6)
+#define QyEx_ETYPE_CER			(0x2UL << 6)
+#define QyEx_ETYPE_QER			(0x3UL << 6)
+#define QyEx_ENUM_MASK			(0x1FUL << 0)
+	vcuint32_t	Q0Ex[16];
+	vcuint32_t	Q1Ex[16];
 	uint32_t	RESERVED10[_RS(0x600,0x47C)];
-	vuint32_t	QSTATx[2];
+#define QSTAT_WM_MASK			(0x1FUL << 16)
+#define QSTAT_WM_isLegal(x)		(0 <= (x) && (x) <= 10)
+#define QSTAT_NUMVAL_MASK		(0x1FUL << 8)
+#define QSTAT_NUMVAL_isLegal(x)		(0 <= (x) && (x) <= 10)
+#define QSTAT_STRTPTR_MASK		(0xFUL << 0)
+	vcuint32_t	QSTATx[2];
 	uint32_t	RESERVED11[_RS(0x620,0x604)];
+#define QWMTHRA_Q1_MASK			(0x1FUL << 8)
+#define QWMTHRA_Q0_MASK			(0x1FUL << 0)
 	vuint32_t	QWMTHRA;
 	uint32_t	RESERVED12[_RS(0x640,0x620)];
-	vuint32_t	CCSTAT;
+#define CCSTAT_COMPACTV_MASK		(0x3FUL << 8)
+	vcuint32_t	CCSTAT;
 	uint32_t	RESERVED13[_RS(0x1000,0x640)];
 	EDMA3CC_CH_t	Global;
 	uint32_t	RESERVED14[_RS(0x2000,0x1094)];
@@ -874,44 +973,113 @@ typedef struct {
 	uint32_t	RESERVED15[_RS(0x2200,0x2094)];
 	EDMA3CC_CH_t	Region1;
 	uint32_t	RESERVED16[_RS(0x4000,0x2294)];
-	vuint32_t	PaRAM[1024];
+	PaRAM_entry_t	PREntry[128];
 } EDMA3CC_con_t;
+
+enum {
+	BIT_DEF(CCCFG,25,MP_EXIST,no,yes),
+	BIT_DEF(CCCFG,24,CHMAP_EXIST,no,yes),
+	BIT_DEF(CCERR,16,TCCERR,none,reached),
+	BIT_DEF(CCERR,1,QTHRXCD1,none,exceed),
+	BIT_DEF(CCERR,0,QTHRXCD0,none,exceed),
+	BIT_DEF(CCERRCLR,16,TCCERR,none,clear),
+	BIT_DEF(CCERRCLR,1,QTHRXCD1,none,clear),
+	BIT_DEF(CCERRCLR,0,QTHRXCD0,none,clear),
+	BIT_DEF(EEVAL,0,EVAL,none,pulsed),
+	BIT_DEF(QSTAT,24,THRXCD,no,yes),
+	BIT_DEF(CCSTAT,17,QUEACTV1,no,yes),
+	BIT_DEF(CCSTAT,16,QUEACTV0,no,yes),
+	BIT_DEF(CCSTAT,4,ACTV,no,yes),
+	BIT_DEF(CCSTAT,3,WSTATACTV,no,yes),
+	BIT_DEF(CCSTAT,2,TRACTV,no,yes),
+	BIT_DEF(CCSTAT,1,QEVTACTV,no,yes),
+	BIT_DEF(CCSTAT,0,EVTACTV,no,yes),
+	BIT_DEF(IEVAL,0,EVAL,none,pulsed),
+};
 
 typedef struct {
 	vuint32_t	OPT;
-	vuint32_t	SRC;
-	vuint32_t	CNT;
-	vuint32_t	DST;
-	vuint32_t	BIDX;
-	vuint32_t	MPPRXY;
+	vcuint32_t	SRC;
+	vcuint32_t	CNT;
+	vcuint32_t	DST;
+	vcuint32_t	BIDX;
+#define MPPRXY_PRIVID_MASK		(0xFUL << 0)
+	vcuint32_t	MPPRXY;
 	// only valid for Source Active (SA)
-	vuint32_t	CNTRLD;
-	vuint32_t	SRCBREF;
-	vuint32_t	DSTBREF;
+	vcuint32_t	SACNTRLD;
+	vcuint32_t	SASRCBREF;
+	vcuint32_t	SADSTBREF;
 	uint32_t	RESERVED0[_RS(0x40,0x20)];
 } EDMA3TC_fifo_t;
 
+enum {
+	BIT_DEF(MPPRXY,8,PRIV,user,supervisor),
+};
+
 typedef struct {
+#define EDMA3TC_REVID			0x40003B00UL
 	vcuint32_t	REVID;
-	vuint32_t	TCCFG;
+#define TCCFG_DREGDEPTH_MASK		(0x3UL << 8)
+#define TCCFG_BUSWIDTH_MASK		(0x3UL << 4)
+#define TCCFG_FIFOSIZE_MASK		(0x7UL << 0)
+	vcuint32_t	TCCFG;
 	uint32_t	RESERVED0[_RS(0x100,0x004)];
-	vuint32_t	TCSTAT;
+#define TCSTAT_DFSTRTPTR_MASK		(0x3UL << 11)
+#define TCSTAT_DSTACTV_MASK		(0x7UL << 4)
+	vcuint32_t	TCSTAT;
 	uint32_t	RESERVED1[_RS(0x120,0x100)];
-	vuint32_t	ERRSTAT;
+	vcuint32_t	ERRSTAT;
 	vuint32_t	ERREN;
 	vuint32_t	ERRCLR;
-	vuint32_t	ERRDET;
+#define ERRDET_TCC_MASK			(0x3FUL << 8)
+#define ERRDET_STAT_MASK		(0xFUL << 0)
+#define ERRDET_STAT_NoError		(0x0UL << 0)
+#define ERRDET_STAT_ReadAddressing	(0x1UL << 0)
+#define ERRDET_STAT_ReadPrivilege	(0x2UL << 0)
+#define ERRDET_STAT_ReadTimeout		(0x3UL << 0)
+#define ERRDET_STAT_ReadData		(0x4UL << 0)
+#define ERRDET_STAT_ReadExclusive	(0x7UL << 0)
+#define ERRDET_STAT_WriteAddressing	(0x9UL << 0)
+#define ERRDET_STAT_WritePrivilege	(0xAUL << 0)
+#define ERRDET_STAT_WriteTimeout	(0xBUL << 0)
+#define ERRDET_STAT_WriteData		(0xCUL << 0)
+#define ERRDET_STAT_WriteExclusive	(0xFUL << 0)
+	vcuint32_t	ERRDET;
 	vuint32_t	ERRCMD;
 	uint32_t	RESERVED2[_RS(0x140,0x130)];
+#define RDRATE_X_MASK			(0x7UL << 0)
+#define RDRATE_X_AsFast			(0x0UL << 0)
+#define RDRATE_X_4cycles		(0x1UL << 0)
+#define RDRATE_X_8cycles		(0x2UL << 0)
+#define RDRATE_X_16cycles		(0x3UL << 0)
+#define RDRATE_X_32cycles		(0x4UL << 0)
 	vuint32_t	RDRATE;
 	uint32_t	RESERVED3[_RS(0x240,0x140)];
 	EDMA3TC_fifo_t	SAx[1];
-	vuint32_t	DFCNTRLD;
-	vuint32_t	DFSRCBREF;
-	vuint32_t	DFDSTBREF;
+	vcuint32_t	DFCNTRLD;
+	vcuint32_t	DFSRCBREF;
+	vcuint32_t	DFDSTBREF;
 	uint32_t	RESERVED5[_RS(0x300,0x288)];
 	EDMA3TC_fifo_t	DFx[4];
 } EDMA3TC_con_t;
+
+enum {
+	BIT_DEF(TCSTAT,2,WSACTV,none,pending),
+	BIT_DEF(TCSTAT,1,SRCACTV,idle,busy),
+	BIT_DEF(TCSTAT,0,PROGBUSY,idle,busy),
+	BIT_DEF(ERRSTAT,3,MMRAERR,no,yes),
+	BIT_DEF(ERRSTAT,2,THERR,no,yes),
+	BIT_DEF(ERRSTAT,0,BUSERR,no,yes),
+	BIT_DEF(ERREN,3,MMRAERR,no,yes),
+	BIT_DEF(ERREN,2,THERR,no,yes),
+	BIT_DEF(ERREN,0,BUSERR,no,yes),
+	BIT_DEF(ERRCLR,3,MMRAERR,none,clear),
+	BIT_DEF(ERRCLR,2,THERR,none,clear),
+	BIT_DEF(ERRCLR,0,BUSERR,none,clear),
+	BIT_DEF(ERRDET,17,TCCHEN,no,yes),
+	BIT_DEF(ERRDET,16,TCINTEN,no,yes),
+	BIT_DEF(ERRCMD,0,EVAL,none,pulsed),
+};
 
 typedef struct {
 #define XXX_GPkPj_MASK(j)		(0x1UL << (j))
@@ -1453,6 +1621,9 @@ typedef struct {
 /*----------------------------------------------------------------------------*/
 // AM1808 ARM Microprocessor
 // 2.4 Memory Map Summary
+#define EDMA3_0CC0_BASE			0x01C00000UL
+#define EDMA3_0TC0_BASE			0x01C08000UL
+#define EDMA3_0TC1_BASE			0x01C08400UL
 #define PSC0_BASE			0x01C10000UL
 #define PLL0_BASE			0x01C11000UL
 #define SYSCFG0_BASE			0x01C14000UL
@@ -1480,12 +1651,14 @@ typedef struct {
 #define PSC1_BASE			0x01E27000UL
 #define I2C1_BASE			0x01E28000UL
 #define SYSCFG1_BASE			0x01E2C000UL
+#define EDMA3_1CC0_BASE			0x01E30000UL
+#define EDMA3_1TC0_BASE			0x01E38000UL
 #define TIMER2_BASE			0x01F0C000UL
 #define TIMER3_BASE			0x01F0D000UL
-#define ARMlocalROM_BASE		0xFFFD0000UL
+#define ARMLocalROM_BASE		0xFFFD0000UL
 #define ARMLocalROM_SIZE		0x00010000UL
 #define AINTC_BASE			0xFFFEE000UL
-#define ARMlocalRAM_BASE		0xFFFF0000UL
+#define ARMLocalRAM_BASE		0xFFFF0000UL
 #define ARMLocalRAM_SIZE		0x00002000UL
 
 
