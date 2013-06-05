@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
 	arm_mmu_show_id_code();
 	arm_mmu_show_cache_type();
 
-	for (inst = (unsigned*)ARMlocalRAM_BASE, i = 0; i < 16; i++) {
+	for (inst = (unsigned*)ARMLocalRAM_BASE, i = 0; i < 16; i++) {
 		printk("[%.2d] = 0x%.8X\n", i, *inst++);
 	}
 

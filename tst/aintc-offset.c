@@ -35,7 +35,7 @@ kv_t aintc_kv[] = {
 };
 
 kv_t edma_kv[] = {
-	KVS(PaRAM_con_t),
+	KVS(PaRAM_entry_t),
 	KVS(EDMA3CC_CH_t),
 	KVS(EDMA3CC_con_t),
 	KVS(EDMA3TC_fifo_t),

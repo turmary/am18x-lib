@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
 
 	printk(title);
 	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);
-	printk("AM18XX Bootloader Revision=%s\n", (char*)ARMlocalROM_BASE + 8);
+	printk("AM18XX Bootloader Revision=%s\n", (char*)ARMLocalROM_BASE + 8);
 
 	mode = syscfg_bootmode();
 	for (i = 0; i < countof(kv_boot); i++) {

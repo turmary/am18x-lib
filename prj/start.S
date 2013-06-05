@@ -99,7 +99,7 @@ HandleReset:
 		BL	__reloc_got
 
 		@ copy vectors to high memory
-		LDR	R0, =ARMlocalRAM_BASE
+		LDR	R0, =ARMLocalRAM_BASE
 		ldr_fix	R1, __vector_start
 		ldr_fix	R2, __vector_end
 		BL	__copy_mem

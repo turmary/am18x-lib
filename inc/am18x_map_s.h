@@ -353,6 +353,7 @@
 #define OPT_FWID_64b			(0x3 << 8)
 #define OPT_FWID_128b			(0x4 << 8)
 #define OPT_FWID_256b			(0x5 << 8)
+#define OPT_PRI_MASK			(0x7 << 4)
 #define PARAM_BCNT_MASK			(0xFFFF << 16)
 #define PARAM_ACNT_MASK			(0xFFFF << 0)
 #define PARAM_DSTBIDX_MASK		(0xFFFF << 16)
@@ -441,6 +442,7 @@
 #define QWMTHRA_Q1_MASK			(0x1F << 8)
 #define QWMTHRA_Q0_MASK			(0x1F << 0)
 #define CCSTAT_COMPACTV_MASK		(0x3F << 8)
+#define MPPRXY_PRIVID_MASK		(0xF << 0)
 #define EDMA3TC_REVID			0x40003B00
 #define TCCFG_DREGDEPTH_MASK		(0x3 << 8)
 #define TCCFG_BUSWIDTH_MASK		(0x3 << 4)
