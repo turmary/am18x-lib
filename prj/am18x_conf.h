@@ -33,6 +33,10 @@ extern const uint32_t f_osc;
 #define _PRU0
 #define _PRU1
 
+#define _EDMA
+#define _EDMA0
+#define _EDMA1
+
 #define _GPIO
 
 #define _I2C

@@ -49,4 +49,8 @@
 #include "am18x_pru.h"
 #endif
 
+#ifdef _EDMA
+#include "am18x_edma.h"
+#endif
+
 #endif//__AM18X_LIB_H__

@@ -1082,6 +1082,12 @@ enum {
 };
 
 typedef struct {
+	EDMA3CC_con_t		CC;
+	uint32_t		RESERVED0[_RS(0x8000,0x4FFC)];
+	EDMA3TC_con_t		TC[2];
+} EDMA_con_t;
+
+typedef struct {
 #define XXX_GPkPj_MASK(j)		(0x1UL << (j))
 #define DIR_GPkPj_output(j)		(0x0UL << (j))
 #define DIR_GPkPj_input(j)		(0x1UL << (j))
@@ -1701,6 +1707,12 @@ typedef struct {
 #ifdef _PRU1
 	#define PRU1			((PRU_con_t*)PRU1_BASE)
 #endif
+#ifdef _EDMA0
+	#define EDMA0			((EDMA_con_t)EDMA3_0CC0_BASE)
+#endif
+#ifdef _EDMA1
+	#define EDMA1			((EDMA_con_t)EDMA3_1CC0_BASE)
+#endif
 #ifdef _GPIO
 	#define GPIOCON			((GPIO_con_t*)GPIOCON_BASE)
 #endif
@@ -1765,6 +1777,12 @@ typedef struct {
 #endif
 #ifdef _PRU1
 	_EXTERN PRU_con_t		*PRU1;
+#endif
+#ifdef _EDMA0
+	_EXTERN EDMA_con_t		*EDMA0;
+#endif
+#ifdef _EDMA1
+	_EXTERN EDMA_con_t		*EDMA1;
 #endif
 #ifdef _GPIO
 	_EXTERN GPIO_con_t		*GPIOCON;
