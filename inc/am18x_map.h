@@ -756,6 +756,92 @@ enum {
 	BIT_DEF(CONTROL,0,SOFTRESET,yes,no),
 };
 
+// am1808.pdf, Page 52
+// 5.9.1 EDMA3 Channel Synchronization Events
+typedef enum {
+	// EDMA Channel Controller 0
+	EDMA_McASP0_Receive,
+	EDMA_McASP0_Transmit,
+	EDMA_McBSP0_Receive,
+	EDMA_McBSP0_Transmit,
+
+	EDMA_McBSP1_Receive,
+	EDMA_McBSP1_Transmit,
+	EDMA_GPIO_Bank0_Interrupt,
+	EDMA_GPIO_Bank1_Interrupt,
+
+	EDMA_UART0_Receive,
+	EDMA_UART0_Transmit,
+	EDMA_Timer64P0_EventOut12,
+	EDMA_Timer64P0_EventOut34,
+
+	EDMA_UART1_Receive,
+	EDMA_UART1_Transmit,
+	EDMA_SPI0_Receive,
+	EDMA_SPI0_Transmit,
+
+	EDMA_MMCSD0_Receive,
+	EDMA_MMCSD0_Transmit,
+	EDMA_SPI1_Receive,
+	EDMA_SPI1_Transmit,
+
+	EDMA_PRU_EVTOUT6,
+	EDMA_PRU_EVTOUT7,
+	EDMA_GPIO_Bank2_Interrupt,
+	EDMA_GPIO_Bank3_Interrupt,
+
+	EDMA_I2C0_Receive,
+	EDMA_I2C0_Transmit,
+	EDMA_I2C1_Receive,
+	EDMA_I2C1_Transmit,
+
+	EDMA_GPIO_Bank4_Interrupt,
+	EDMA_GPIO_Bank5_Interrupt,
+	EDMA_UART2_Receive,
+	EDMA_UART2_Transmit,
+
+	// EDMA Channel Controller 1
+	EDMA_Timer64P2_CompareEvent0,
+	EDMA_Timer64P2_CompareEvent1,
+	EDMA_Timer64P2_CompareEvent2,
+	EDMA_Timer64P2_CompareEvent3,
+
+	EDMA_Timer64P2_CompareEvent4,
+	EDMA_Timer64P2_CompareEvent5,
+	EDMA_Timer64P2_CompareEvent6,
+	EDMA_Timer64P2_CompareEvent7,
+
+	EDMA_Timer64P3_CompareEvent0,
+	EDMA_Timer64P3_CompareEvent1,
+	EDMA_Timer64P3_CompareEvent2,
+	EDMA_Timer64P3_CompareEvent3,
+
+	EDMA_Timer64P3_CompareEvent4,
+	EDMA_Timer64P3_CompareEvent5,
+	EDMA_Timer64P3_CompareEvent6,
+	EDMA_Timer64P3_CompareEvent7,
+
+	EDMA_GPIO_Bank6_Interrupt,
+	EDMA_GPIO_Bank7_Interrupt,
+	EDMA_GPIO_Bank8_Interrupt,
+	EDMA_Reserved0,
+
+	EDMA_Reserved1,
+	EDMA_Reserved2,
+	EDMA_Reserved3,
+	EDMA_Reserved4,
+
+	EDMA_Timer64P2_EventOut12,
+	EDMA_Timer64P2_EventOut34,
+	EDMA_Timer64P3_EventOut12,
+	EDMA_Timer64P3_EventOut34,
+
+	EDMA_MMCSD1_Receive,
+	EDMA_MMCSD1_Transmit,
+	EDMA_Reserved5,
+	EDMA_Reserved6,
+} EDMA_event_t;
+
 typedef struct {
 #define OPT_PRIVID_MASK			(0xFUL << 24)
 #define OPT_PRIVID_X(x)			(((x) & 0xFUL) << 24)
@@ -869,8 +955,8 @@ typedef struct {
 	vcuint32_t	QER;
 // n = 0..7
 #define QEExR_En_MASK(n)		(0x1UL << (n))
-#define QEExR_En_disabled(n)		(0x0UL << (n))
-#define QEExR_En_enabled(n)		(0x1UL << (n))
+#define QEExR_En_no(n)			(0x0UL << (n))
+#define QEExR_En_yes(n)			(0x1UL << (n))
 #define QEExR_En_clear(n)		(0x1UL << (n))
 #define QEExR_En_set(n)			(0x1UL << (n))
 	vcuint32_t	QEER;
@@ -973,7 +1059,8 @@ typedef struct {
 	uint32_t	RESERVED15[_RS(0x2200,0x2094)];
 	EDMA3CC_CH_t	Region1;
 	uint32_t	RESERVED16[_RS(0x4000,0x2294)];
-	PaRAM_entry_t	PREntry[128];
+#define PAEntry_CNT			128
+	PaRAM_entry_t	PAEntry[PAEntry_CNT];
 } EDMA3CC_con_t;
 
 enum {
@@ -1708,10 +1795,10 @@ typedef struct {
 	#define PRU1			((PRU_con_t*)PRU1_BASE)
 #endif
 #ifdef _EDMA0
-	#define EDMA0			((EDMA_con_t)EDMA3_0CC0_BASE)
+	#define EDMA0			((EDMA_con_t*)EDMA3_0CC0_BASE)
 #endif
 #ifdef _EDMA1
-	#define EDMA1			((EDMA_con_t)EDMA3_1CC0_BASE)
+	#define EDMA1			((EDMA_con_t*)EDMA3_1CC0_BASE)
 #endif
 #ifdef _GPIO
 	#define GPIOCON			((GPIO_con_t*)GPIOCON_BASE)
@@ -1819,4 +1906,4 @@ typedef struct {
 
 #endif//__AM18X_MAP_H__
 // to generate am18x_map_s.h, run the command
-// cat am18x_map.h | sed -e "s/\([^0]0x[0-9a-fA-F]\+\)UL/\1/g" | egrep "^#define " >am18x_map_s.h
+// sed -n -e "/^#define/{ s/\([^0]0x[0-9a-fA-F]\+\)UL/\1/g;p; }" am18x_map.h >am18x_map_s.h

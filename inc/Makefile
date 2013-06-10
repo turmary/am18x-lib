@@ -3,7 +3,7 @@
 all : am18x_map_s.h
 
 am18x_map_s.h: am18x_map.h
-	cat $< | sed -e "s/\([^0]0x[0-9a-fA-F]\+\)UL/\1/g" | egrep "^#define " > $@
+	sed -n -e "/^#define/{ s/\([^0]0x[0-9a-fA-F]\+\)UL/\1/g;p; }" $< > $@
 
 clean:
 

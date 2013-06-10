@@ -393,8 +393,8 @@
 #define QER_En_none(n)			(0x0 << (n))
 #define QER_En_prioritized(n)		(0x1 << (n))
 #define QEExR_En_MASK(n)		(0x1 << (n))
-#define QEExR_En_disabled(n)		(0x0 << (n))
-#define QEExR_En_enabled(n)		(0x1 << (n))
+#define QEExR_En_no(n)			(0x0 << (n))
+#define QEExR_En_yes(n)			(0x1 << (n))
 #define QEExR_En_clear(n)		(0x1 << (n))
 #define QEExR_En_set(n)			(0x1 << (n))
 #define QSExR_En_MASK(n)		(0x1 << (n))
@@ -442,6 +442,7 @@
 #define QWMTHRA_Q1_MASK			(0x1F << 8)
 #define QWMTHRA_Q0_MASK			(0x1F << 0)
 #define CCSTAT_COMPACTV_MASK		(0x3F << 8)
+#define PAEntry_CNT			128
 #define MPPRXY_PRIVID_MASK		(0xF << 0)
 #define EDMA3TC_REVID			0x40003B00
 #define TCCFG_DREGDEPTH_MASK		(0x3 << 8)
