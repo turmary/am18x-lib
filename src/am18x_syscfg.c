@@ -56,8 +56,8 @@ am18x_rt syscfg_aync3(am18x_bool ispll0) {
 am18x_rt syscfg_pinmux(uint32_t mux, uint32_t pos, uint32_t val) {
 	uint32_t reg;
 
-	if (mux >= 20 || pos >= 32 || pos % 4 != 0 || val >= 8) {
-		return AM18X_FALSE;
+	if (mux >= 20 || pos >= 32 || (pos & 0x3UL) != 0 || val >= 8) {
+		return AM18X_ERR;
 	}
 
 	reg = SYSCFG0->PINMUXx[mux];

@@ -5,10 +5,10 @@
 
 #include "am18x_map.h"
 
-#define CHANEL_X_MAX			(0x1FUL)
-#define CHANEL(x)			((x) & CHANEL_X_MAX)
-#define QCHANEL_X_MAX			(0x7UL)
-#define QCHANEL(x)			((x) & QCHANEL_X_MAX)
+#define CHANNEL_X_MAX			(0x1FUL)
+#define CHANNEL(x)			((x) & CHANNEL_X_MAX)
+#define QCHANNEL_X_MAX			(0x7UL)
+#define QCHANNEL(x)			((x) & QCHANNEL_X_MAX)
 #define TR_WORD(addr)			(((addr) & 0x1FUL) >> 2)
 
 typedef enum {
@@ -19,7 +19,7 @@ typedef enum {
 
 typedef enum {
 	EDMA_Q0,
-	EDMA_Q1,	// EDMA1 only
+	EDMA_Q1,			// EDMA1 only
 } emda_queue_t;
 
 typedef enum {
@@ -51,7 +51,7 @@ typedef struct {
 	uint16_t	a_cnt;		// (one array has a_cnt bytes)
 	uint16_t	b_cnt;		// (one frame has b_cnt arrays)
 
-	uint16_t	c_cnt;		// (one transfer has c_cnt frames)
+	uint16_t	c_cnt;		// (one pa entry transfer has c_cnt frames)
 #define LINK_NULL			0xFFFFUL
 	uint16_t	link;		// linked as pa[n].link = &param[pa[n+1].index]
 
@@ -62,7 +62,7 @@ typedef struct {
 	uint16_t	dst_c_idx;	// AB-sync for dist(frames[n + 1].0, frames[n].0)
 
 	uint8_t		tcc;		// chain channel or interrupt bit index #
-	uint8_t		priv_id;
+	uint8_t		priv_id;	// 0 --- EDMA3 master's privilege identification value
 	uint8_t		index;		// index of PaRAM set
 	uint8_t		reserved0[1];	// QCHANNEL --- customized by user
 					// CHANNEL  --- first one identical with edma_conf_t.channel
@@ -71,7 +71,7 @@ typedef struct {
 } pa_conf_t;
 
 typedef struct {
-	uint8_t		channel;	// CHANEL(n) or QCHANEL(n)
+	uint8_t		channel;	// CHANNEL(n) or QCHANNEL(n)
 	uint8_t		region;		// edma_region_t
 	uint8_t		queue;		// emda_queue_t
 	uint8_t		trigger;	// edma_trigger_t
@@ -86,6 +86,6 @@ am18x_rt edma_init(EDMA_con_t* econ, const edma_conf_t* conf);
 am18x_rt edma_param(EDMA_con_t* econ, const edma_conf_t* conf);
 am18x_rt edma_interrupt(EDMA_con_t* econ, const edma_conf_t* conf);
 am18x_rt edma_transfer(EDMA_con_t* econ, const edma_conf_t* conf);
-am18x_rt edma_wait_completion(EDMA_con_t* econ);
+am18x_rt edma_is_completion(EDMA_con_t* econ, const edma_conf_t* conf);
 
 #endif//__AM18X_EDMA_H__

@@ -1,5 +1,6 @@
 // tary, 22:38 2013/6/5
 #include "am18x_edma.h"
+// #include "auxlib.h"
 
 static EDMA3CC_rgn_t* region_2_reg(EDMA3CC_con_t* ccon, int region) {
 	if (ccon == NULL) {
@@ -122,7 +123,7 @@ am18x_rt edma_param(EDMA_con_t* econ, const edma_conf_t* conf) {
 			v = FIELD_SET(v, OPT_TCCHEN_MASK, OPT_TCCHEN_yes);
 		}
 		if (pa->flags & FLAG_TRANS_INTR) {
-			v = FIELD_SET(v, OPT_ITCINTEN_MASK, OPT_ITCINTEN_yes);
+			// v = FIELD_SET(v, OPT_ITCINTEN_MASK, OPT_ITCINTEN_yes);
 			v = FIELD_SET(v, OPT_TCINTEN_MASK, OPT_TCINTEN_yes);
 		}
 		if (pa->flags & FLAG_LAST_PAENTRY) {
@@ -135,30 +136,33 @@ am18x_rt edma_param(EDMA_con_t* econ, const edma_conf_t* conf) {
 
 		pa_entry->SRC = pa->src;
 
-		v = FIELD_SET(0, PARAM_ACNT_MASK, pa->a_cnt);
-		v = FIELD_SET(v, PARAM_BCNT_MASK, pa->b_cnt);
+		v = __field_xset(0, PARAM_ACNT_MASK, pa->a_cnt);
+		v = __field_xset(v, PARAM_BCNT_MASK, pa->b_cnt);
 		pa_entry->A_B_CNT = v;
 
 		pa_entry->DST = pa->dst;
 
-		v = FIELD_SET(0, PARAM_SRCBIDX_MASK, pa->src_b_idx);
-		v = FIELD_SET(v, PARAM_DSTBIDX_MASK, pa->dst_b_idx);
+		v = __field_xset(0, PARAM_SRCBIDX_MASK, pa->src_b_idx);
+		v = __field_xset(v, PARAM_DSTBIDX_MASK, pa->dst_b_idx);
 		pa_entry->SRC_DST_BIDX = v;	
 
-		v = FIELD_SET(0, PARAM_LINK_MASK, pa->link);
+		v = __field_xset(0, PARAM_LINK_MASK, pa->link);
 		if ((pa->flags & FLAG_SYNCTYPE_AB) == 0) {
-			v = FIELD_SET(v, PARAM_BCNTRLD_MASK, pa->b_cnt);
+			v = __field_xset(v, PARAM_BCNTRLD_MASK, pa->b_cnt);
 		}
 		pa_entry->LINK_BCNTRLD = v;
 
-		v = FIELD_SET(0, PARAM_SRCCIDX_MASK, pa->src_c_idx);
-		v = FIELD_SET(v, PARAM_DSTCIDX_MASK, pa->dst_c_idx);
+		v = __field_xset(0, PARAM_SRCCIDX_MASK, pa->src_c_idx);
+		v = __field_xset(v, PARAM_DSTCIDX_MASK, pa->dst_c_idx);
 		pa_entry->SRC_DST_CIDX = v;
 
-		v = FIELD_SET(0, PARAM_CCNT_MASK, pa->c_cnt);
+		v = __field_xset(0, PARAM_CCNT_MASK, pa->c_cnt);
 		pa_entry->CCNT = v;
 
 		pa_regs[pa->index] = *pa_entry;
+
+		// printk("\n&param0 = 0x%.8X\n", &pa_regs[pa->index]);
+		// dump_regs_word("pa_orig", (int)pa_entry, sizeof *pa_entry);
 	}
 	return AM18X_OK;
 }
@@ -196,6 +200,8 @@ am18x_rt edma_transfer(EDMA_con_t* econ, const edma_conf_t* conf) {
 
 	rgn = region_2_reg(ccon, conf->region);
 
+	rgn->SECR = rgn->SER;
+
 	ch = conf->channel;
 	if (conf->trigger == QDMA_AUTO_TRIGGERED) {
 		rgn->QEESR = FIELD_SET(0, QEExR_En_MASK(ch), QEExR_En_set(ch));
@@ -210,3 +216,28 @@ am18x_rt edma_transfer(EDMA_con_t* econ, const edma_conf_t* conf) {
 	return AM18X_OK;
 }
 
+am18x_rt edma_is_completion(EDMA_con_t* econ, const edma_conf_t* conf) {
+	EDMA3CC_con_t* ccon = &econ->CC;
+	EDMA3CC_rgn_t* rgn;
+	pa_conf_t* pa;
+	uint32_t msk;
+	int i;
+
+	rgn = region_2_reg(ccon, conf->region);
+
+	pa = conf->pa_conf;
+	for (i = 0; i < conf->pa_cnt; i++, pa++) {
+		if ((pa->flags & FLAG_TRANS_INTR) == 0) {
+			continue;
+		}
+		msk = IxR_En_MASK(pa->tcc);
+		if (FIELD_GET(rgn->IPR, msk) == IxR_En_none(pa->tcc)) {
+			return AM18X_ERR;
+		}
+	}
+
+	// clear pending bits in IPR
+	rgn->ICR = rgn->IPR;
+
+	return AM18X_OK;
+}
