@@ -55,14 +55,14 @@ typedef struct {
 #define LINK_NULL			0xFFFFUL
 	uint16_t	link;		// linked as pa[n].link = &param[pa[n+1].index]
 
-	uint16_t	src_b_idx;	// dist(arrrys[n+1], array[n]) in a frame
+	uint16_t	src_b_idx;	// distance (arrrys[n+1], array[n]) in a frame
 	uint16_t	dst_b_idx;	//
 
-	uint16_t	src_c_idx;	// A-sync for  dist(frames[n + 1].0, frames[n].last)
-	uint16_t	dst_c_idx;	// AB-sync for dist(frames[n + 1].0, frames[n].0)
+	uint16_t	src_c_idx;	// A-sync  for distance (frames[n + 1].0, frames[n].last)
+	uint16_t	dst_c_idx;	// AB-sync for distance (frames[n + 1].0, frames[n].0)
 
-	uint8_t		tcc;		// chain channel or interrupt bit index #
 	uint8_t		priv_id;	// 0 --- EDMA3 master's privilege identification value
+	uint8_t		tcc;		// chain channel or interrupt bit index #
 	uint8_t		index;		// index of PaRAM set
 	uint8_t		reserved0[1];	// QCHANNEL --- customized by user
 					// CHANNEL  --- first one identical with edma_conf_t.channel
@@ -71,21 +71,21 @@ typedef struct {
 } pa_conf_t;
 
 typedef struct {
+	pa_conf_t*	pa_conf;	// param sets as chained or linked
+	uint16_t	pa_cnt;		// elements count of pa_conf
+	uint8_t		tr_word;	// QCHANNEL only
+	uint8_t		reserved0[1];
+
 	uint8_t		channel;	// CHANNEL(n) or QCHANNEL(n)
 	uint8_t		region;		// edma_region_t
 	uint8_t		queue;		// emda_queue_t
 	uint8_t		trigger;	// edma_trigger_t
-
-	uint8_t		tr_word;	// QCHANNEL only
-	uint8_t		reserved0[2];
-	uint8_t		pa_cnt;		// elements count of pa_conf
-	pa_conf_t*	pa_conf;	// param sets as chained or linked
 } edma_conf_t;
 
 am18x_rt edma_init(EDMA_con_t* econ, const edma_conf_t* conf);
 am18x_rt edma_param(EDMA_con_t* econ, const edma_conf_t* conf);
 am18x_rt edma_interrupt(EDMA_con_t* econ, const edma_conf_t* conf);
 am18x_rt edma_transfer(EDMA_con_t* econ, const edma_conf_t* conf);
-am18x_rt edma_is_completion(EDMA_con_t* econ, const edma_conf_t* conf);
+am18x_rt edma_completed(EDMA_con_t* econ, const edma_conf_t* conf);
 
 #endif//__AM18X_EDMA_H__

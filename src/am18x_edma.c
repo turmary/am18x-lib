@@ -6,7 +6,7 @@ static EDMA3CC_rgn_t* region_2_reg(EDMA3CC_con_t* ccon, int region) {
 	if (ccon == NULL) {
 		return NULL;
 	}
-	switch(region) {
+	switch (region) {
 	case REGION_0:
 		return &ccon->Region0;
 		break;
@@ -208,7 +208,7 @@ am18x_rt edma_transfer(EDMA_con_t* econ, const edma_conf_t* conf) {
 
 		tr_p = (vuint32_t*)&pa_regs[conf->pa_conf[0].index];
 		tr_p += conf->tr_word;
-		// trigger the transfer by writing the tr_word in param set pa
+		// trigger the transfer by writing the tr_word in param set
 		*tr_p = *tr_p;
 	} else if (conf->trigger == DMA_MANUALLY_TRIGGERED) {
 		rgn->ESR = FIELD_SET(0, ExR_En_MASK(ch), ExR_En_set(ch));
@@ -216,7 +216,7 @@ am18x_rt edma_transfer(EDMA_con_t* econ, const edma_conf_t* conf) {
 	return AM18X_OK;
 }
 
-am18x_rt edma_is_completion(EDMA_con_t* econ, const edma_conf_t* conf) {
+am18x_rt edma_completed(EDMA_con_t* econ, const edma_conf_t* conf) {
 	EDMA3CC_con_t* ccon = &econ->CC;
 	EDMA3CC_rgn_t* rgn;
 	pa_conf_t* pa;

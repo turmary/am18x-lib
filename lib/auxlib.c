@@ -87,10 +87,14 @@ const char* strchr(const char* s, char c) {
 int debug_buf(const char* head, char* buf, int len) {
 	int i;
 
-	printk("\r\nDBG:%s[%d] = \r\n\t", head, len);
+	printk("\nDBG:%s[%d] = \n\t", head, len);
 	for (i = 0; i < len; i++) {
 		printk("%.2X ", buf[i]);
+		if ((i & 0xFUL) == 0xFUL && i != len - 1) {
+			printk("\n\t");
+		}
 	}
+	printk("\n");
 	return len;
 }
 
@@ -99,7 +103,7 @@ int debug_line(const char* file, int lin, int nr, ...) {
 	const char* s;
 	va_list ap;
 
-	printk("\r\nDBG:%s() L%d\t", file, lin);
+	printk("\nDBG:%s() L%d\t", file, lin);
 
 	va_start(ap, nr);
 	while (nr-- > 0) {
@@ -116,6 +120,7 @@ int debug_line(const char* file, int lin, int nr, ...) {
 		}
 	}
 	va_end(ap);
+	printk("\n");
 
 	return nr;
 }

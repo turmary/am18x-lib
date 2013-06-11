@@ -1076,9 +1076,9 @@ typedef struct {
 	vcuint32_t	Q1Ex[16];
 	uint32_t	RESERVED10[_RS(0x600,0x47C)];
 #define QSTAT_WM_MASK			(0x1FUL << 16)
-#define QSTAT_WM_isLegal(x)		(0 <= (x) && (x) <= 10)
+#define QSTAT_WM_isLegal(x)		(0 <= (x) && (x) <= 0x10UL)
 #define QSTAT_NUMVAL_MASK		(0x1FUL << 8)
-#define QSTAT_NUMVAL_isLegal(x)		(0 <= (x) && (x) <= 10)
+#define QSTAT_NUMVAL_isLegal(x)		(0 <= (x) && (x) <= 0x10UL)
 #define QSTAT_STRTPTR_MASK		(0xFUL << 0)
 	vcuint32_t	QSTATx[2];
 	uint32_t	RESERVED11[_RS(0x620,0x604)];
