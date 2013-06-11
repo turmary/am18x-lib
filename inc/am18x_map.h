@@ -377,6 +377,38 @@ typedef struct {
 	vuint32_t	MDCTLx[MODULE_NR_PER_PSC];
 } PSC_con_t;
 
+enum {
+	MSTPRI_ARM_I,
+	MSTPRI_ARM_D,
+	MSTPRI_Reserved0,
+	MSTPRI_Reserved1,
+
+	MSTPRI_UPP,
+	MSTPRI_STAT,
+	MSTPRI_Reserved2,
+	MSTPRI_Reserved3,
+
+	MSTPRI_PRU0,
+	MSTPRI_PRU1,
+	MSTPRI_EDMA30TC0,
+	MSTPRI_EDMA30TC1,
+
+	MSTPRI_EDMA31TC0,
+	MSTPRI_Reserved4,
+	MSTPRI_VPIF_DMA_0,
+	MSTPRI_VPIF_DMA_1,
+
+	MSTPRI_EMAC,
+	MSTPRI_Reserved5,
+	MSTPRI_USB0CFG,
+	MSTPRI_USB0CDMA,
+
+	MSTPRI_Reserved6,
+	MSTPRI_UHPI,
+	MSTPRI_USB1,
+	MSTPRI_LCDC,
+};
+
 typedef struct {
 #define SYSCFG0_REVID			0x4E840102UL
 	vcuint32_t	REVID;
@@ -441,7 +473,10 @@ typedef struct {
 #define FLTSTAT_ID_MASK			(0xFFUL << 24)
 	vcuint32_t	FLTSTAT;
 	uint32_t	RESERVED4[5];
-// TODO, Master Priority X
+// Master Priority X
+// x = 0..23
+#define MSTPRIx_IDX(x)			((x) >> 3)
+#define MSTPRIx_MASK(x)			(0x7UL << (((x) & 0x7UL) << 2))
 	vuint32_t	MSTPRIx[3];
 	uint32_t	RESERVED5;
 	vuint32_t	PINMUXx[20];
@@ -879,6 +914,7 @@ enum {
 	BIT_DEF(OPT,22,TCCHEN,no,yes),
 	BIT_DEF(OPT,21,ITCINTEN,no,yes),
 	BIT_DEF(OPT,20,TCINTEN,no,yes),
+	BIT_DEF(OPT,11,TCCMODE,Normal,Early),
 	BIT_DEF(OPT,3,STATIC,no,yes),
 	BIT_DEF(OPT,2,SYNCDIM,Async,ABsync),
 	BIT_DEF(OPT,1,DAM,INCR,CONST),
@@ -927,8 +963,8 @@ typedef struct {
 	uint32_t	RESERVED8[_RS(0x50,0x40)];
 // n = 0..31
 #define IExR_En_MASK(n)			(0x1UL << (n))
-#define IExR_En_disabled(n)		(0x0UL << (n))
-#define IExR_En_enabled(n)		(0x1UL << (n))
+#define IExR_En_no(n)			(0x0UL << (n))
+#define IExR_En_yes(n)			(0x1UL << (n))
 #define IExR_En_clear(n)		(0x1UL << (n))
 #define IExR_En_set(n)			(0x1UL << (n))
 	vcuint32_t	IER;
@@ -969,7 +1005,7 @@ typedef struct {
 #define QSExR_En_clear(n)		(0x1UL << (n))
 	vcuint32_t	QSER;
 	vuint32_t	QSECR;
-} EDMA3CC_CH_t;
+} EDMA3CC_rgn_t;
 
 typedef struct {
 #define EDMA3CC_REVID			0x40015300UL
@@ -1053,11 +1089,11 @@ typedef struct {
 #define CCSTAT_COMPACTV_MASK		(0x3FUL << 8)
 	vcuint32_t	CCSTAT;
 	uint32_t	RESERVED13[_RS(0x1000,0x640)];
-	EDMA3CC_CH_t	Global;
+	EDMA3CC_rgn_t	Global;
 	uint32_t	RESERVED14[_RS(0x2000,0x1094)];
-	EDMA3CC_CH_t	Region0;
+	EDMA3CC_rgn_t	Region0;
 	uint32_t	RESERVED15[_RS(0x2200,0x2094)];
-	EDMA3CC_CH_t	Region1;
+	EDMA3CC_rgn_t	Region1;
 	uint32_t	RESERVED16[_RS(0x4000,0x2294)];
 #define PAEntry_CNT			128
 	PaRAM_entry_t	PAEntry[PAEntry_CNT];
