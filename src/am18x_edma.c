@@ -105,8 +105,9 @@ am18x_rt edma_init(EDMA_con_t* econ, const edma_conf_t* conf) {
 }
 
 am18x_rt edma_param(EDMA_con_t* econ, const edma_conf_t* conf) {
+	EDMA3CC_con_t* ccon = &econ->CC;
+	PaRAM_entry_t* pa_regs = ccon->PAEntry;
 	PaRAM_entry_t pa_entry[1];
-	PaRAM_entry_t* pa_regs = econ->CC.PAEntry;
 	pa_conf_t* pa;
 	uint32_t v;
 	int i;
@@ -179,6 +180,13 @@ am18x_rt edma_interrupt(EDMA_con_t* econ, const edma_conf_t* conf) {
 	pa = conf->pa_conf;
 	for (i = 0; i < conf->pa_cnt; i++, pa++) {
 		if (pa->flags & FLAG_TRANS_INTR) {
+			if (conf->region != REGION_GLOBAL && pa->tcc != conf->channel) {
+				uint32_t v;
+
+				v = ccon->DRAEx[DRAE_IDX(conf->region)];
+				v = FIELD_SET(v, DRAE_En_MASK(pa->tcc), DRAE_En_allow(pa->tcc));
+				ccon->DRAEx[DRAE_IDX(conf->region)] = v;
+			}
 			msk = IExR_En_MASK(pa->tcc);
 			rgn->IESR = FIELD_SET(0, msk, IExR_En_set(pa->tcc));
 		}
@@ -227,6 +235,11 @@ am18x_rt edma_completed(EDMA_con_t* econ, const edma_conf_t* conf) {
 
 	pa = conf->pa_conf;
 	for (i = 0; i < conf->pa_cnt; i++, pa++) {
+		#if 0
+		if ((pa->flags & FLAG_LAST_PAENTRY) == 0) {
+			continue;
+		}
+		#endif
 		if ((pa->flags & FLAG_TRANS_INTR) == 0) {
 			continue;
 		}

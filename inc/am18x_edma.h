@@ -53,6 +53,7 @@ typedef struct {
 
 	uint16_t	c_cnt;		// (one pa entry transfer has c_cnt frames)
 #define LINK_NULL			0xFFFFUL
+#define LINK_NEXT(idx)			(0x4000UL + ((idx) << 5))
 	uint16_t	link;		// linked as pa[n].link = &param[pa[n+1].index]
 
 	uint16_t	src_b_idx;	// distance (arrrys[n+1], array[n]) in a frame
