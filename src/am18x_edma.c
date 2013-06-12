@@ -1,6 +1,6 @@
 // tary, 22:38 2013/6/5
 #include "am18x_edma.h"
-// #include "auxlib.h"
+#include "auxlib.h"
 
 static EDMA3CC_rgn_t* region_2_reg(EDMA3CC_con_t* ccon, int region) {
 	if (ccon == NULL) {
@@ -268,9 +268,9 @@ am18x_rt edma_status(const EDMA_con_t* econ, char* statuses[], uint32_t* comp_ac
 
 	for (i = 0; bit_nrs[i] != -1; i++) {
 		if (FIELD_GET(ccstat, BIT(bit_nrs[i])) != 0) {
-			statuses[i] = inner_status[i];
+			statuses[i] = inner_status[i] + get_exec_base();
 		} else {
-			statuses[i] = (char*)-1;
+			statuses[i] = "none";
 		}
 	}
 

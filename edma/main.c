@@ -33,7 +33,7 @@ static pa_conf_t pa_conf[1] = {
 	.index		= 0,
 	// .reserved0	= {0,},
 
-	.flags		= FLAG_SYNCTYPE_A | FLAG_TRANS_INTR |
+	.flags		= FLAG_SYNCTYPE_AB | FLAG_TRANS_INTR |
 			FLAG_LAST_PAENTRY | FLAG_TCC_NORMAL,
 }
 };
@@ -88,11 +88,7 @@ int main(int argc, char* argv[]) {
 	if (AM18X_OK == edma_status(DMA_NR, status, &completed)) {
 		printk("completed %d requests\n", completed);
 		for (i = 0; status[i] != NULL; i++) {
-			if ((int)status[i] == -1) {
-				printk("S%d none\n", i);
-			} else {
-				printk("S%d %s\n", i, status[i] + get_exec_base());
-			}
+			printk("S%d %s\n", i, status[i]);
 		}
 	}
 
