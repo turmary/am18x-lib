@@ -127,6 +127,9 @@ am18x_rt edma_param(EDMA_con_t* econ, const edma_conf_t* conf) {
 			// v = FIELD_SET(v, OPT_ITCINTEN_MASK, OPT_ITCINTEN_yes);
 			v = FIELD_SET(v, OPT_TCINTEN_MASK, OPT_TCINTEN_yes);
 		}
+		if (pa->flags & FLAG_TCC_EARLY) {
+			v = FIELD_SET(v, OPT_TCCMODE_MASK, OPT_TCCMODE_Early);
+		}
 		if (pa->flags & FLAG_LAST_PAENTRY) {
 			v = FIELD_SET(v, OPT_STATIC_MASK, OPT_STATIC_yes);
 		}
@@ -255,7 +258,7 @@ am18x_rt edma_completed(EDMA_con_t* econ, const edma_conf_t* conf) {
 	return AM18X_OK;
 }
 
-am18x_rt edma_status(const EDMA_con_t* econ, char* statuses[], uint32_t* comp_actv) {
+am18x_rt edma_status(const EDMA_con_t* econ, edma_stat_t* stat) {
 	static int bit_nrs[] = {0, 1, 2, 3, 4, 16, 17, -1};
 	static char* inner_status[] = {
 		"DMA  event active",
@@ -275,18 +278,26 @@ am18x_rt edma_status(const EDMA_con_t* econ, char* statuses[], uint32_t* comp_ac
 		return AM18X_ERR;
 	}
 
-	if (comp_actv != NULL) {
-		*comp_actv = __field_xget(ccstat, CCSTAT_COMPACTV_MASK);
+	if (stat == NULL) {
+		return AM18X_OK;
+	}
+
+	stat->comp_actv = __field_xget(ccstat, CCSTAT_COMPACTV_MASK);
+	stat->queue_evts[0] = __field_xget(econ->CC.QSTATx[0], QSTAT_NUMVAL_MASK);
+	if (econ == EDMA0) {
+		stat->queue_evts[1] = __field_xget(econ->CC.QSTATx[1], QSTAT_NUMVAL_MASK);
+	} else {
+		stat->queue_evts[1] = 0;
 	}
 
 	for (i = 0; bit_nrs[i] != -1; i++) {
 		if (FIELD_GET(ccstat, BIT(bit_nrs[i])) != 0) {
-			statuses[i] = inner_status[i] + get_exec_base();
+			stat->status[i] = inner_status[i] + get_exec_base();
 		} else {
-			statuses[i] = "none";
+			stat->status[i] = "none";
 		}
 	}
 
-	statuses[i] = NULL;
+	stat->status[i] = NULL;
 	return AM18X_OK;
 }

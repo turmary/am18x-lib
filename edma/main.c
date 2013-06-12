@@ -3,6 +3,7 @@
 #include "arm920t.h"
 #include "systick.h"
 #include "auxlib.h"
+#include "edma.h"
 
 const uint32_t f_osc = F_OSCIN;
 
@@ -21,6 +22,8 @@ int main(int argc, char* argv[]) {
 	edma_block_move_example();
 
 	edma_linked_transfer_example();
+
+	edma_transfer_channing_example();
 
 	return 0;
 }

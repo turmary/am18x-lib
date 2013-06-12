@@ -83,11 +83,17 @@ typedef struct {
 	uint8_t		trigger;	// edma_trigger_t
 } edma_conf_t;
 
+typedef struct {
+	char*		status[8];
+	uint32_t	comp_actv;
+	uint16_t	queue_evts[2];
+} edma_stat_t;
+
 am18x_rt edma_init(EDMA_con_t* econ, const edma_conf_t* conf);
 am18x_rt edma_param(EDMA_con_t* econ, const edma_conf_t* conf);
 am18x_rt edma_interrupt(EDMA_con_t* econ, const edma_conf_t* conf);
 am18x_rt edma_transfer(EDMA_con_t* econ, const edma_conf_t* conf);
 am18x_rt edma_completed(EDMA_con_t* econ, const edma_conf_t* conf);
-am18x_rt edma_status(const EDMA_con_t* econ, char* statuses[], uint32_t* comp_actv);
+am18x_rt edma_status(const EDMA_con_t* econ, edma_stat_t* stat);
 
 #endif//__AM18X_EDMA_H__
