@@ -5,7 +5,7 @@
 
 #define DMA_NR		EDMA0
 
-static char src[] = {"0123456789ABCDEFXYZ"};
+static char src[] = {"ABCDEFGHIJKLMNOPQRSTUVWXYZ01234"};
 static char dst[sizeof src * 2] = {0};
 
 static pa_conf_t pa_conf[2] = {
@@ -59,9 +59,10 @@ static int edma_transfer_inner(edma_conf_t* edma_conf) {
 	edma_interrupt(DMA_NR, edma_conf);
 
 	#if 0
-	// printk("&param0 = 0x%.8X\n", &DMA_NR->CC.PAEntry);
-	dump_regs_word("param0", (uint32_t)&DMA_NR->CC.PAEntry[0], sizeof(PaRAM_entry_t));
-	dump_regs_word("param127", (uint32_t)&DMA_NR->CC.PAEntry[127], sizeof(PaRAM_entry_t));
+	dump_regs_word("param0", (uint32_t)&DMA_NR->CC.PAEntry[pa_conf[0].index], sizeof(PaRAM_entry_t));
+	if (edma_conf->pa_cnt > 1) {
+	dump_regs_word("param1", (uint32_t)&DMA_NR->CC.PAEntry[pa_conf[1].index], sizeof(PaRAM_entry_t));
+	}
 	#endif
 
 	edma_transfer(DMA_NR, edma_conf);
@@ -82,8 +83,10 @@ static int edma_transfer_inner(edma_conf_t* edma_conf) {
 
 	#if 0
 	dump_regs_word("CC0 Region0", (uint32_t)&DMA_NR->CC.Region0, sizeof(EDMA3CC_rgn_t));
-	dump_regs_word("param0", (uint32_t)&DMA_NR->CC.PAEntry[0], sizeof(PaRAM_entry_t));
-	dump_regs_word("param127", (uint32_t)&DMA_NR->CC.PAEntry[127], sizeof(PaRAM_entry_t));
+	dump_regs_word("param0", (uint32_t)&DMA_NR->CC.PAEntry[pa_conf[0].index], sizeof(PaRAM_entry_t));
+	if (edma_conf->pa_cnt > 1) {
+	dump_regs_word("param1", (uint32_t)&DMA_NR->CC.PAEntry[pa_conf[1].index], sizeof(PaRAM_entry_t));
+	}
 	#endif
 
 	if (i >= RETRY_COUNT) {

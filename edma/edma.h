@@ -6,5 +6,7 @@
 int edma_block_move_example(void);
 // Page 551, Figure 17-8 Linked Transfer Example
 int edma_linked_transfer_example(void);
+// Page 594, 17.3.4.5 Transfer Chainning Examples
+int edma_transfer_channing_example(void);
 
 #endif//__EDMA_H__
