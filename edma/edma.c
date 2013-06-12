@@ -178,18 +178,20 @@ int edma_transfer_channing_example(void) {
 	pa_conf[0].c_cnt	= sizeof src / pa_conf[0].b_cnt / 2;
 	pa_conf[0].src_b_idx	= 1;
 	pa_conf[0].src_c_idx	= 2;
-	pa_conf[0].dst_b_idx	= 1;
-	pa_conf[0].dst_c_idx	= 2;
-	pa_conf[0].tcc		= 3;	/* event to trigger pa_conf[1] */
+	pa_conf[0].dst_b_idx	= 2;
+	pa_conf[0].dst_c_idx	= 4;
+	pa_conf[0].tcc		= 3;		/* event to trigger pa_conf[1] */
 	pa_conf[0].link		= LINK_NULL;
 	pa_conf[0].flags	= FLAG_SYNCTYPE_AB | FLAG_TRANS_INTR | FLAG_TCC_EARLY |
 				FLAG_TRANS_EVT;
 
 	pa_conf[1]		= pa_conf[0];
-	pa_conf[1].index	= 3;
+	pa_conf[1].index	= pa_conf[0].tcc;
 	pa_conf[1].src		= (uint32_t)src + sizeof src / 2;
 	pa_conf[1].dst		= (uint32_t)dst + sizeof src;
-	pa_conf[1].tcc		= 2;	/* event to trigger pa_conf[0] */
+	pa_conf[1].dst_b_idx	= 1;
+	pa_conf[1].dst_c_idx	= 2;
+	pa_conf[1].tcc		= pa_conf[0].index;/* event to trigger pa_conf[0] */
 
 	edma_conf->pa_conf	= pa_conf;
 	edma_conf->pa_cnt	= 2;
