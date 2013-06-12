@@ -53,6 +53,9 @@ static edma_conf_t edma_conf[1] = {
 
 int main(int argc, char* argv[]) {
 	const char* title = "\nam18x library for edma!\n";
+	char* status[16];
+	uint32_t completed;
+	int i;
 
 	arm_intr_enable();
 	systick_start();
@@ -81,6 +84,18 @@ int main(int argc, char* argv[]) {
 	#endif
 
 	edma_transfer(DMA_NR, edma_conf);
+
+	if (AM18X_OK == edma_status(DMA_NR, status, &completed)) {
+		printk("completed %d requests\n", completed);
+		for (i = 0; status[i] != NULL; i++) {
+			if ((int)status[i] == -1) {
+				printk("S%d none\n", i);
+			} else {
+				printk("S%d %s\n", i, status[i] + get_exec_base());
+			}
+		}
+	}
+
 	while (AM18X_OK != edma_completed(DMA_NR, edma_conf)) {
 		printk(".");
 	}

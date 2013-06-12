@@ -34,14 +34,14 @@ static am18x_bool is_qchannel(const edma_conf_t* conf) {
 	return AM18X_TRUE;
 }
 
-static am18x_bool is_null_pa_entry(pa_conf_t* pa) {
+static am18x_bool is_null_pa_entry(const pa_conf_t* pa) {
 	if (pa->a_cnt == 0 && pa->b_cnt == 0 && pa->c_cnt == 0) {
 		return AM18X_TRUE;
 	}
 	return AM18X_FALSE;
 }
 
-static am18x_bool is_dummy_pa_entry(pa_conf_t* pa) {
+static am18x_bool is_dummy_pa_entry(const pa_conf_t* pa) {
 	if ((pa->a_cnt == 0 || pa->b_cnt == 0 || pa->c_cnt == 0)
 	&& (pa->a_cnt != 0 || pa->b_cnt != 0 || pa->c_cnt != 0)
 	) {
@@ -239,5 +239,41 @@ am18x_rt edma_completed(EDMA_con_t* econ, const edma_conf_t* conf) {
 	// clear pending bits in IPR
 	rgn->ICR = rgn->IPR;
 
+	return AM18X_OK;
+}
+
+am18x_rt edma_status(const EDMA_con_t* econ, char* statuses[], uint32_t* comp_actv) {
+	static int bit_nrs[] = {0, 1, 2, 3, 4, 16, 17, -1};
+	static char* inner_status[] = {
+		"DMA  event active",
+		"QDMA event active",
+		"transfer request active",
+		"write status active",
+		"channel controller active",
+		"Queue 0 active",
+		"Queue 1 active",
+		"none",
+	};
+	uint32_t ccstat;
+	int i;
+
+	ccstat = econ->CC.CCSTAT;
+	if (FIELD_GET(ccstat, 0x0003001FUL) == 0) {
+		return AM18X_ERR;
+	}
+
+	if (comp_actv != NULL) {
+		*comp_actv = __field_xget(ccstat, CCSTAT_COMPACTV_MASK);
+	}
+
+	for (i = 0; bit_nrs[i] != -1; i++) {
+		if (FIELD_GET(ccstat, BIT(bit_nrs[i])) != 0) {
+			statuses[i] = inner_status[i];
+		} else {
+			statuses[i] = (char*)-1;
+		}
+	}
+
+	statuses[i] = NULL;
 	return AM18X_OK;
 }

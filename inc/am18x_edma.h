@@ -87,5 +87,6 @@ am18x_rt edma_param(EDMA_con_t* econ, const edma_conf_t* conf);
 am18x_rt edma_interrupt(EDMA_con_t* econ, const edma_conf_t* conf);
 am18x_rt edma_transfer(EDMA_con_t* econ, const edma_conf_t* conf);
 am18x_rt edma_completed(EDMA_con_t* econ, const edma_conf_t* conf);
+am18x_rt edma_status(const EDMA_con_t* econ, char* statuses[], uint32_t* comp_actv);
 
 #endif//__AM18X_EDMA_H__
