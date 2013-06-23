@@ -43,6 +43,10 @@ extern const uint32_t f_osc;
 #define _I2C0
 #define _I2C1
 
+#define _MMCSD
+#define _MMCSD0
+#define _MMCSD1
+
 #define _TIMER
 #define _TIMER0
 #define _TIMER1

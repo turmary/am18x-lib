@@ -53,4 +53,8 @@
 #include "am18x_edma.h"
 #endif
 
+#ifdef _MMCSD
+#include "am18x_mmcsd.h"
+#endif
+
 #endif//__AM18X_LIB_H__

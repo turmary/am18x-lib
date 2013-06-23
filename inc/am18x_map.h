@@ -1440,6 +1440,33 @@ typedef struct {
 } I2C_con_t;
 
 typedef struct {
+	vuint32_t	MMCCTL;
+	vuint32_t	MMCCLK;
+	vcuint32_t	MMCST0;
+	vcuint32_t	MMCST1;
+	vuint32_t	MMCIM;
+	vuint32_t	MMCTOR;
+	vuint32_t	MMCTOD;
+	vuint32_t	MMCBLEN;
+	vuint32_t	MMCNBLK;
+	vcuint32_t	MMCNBLC;
+	vuint32_t	MMCDRR;
+	vuint32_t	MMCDXR;
+	vuint32_t	MMCCMD;
+	vuint32_t	MMCARGHL;
+	vuint32_t	MMCRSP[4];
+	vuint32_t	MMCDRSP;
+	uint32_t	RESERVED0;
+	vuint32_t	MMCCIDX;
+	uint32_t	RESERVED1[_RS(0x64,0x50)];
+	vuint32_t	SDIOCTL;
+	vcuint32_t	SDIOST0;
+	vuint32_t	SDIOIEN;
+	vuint32_t	SDIOIST;
+	vuint32_t	MMCFIFOCTL;
+} MMCSD_con_t;
+
+typedef struct {
 	vcuint32_t	REVID;
 #define EMUMGT_SOFT_MASK		(0x1UL << 1)
 #define EMUMGT_SOFT_stop		(0x0UL << 1)
@@ -1770,12 +1797,14 @@ typedef struct {
 #define PRU_InstRAM0_SIZE		0x00001000UL
 #define PRU_InstRAM1_BASE		0x01C3C000UL
 #define PRU_InstRAM1_SIZE		0x00001000UL
+#define MMCSD0_BASE			0x01C40000UL
 #define UART0_BASE			0x01C42000UL
 #define UART1_BASE			0x01D0C000UL
 #define UART2_BASE			0x01D0D000UL
 #define MPU1_BASE			0x01E14000UL
 #define MPU2_BASE			0x01E15000UL
 #define PLL1_BASE			0x01E1A000UL
+#define MMCSD1_BASE			0x01E1B000UL
 #define GPIOCON_BASE			0x01E26000UL
 #define PSC1_BASE			0x01E27000UL
 #define I2C1_BASE			0x01E28000UL
@@ -1844,6 +1873,12 @@ typedef struct {
 #endif
 #ifdef _I2C1
 	#define I2C1			((I2C_con_t*)I2C1_BASE)
+#endif
+#ifdef _MMCSD0
+	#define MMCSD0 			((MMCSD_con_t*)MMCSD0_BASE)
+#endif
+#ifdef _MMCSD1
+	#define MMCSD1			((MMCSD_con_t*)MMCSD1_BASE)
 #endif
 #ifdef _TIMER0
 	#define TIMER0			((TIMER_con_t*)TIMER0_BASE)
@@ -1915,6 +1950,12 @@ typedef struct {
 #endif
 #ifdef _I2C1
 	_EXTERN I2C_con_t		*I2C1;
+#endif
+#ifdef _MMCSD0
+	_EXTERN MMCSD_con_t		*MMCSD0;
+#endif
+#ifdef _MMCSD1
+	_EXTERN MMCSD_con_t		*MMCSD1;
 #endif
 #ifdef _TIMER0
 	_EXTERN TIMER_con_t		*TIMER0
