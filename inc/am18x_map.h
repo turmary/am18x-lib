@@ -1440,31 +1440,141 @@ typedef struct {
 } I2C_con_t;
 
 typedef struct {
+#define MMCCTL_DATEG_MASK		(0x3UL << 6)
+#define MMCCTL_DATEG_disabled		(0x0UL << 6)
+#define MMCCTL_DATEG_rising		(0x1UL << 6)
+#define MMCCTL_DATEG_falling		(0x2UL << 6)
+#define MMCCTL_DATEG_both		(0x3UL << 6)
 	vuint32_t	MMCCTL;
+#define MMCCLK_CLKRT_MASK		(0xFFUL << 0)
+#define MMCCLK_CLKRT_VAL(x)		(((x) & 0xFFUL) << 0)
 	vuint32_t	MMCCLK;
 	vcuint32_t	MMCST0;
 	vcuint32_t	MMCST1;
 	vuint32_t	MMCIM;
+#define MMCTOR_TOD25_16_MASK		(0x3FFUL << 8)
+#define MMCTOR_TOD25_16_VAL(x)		((((x) >> 16) & 0x3FFUL) << 8)
+#define MMCTOR_TOR_MASK			(0xFFUL << 0)
+#define MMCTOR_TOR_VAL(x)		(((x) & 0xFFUL) << 0)
+#define MMCTOD_TOD15_0_MASK		(0xFFFFUL << 0)
+#define MMCTOD_TOD15_0_VAL(x)		(((x) & 0xFFFFUL) << 0)
 	vuint32_t	MMCTOR;
 	vuint32_t	MMCTOD;
+#define MMCBLEN_BLEN_MASK		(0xFFFUL << 0)
+#define MMCBLEN_BLEN_VAL(x)		((x) << 0)
 	vuint32_t	MMCBLEN;
+#define MMCNBLK_NBLK_MASK		(0xFFFFUL << 0)
+#define MMCNBLK_NBLK_Infinite		0x0UL
+#define MMCNBLK_NBLK_VAL(x)		((x) << 0)
 	vuint32_t	MMCNBLK;
+#define MMCNBLC_NBLC_MASK		(0xFFFFUL << 0)
 	vcuint32_t	MMCNBLC;
 	vuint32_t	MMCDRR;
 	vuint32_t	MMCDXR;
+#define MMCCMD_RSPFMT_MASK		(0x3UL << 9)
+#define MMCCMD_RSPFMT_none		(0x0UL << 9)
+#define MMCCMD_RSPFMT_48bCRC		(0x1UL << 9)
+#define MMCCMD_RSPFMT_136b		(0x2UL << 9)
+#define MMCCMD_RSPFMT_48b		(0x3UL << 9)
+#define MMCCMD_CMD_MASK			(0x3FUL << 0)
+#define MMCCMD_CMD_VAL(x)		(((x) & 0x3FUL) << 0)
 	vuint32_t	MMCCMD;
+#define MMCARGHL_ARGH_MASK		(0xFFFFUL << 16)
+#define MMCARGHL_ARGH_VAL(x)		(((x) & 0xFFFFUL) << 16)
+#define MMCARGHL_ARGL_MASK		(0xFFFFUL << 0)
+#define MMCARGHL_ARGL_VAL(x)		(((x) & 0xFFFFUL) << 0)
 	vuint32_t	MMCARGHL;
+// 48b
+// 0-7   0x00FF0000 & MMCRSP[2];
+// 8-39  0xFFFFFFFF & MMCRSP[3];
+// 40-47 0xFF       & MMCCIDX;
+// 136b
+// 0-127 MMCRSP[0] - MMCRSP[3];
+// 128-135 MMCCIDX;
 	vuint32_t	MMCRSP[4];
+#define MMCDRSP_DRSP_MASK		(0xFFUL << 0)
 	vuint32_t	MMCDRSP;
 	uint32_t	RESERVED0;
+#define MMCCIDX_CIDX_MASK		(0x3FUL << 0)
 	vuint32_t	MMCCIDX;
 	uint32_t	RESERVED1[_RS(0x64,0x50)];
 	vuint32_t	SDIOCTL;
 	vcuint32_t	SDIOST0;
 	vuint32_t	SDIOIEN;
 	vuint32_t	SDIOIST;
+#define MMCFIFOCTL_ACCWD_MASK		(0x3UL << 3)
+#define MMCFIFOCTL_ACCWD_4bytes		(0x0UL << 3)
+#define MMCFIFOCTL_ACCWD_3bytes		(0x1UL << 3)
+#define MMCFIFOCTL_ACCWD_2bytes		(0x2UL << 3)
+#define MMCFIFOCTL_ACCWD_1bytes		(0x3UL << 3)
 	vuint32_t	MMCFIFOCTL;
 } MMCSD_con_t;
+
+enum {
+	BIT_DEF(MMCCTL,10,PERMDX,Little,Big),
+	BIT_DEF(MMCCTL,9,PERMDR,Little,Big),
+	BIT_DEF(MMCCTL,8,WIDTH1,none,8bit),
+	BIT_DEF(MMCCTL,2,WIDTH0,4bit,1bit),
+	BIT_DEF(MMCCTL,1,CMDRST,enabled,disabled),
+	BIT_DEF(MMCCTL,0,DATRST,enabled,disabled),
+	BIT_DEF(MMCCLK,9,DIV4,div2,div4),
+	BIT_DEF(MMCCLK,8,CLKEN,low,enabled),
+	BIT_DEF(MMCST0,13,CCS,none,completed),
+	BIT_DEF(MMCST0,12,TRNDNE,none,done),
+	BIT_DEF(MMCST0,11,DATED,none,detected),
+	BIT_DEF(MMCST0,10,DRRDY,none,ready),
+	BIT_DEF(MMCST0,9,DXRDY,none,ready),
+	BIT_DEF(MMCST0,7,CRCRS,none,detected),
+	BIT_DEF(MMCST0,6,CRCRD,none,detected),
+	BIT_DEF(MMCST0,5,CRCWR,none,detected),
+	BIT_DEF(MMCST0,4,TOUTRS,none,occurred),
+	BIT_DEF(MMCST0,3,TOUTRD,none,occurred),
+	BIT_DEF(MMCST0,2,RSPDNE,none,done),
+	BIT_DEF(MMCST0,1,BSYDNE,none,done),
+	BIT_DEF(MMCST0,0,DATDNE,none,done),
+	BIT_DEF(MMCST1,6,FIFOFUL,no,yes),
+	BIT_DEF(MMCST1,5,FIFOEMP,no,yes),
+	BIT_DEF(MMCST1,4,DAT3ST,low,high),
+	BIT_DEF(MMCST1,3,DRFUL,no,yes),
+	BIT_DEF(MMCST1,2,DXEMP,no,yes),
+	BIT_DEF(MMCST1,1,CLKSTP,active,low),
+	BIT_DEF(MMCST1,0,BUSY,none,detected),
+	BIT_DEF(MMCIM,13,ECCS,disabled,enabled),
+	BIT_DEF(MMCIM,12,ETRNDNE,disabled,enabled),
+	BIT_DEF(MMCIM,11,EDATED,disabled,enabled),
+	BIT_DEF(MMCIM,10,EDRRDY,disabled,enabled),
+	BIT_DEF(MMCIM,9,EDXRDY,disabled,enabled),
+	BIT_DEF(MMCIM,7,ECRCRS,disabled,enabled),
+	BIT_DEF(MMCIM,6,ECRCRD,disabled,enabled),
+	BIT_DEF(MMCIM,5,ECRCWR,disabled,enabled),
+	BIT_DEF(MMCIM,4,ETOUTRS,disabled,enabled),
+	BIT_DEF(MMCIM,3,ETOUTRD,disabled,enabled),
+	BIT_DEF(MMCIM,2,ERSPDNE,disabled,enabled),
+	BIT_DEF(MMCIM,1,EBSYDNE,disabled,enabled),
+	BIT_DEF(MMCIM,0,EDATDNE,disabled,enabled),
+	BIT_DEF(MMCCMD,16,DAMTRIG,none,triggered),
+	BIT_DEF(MMCCMD,15,DCLR,none,clear),
+	BIT_DEF(MMCCMD,14,INITCK,no,yes),
+	BIT_DEF(MMCCMD,13,WDATX,no,yes),
+	BIT_DEF(MMCCMD,12,STRMTP,block,stream),
+	BIT_DEF(MMCCMD,11,DTRW,read,write),
+	BIT_DEF(MMCCMD,8,BSYEXP,none,expected),
+	BIT_DEF(MMCCMD,7,PPLEN,none,enabled),
+	BIT_DEF(MMCCIDX,7,STRT,0s,1s),
+	BIT_DEF(MMCCIDX,6,XMIT,0s,1s),
+	BIT_DEF(SDIOCTL,1,RDWTCR,disabled,enabled),
+	BIT_DEF(SDIOCTL,0,RDWTRQ,end,request),
+	BIT_DEF(SDIOST0,2,RDWTST,none,doing),
+	BIT_DEF(SDIOST0,1,INTPRD,none,doing),
+	BIT_DEF(SDIOST0,0,DAT1,low,high),
+	BIT_DEF(SDIOIEN,1,RWSEN,disabled,enabled),
+	BIT_DEF(SDIOIEN,0,IOINTEN,disabled,enabled),
+	BIT_DEF(SDIOIST,1,RWS,none,occurred),
+	BIT_DEF(SDIOIST,0,IOINT,none,occurred),
+	BIT_DEF(SDIOFIFOCTL,2,FIFOLEV,32B,64B),
+	BIT_DEF(SDIOFIFOCTL,1,FIFODIR,read,write),
+	BIT_DEF(SDIOFIFOCTL,0,FIFORST,disabled,enabled),
+};
 
 typedef struct {
 	vcuint32_t	REVID;
