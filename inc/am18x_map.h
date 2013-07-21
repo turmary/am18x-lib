@@ -1447,7 +1447,7 @@ typedef struct {
 #define MMCCTL_DATEG_both		(0x3UL << 6)
 	vuint32_t	MMCCTL;
 #define MMCCLK_CLKRT_MASK		(0xFFUL << 0)
-#define MMCCLK_CLKRT_VAL(x)		(((x) & 0xFFUL) << 0)
+#define MMCCLK_CLKRT_VAL(x)		((((x) - 1) & 0xFFUL) << 0)
 	vuint32_t	MMCCLK;
 	vcuint32_t	MMCST0;
 	vcuint32_t	MMCST1;
@@ -1485,12 +1485,12 @@ typedef struct {
 #define MMCARGHL_ARGL_VAL(x)		(((x) & 0xFFFFUL) << 0)
 	vuint32_t	MMCARGHL;
 // 48b
-// 0-7   0x00FF0000 & MMCRSP[2];
-// 8-39  0xFFFFFFFF & MMCRSP[3];
-// 40-47 0xFF       & MMCCIDX;
+// 0-7   0x00FF0000 & MMCRSP[2];-- end bit & CRC7
+// 8-39  0xFFFFFFFF & MMCRSP[3];-- card status
+// 40-47 0xFF       & MMCCIDX;	-- command index:6 & transmission bit:1 & start bit:1
 // 136b
-// 0-127 MMCRSP[0] - MMCRSP[3];
-// 128-135 MMCCIDX;
+// 0-127 MMCRSP[0] - MMCRSP[3];	-- end bit & [(CID or CSD) include CRC7]:127
+// 128-135 MMCCIDX;		-- reserved:6 & transmission:1 & start bit:1
 	vuint32_t	MMCRSP[4];
 #define MMCDRSP_DRSP_MASK		(0xFFUL << 0)
 	vuint32_t	MMCDRSP;
@@ -1513,8 +1513,8 @@ typedef struct {
 enum {
 	BIT_DEF(MMCCTL,10,PERMDX,Little,Big),
 	BIT_DEF(MMCCTL,9,PERMDR,Little,Big),
-	BIT_DEF(MMCCTL,8,WIDTH1,none,8bit),
-	BIT_DEF(MMCCTL,2,WIDTH0,4bit,1bit),
+	BIT_DEF(MMCCTL,8,WIDTH1,1_4bit,8bit),
+	BIT_DEF(MMCCTL,2,WIDTH0,1bit,4bit),
 	BIT_DEF(MMCCTL,1,CMDRST,enabled,disabled),
 	BIT_DEF(MMCCTL,0,DATRST,enabled,disabled),
 	BIT_DEF(MMCCLK,9,DIV4,div2,div4),
@@ -1552,7 +1552,7 @@ enum {
 	BIT_DEF(MMCIM,2,ERSPDNE,disabled,enabled),
 	BIT_DEF(MMCIM,1,EBSYDNE,disabled,enabled),
 	BIT_DEF(MMCIM,0,EDATDNE,disabled,enabled),
-	BIT_DEF(MMCCMD,16,DAMTRIG,none,triggered),
+	BIT_DEF(MMCCMD,16,DMATRIG,none,triggered),
 	BIT_DEF(MMCCMD,15,DCLR,none,clear),
 	BIT_DEF(MMCCMD,14,INITCK,no,yes),
 	BIT_DEF(MMCCMD,13,WDATX,no,yes),
@@ -1571,9 +1571,9 @@ enum {
 	BIT_DEF(SDIOIEN,0,IOINTEN,disabled,enabled),
 	BIT_DEF(SDIOIST,1,RWS,none,occurred),
 	BIT_DEF(SDIOIST,0,IOINT,none,occurred),
-	BIT_DEF(SDIOFIFOCTL,2,FIFOLEV,32B,64B),
-	BIT_DEF(SDIOFIFOCTL,1,FIFODIR,read,write),
-	BIT_DEF(SDIOFIFOCTL,0,FIFORST,disabled,enabled),
+	BIT_DEF(MMCFIFOCTL,2,FIFOLEV,32B,64B),
+	BIT_DEF(MMCFIFOCTL,1,FIFODIR,read,write),
+	BIT_DEF(MMCFIFOCTL,0,FIFORST,none,reset),
 };
 
 typedef struct {

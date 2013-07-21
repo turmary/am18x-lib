@@ -654,6 +654,43 @@
 #define ICPDXXX_MASK(x)			(0x1 << (x))
 #define ICPDXXX_none(x)			(0x0 << (x))
 #define ICPDXXX_assert(x)		(0x1 << (x))
+#define MMCCTL_DATEG_MASK		(0x3 << 6)
+#define MMCCTL_DATEG_disabled		(0x0 << 6)
+#define MMCCTL_DATEG_rising		(0x1 << 6)
+#define MMCCTL_DATEG_falling		(0x2 << 6)
+#define MMCCTL_DATEG_both		(0x3 << 6)
+#define MMCCLK_CLKRT_MASK		(0xFF << 0)
+#define MMCCLK_CLKRT_VAL(x)		((((x) - 1) & 0xFF) << 0)
+#define MMCTOR_TOD25_16_MASK		(0x3FF << 8)
+#define MMCTOR_TOD25_16_VAL(x)		((((x) >> 16) & 0x3FF) << 8)
+#define MMCTOR_TOR_MASK			(0xFF << 0)
+#define MMCTOR_TOR_VAL(x)		(((x) & 0xFF) << 0)
+#define MMCTOD_TOD15_0_MASK		(0xFFFF << 0)
+#define MMCTOD_TOD15_0_VAL(x)		(((x) & 0xFFFF) << 0)
+#define MMCBLEN_BLEN_MASK		(0xFFF << 0)
+#define MMCBLEN_BLEN_VAL(x)		((x) << 0)
+#define MMCNBLK_NBLK_MASK		(0xFFFF << 0)
+#define MMCNBLK_NBLK_Infinite		0x0
+#define MMCNBLK_NBLK_VAL(x)		((x) << 0)
+#define MMCNBLC_NBLC_MASK		(0xFFFF << 0)
+#define MMCCMD_RSPFMT_MASK		(0x3 << 9)
+#define MMCCMD_RSPFMT_none		(0x0 << 9)
+#define MMCCMD_RSPFMT_48bCRC		(0x1 << 9)
+#define MMCCMD_RSPFMT_136b		(0x2 << 9)
+#define MMCCMD_RSPFMT_48b		(0x3 << 9)
+#define MMCCMD_CMD_MASK			(0x3F << 0)
+#define MMCCMD_CMD_VAL(x)		(((x) & 0x3F) << 0)
+#define MMCARGHL_ARGH_MASK		(0xFFFF << 16)
+#define MMCARGHL_ARGH_VAL(x)		(((x) & 0xFFFF) << 16)
+#define MMCARGHL_ARGL_MASK		(0xFFFF << 0)
+#define MMCARGHL_ARGL_VAL(x)		(((x) & 0xFFFF) << 0)
+#define MMCDRSP_DRSP_MASK		(0xFF << 0)
+#define MMCCIDX_CIDX_MASK		(0x3F << 0)
+#define MMCFIFOCTL_ACCWD_MASK		(0x3 << 3)
+#define MMCFIFOCTL_ACCWD_4bytes		(0x0 << 3)
+#define MMCFIFOCTL_ACCWD_3bytes		(0x1 << 3)
+#define MMCFIFOCTL_ACCWD_2bytes		(0x2 << 3)
+#define MMCFIFOCTL_ACCWD_1bytes		(0x3 << 3)
 #define EMUMGT_SOFT_MASK		(0x1 << 1)
 #define EMUMGT_SOFT_stop		(0x0 << 1)
 #define EMUMGT_SOFT_reach		(0x1 << 1)
@@ -942,12 +979,14 @@
 #define PRU_InstRAM0_SIZE		0x00001000
 #define PRU_InstRAM1_BASE		0x01C3C000
 #define PRU_InstRAM1_SIZE		0x00001000
+#define MMCSD0_BASE			0x01C40000
 #define UART0_BASE			0x01C42000
 #define UART1_BASE			0x01D0C000
 #define UART2_BASE			0x01D0D000
 #define MPU1_BASE			0x01E14000
 #define MPU2_BASE			0x01E15000
 #define PLL1_BASE			0x01E1A000
+#define MMCSD1_BASE			0x01E1B000
 #define GPIOCON_BASE			0x01E26000
 #define PSC1_BASE			0x01E27000
 #define I2C1_BASE			0x01E28000
