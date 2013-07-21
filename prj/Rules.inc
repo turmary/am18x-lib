@@ -100,7 +100,7 @@ ${AIS_UART}: bin
 	$(NM) -n $< > $@
 
 %.elf: $(OBJS) $(LINK_SCRIPT) $(MAKEFILE_LIST)
-	$(CC) $(ALL_CFLAGS) $(OBJS) --output $@ $(LDFLAGS)
+	$(CC) --output $@ $(LDFLAGS) -Wl,--start-group $(OBJS) -Wl,--end-group
 
 $(COBJ) : %.o : %.c $(MAKEFILE_LIST)
 	$(CC) -c $(ALL_CFLAGS) $< -o $@
