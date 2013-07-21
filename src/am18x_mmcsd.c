@@ -114,12 +114,10 @@ am18x_rt mmcsd_send_cmd(MMCSD_con_t* mcon, const mmcsd_cmd_t* cmd) {
 		reg = FIELD_SET(reg, msk, MMCCMD_WDATX_yes);
 		reg = FIELD_SET(reg, MMCCMD_STRMTP_MASK, MMCCMD_STRMTP_block);
 
-		// important for us
-		reg = FIELD_SET(reg, MMCCMD_DMATRIG_MASK, MMCCMD_DMATRIG_triggered);
-
 		if (cmd->cflags & MMCSD_CMD_F_WRITE) {
 			reg = FIELD_SET(reg, MMCCMD_DTRW_MASK, MMCCMD_DTRW_write);
 		} else {
+			reg = FIELD_SET(reg, MMCCMD_DMATRIG_MASK, MMCCMD_DMATRIG_triggered);
 			reg = FIELD_SET(reg, MMCCMD_DTRW_MASK, MMCCMD_DTRW_read);
 		}
 	} else {
@@ -144,14 +142,22 @@ am18x_rt mmcsd_send_cmd(MMCSD_con_t* mcon, const mmcsd_cmd_t* cmd) {
 	mcon->MMCARGHL = cmd->arg;
 	mcon->MMCCMD = reg;
 
+	if (cmd->cflags & MMCSD_CMD_F_WRITE) {
+		reg = mcon->MMCCMD;
+		mcon->MMCCMD = FIELD_SET(reg, MMCCMD_DMATRIG_MASK, MMCCMD_DMATRIG_triggered);
+	}
+
 	if (cmd->cflags & MMCSD_CMD_F_DATA) {
 		printk("MMCCMD = 0x%.8X\n", mcon->MMCCMD);
 	}
+
 	return AM18X_OK;
 }
 
+#define TRACK_SAMPLES    40000
+#define TRACK_SAVES    0x400
 mmcsd_cmd_state_t mmcsd_cmd_state(const MMCSD_con_t* mcon, am18x_bool need_crc) {
-#if 1
+#if 0
 	uint32_t reg;
 
 	reg = mcon->MMCST0;
@@ -166,8 +172,6 @@ mmcsd_cmd_state_t mmcsd_cmd_state(const MMCSD_con_t* mcon, am18x_bool need_crc) 
 	}
 #else
 	{
-	#define TRACK_SAMPLES    40000
-	#define TRACK_SAVES    0x400
 	uint32_t reg_tracks[TRACK_SAVES];
 	int i, n = 0;
 
@@ -178,6 +182,7 @@ mmcsd_cmd_state_t mmcsd_cmd_state(const MMCSD_con_t* mcon, am18x_bool need_crc) 
 		}
 	}
 
+	printk("%s() \n", __func__);
 	for (i = 0; i < n; i++) {
 		printk("[%.3d] = 0x%.8X\n", i, reg_tracks[i]);
 		if (FIELD_GET(reg_tracks[i], MMCST0_RSPDNE_MASK) == MMCST0_RSPDNE_done
@@ -202,8 +207,6 @@ mmcsd_dat_state_t mmcsd_busy_state(const MMCSD_con_t* mcon) {
 }
 
 mmcsd_dat_state_t mmcsd_rd_state(const MMCSD_con_t* mcon) {
-	#define TRACK_SAMPLES    40000
-	#define TRACK_SAVES    0x400
 	uint32_t reg_tracks[TRACK_SAVES];
 	int i, n = 0;
 
@@ -214,6 +217,7 @@ mmcsd_dat_state_t mmcsd_rd_state(const MMCSD_con_t* mcon) {
 		}
 	}
 
+	printk("%s() \n", __func__);
 	for (i = 0; i < n; i++) {
 		printk("[%.3d] = 0x%.8X\n", i, reg_tracks[i]);
 		if (FIELD_GET(reg_tracks[i], MMCST0_CRCRD_MASK) == MMCST0_CRCRD_detected) {
@@ -233,11 +237,45 @@ mmcsd_dat_state_t mmcsd_rd_state(const MMCSD_con_t* mcon) {
 }
 
 mmcsd_dat_state_t mmcsd_wr_state(const MMCSD_con_t* mcon) {
-	return MMCSD_SD_OK;
-}
+#if 0
+	uint32_t reg;
 
-am18x_rt mmcsd_state_clear(MMCSD_con_t* mcon, mmcsd_state_type_t type) {
-	return AM18X_OK;
+	reg = mcon->MMCST0;
+	if (FIELD_GET(reg, MMCST0_CRCWR_MASK) == MMCST0_CRCWR_detected) {
+		return MMCSD_SD_CRC_ERR;
+	}
+	if (FIELD_GET(reg, MMCST0_DXRDY_MASK) == MMCST0_DXRDY_ready) {
+		return MMCSD_SD_SENT;
+	}
+	if (FIELD_GET(reg, MMCST0_DATDNE_MASK) == MMCST0_DATDNE_done) {
+		return MMCSD_SD_OK;
+	}
+#else
+	uint32_t reg_tracks[TRACK_SAVES];
+	int i, n = 0;
+
+	reg_tracks[n++] = mcon->MMCST0;
+	for (i = 0; i < TRACK_SAMPLES; i++) {
+		if (reg_tracks[n - 1] != (reg_tracks[n] = mcon->MMCST0)) {
+			n++;
+		}
+	}
+
+	printk("%s() \n", __func__);
+	for (i = 0; i < n; i++) {
+		printk("[%.3d] = 0x%.8X\n", i, reg_tracks[i]);
+		if (FIELD_GET(reg_tracks[i], MMCST0_CRCWR_MASK) == MMCST0_CRCWR_detected) {
+			return MMCSD_SD_CRC_ERR;
+		}
+		if (FIELD_GET(reg_tracks[i], MMCST0_DXRDY_MASK) == MMCST0_DXRDY_ready) {
+			return MMCSD_SD_SENT;
+		}
+		if (FIELD_GET(reg_tracks[i], MMCST0_DATDNE_MASK) == MMCST0_DATDNE_done) {
+			return MMCSD_SD_OK;
+		}
+	}
+#endif
+	return MMCSD_SD_NONE;
 }
 
 am18x_rt mmcsd_get_resp(const MMCSD_con_t* mcon, mmcsd_resp_type_t type, mmcsd_resp_t* resp) {
@@ -263,29 +301,39 @@ am18x_rt mmcsd_get_resp(const MMCSD_con_t* mcon, mmcsd_resp_type_t type, mmcsd_r
 am18x_rt mmcsd_cntl_misc(MMCSD_con_t* mcon, const mmcsd_misc_t* misc) {
 	uint32_t reg, msk, v;
 
+	// setting block count
 	if (misc->blkcnt) {
 		mcon->MMCNBLK = misc->blkcnt;
 	}
 
+	// 6. Reset the FIFO
 	reg = mcon->MMCFIFOCTL;
 	msk = MMCFIFOCTL_FIFORST_MASK;
 	if (misc->mflags & MMCSD_MISC_F_FIFO_RST) {
 		mcon->MMCFIFOCTL = FIELD_SET(reg, msk, MMCFIFOCTL_FIFORST_reset);
 	}
 
-	reg = mcon->MMCFIFOCTL;
-	msk = MMCFIFOCTL_ACCWD_MASK;
-	reg = FIELD_SET(reg, msk, MMCFIFOCTL_ACCWD_4bytes);
-	msk = MMCFIFOCTL_FIFOLEV_MASK;
-	reg = FIELD_SET(reg, msk, MMCFIFOCTL_FIFOLEV_32B);
-
+	// 7. Set the FIFO direction to transmit/receive
 	msk = MMCFIFOCTL_FIFODIR_MASK;
 	if (misc->mflags & MMCSD_MISC_F_WRITE) {
 		v = MMCFIFOCTL_FIFODIR_write;
 	} else {
 		v = MMCFIFOCTL_FIFODIR_read;
 	}
-	mcon->MMCFIFOCTL = FIELD_SET(reg, msk, v);
+	reg = FIELD_SET(reg, msk, v);
+
+	// 8. Set the access width
+	msk = MMCFIFOCTL_ACCWD_MASK;
+	reg = FIELD_SET(reg, msk, MMCFIFOCTL_ACCWD_4bytes);
+
+	// 9. Set the FIFO threshold
+	msk = MMCFIFOCTL_FIFOLEV_MASK;
+	if (misc->mflags & MMCSD_MISC_F_FIFO_64B) {
+		reg = FIELD_SET(reg, msk, MMCFIFOCTL_FIFOLEV_64B);
+	} else {
+		reg = FIELD_SET(reg, msk, MMCFIFOCTL_FIFOLEV_32B);
+	}
+	mcon->MMCFIFOCTL = reg;
 	printk("MMCFIFOCTL = 0x%.8X\n", mcon->MMCFIFOCTL);
 
 	if (misc->mflags & MMCSD_MISC_F_BUS4BIT) {
@@ -298,9 +346,11 @@ am18x_rt mmcsd_cntl_misc(MMCSD_con_t* mcon, const mmcsd_misc_t* misc) {
 
 	reg = mcon->MMCIM;
 	if (misc->mflags & MMCSD_MISC_F_WRITE) {
+		// 10. Enable the DXRDYINT interrupt
 		msk = MMCIM_EDXRDY_MASK;
 		mcon->MMCIM = FIELD_SET(reg, msk, MMCIM_EDXRDY_enabled);
 	} else {
+		// 11. Enable the DRRDYINT interrupt
 		msk = MMCIM_EDRRDY_MASK;
 		mcon->MMCIM = FIELD_SET(reg, msk, MMCIM_EDRRDY_enabled);
 	}

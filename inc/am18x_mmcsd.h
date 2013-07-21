@@ -45,22 +45,13 @@ typedef enum {
 
 typedef enum {
 	MMCSD_SD_BUSY,
-	MMCSD_SD_SENDING,
 	MMCSD_SD_SENT,
-	MMCSD_SD_CRCS_ERR,
-	MMCSD_SD_RECVING,
 	MMCSD_SD_RECVED,
 	MMCSD_SD_CRC_ERR,
 	MMCSD_SD_TOUT,
 	MMCSD_SD_NONE,
 	MMCSD_SD_OK,
 } mmcsd_dat_state_t;
-
-typedef enum {
-	MMCSD_STATE_CMD,
-	MMCSD_STATE_DATA,
-	MMCSD_STATE_FIFO,
-} mmcsd_state_type_t;
 
 typedef struct {
 	uint32_t v[4];
@@ -73,11 +64,12 @@ typedef enum {
 
 typedef enum {
 	MMCSD_MISC_F_FIFO_RST = BIT(0),
-	MMCSD_MISC_F_STOP = BIT(1),
+	MMCSD_MISC_F_FIFO_32B = 0,
+	MMCSD_MISC_F_FIFO_64B = BIT(1),
+	MMCSD_MISC_F_READ = 0,
 	MMCSD_MISC_F_WRITE = BIT(2),
-	MMCSD_MISC_F_READ = BIT(3),
-	MMCSD_MISC_F_BUSY = BIT(4),
-	MMCSD_MISC_F_BUS4BIT = BIT(5),
+	MMCSD_MISC_F_BUSY = BIT(3),
+	MMCSD_MISC_F_BUS4BIT = BIT(4),
 } mmcsd_mflags_t;
 
 typedef struct {
