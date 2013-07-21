@@ -28,11 +28,11 @@ int sdmmc_dbg(unsigned blk, unsigned cnt, unsigned start) {
 	}
 
 	prepare_txbuf((uint8_t*)buf, cnt * MMCSD_BLOCK_SIZE, start);
-	/*r = sdmmc_write_block(blk, cnt, buf);
+	r = sdmmc_write_block(blk, cnt, buf);
 	if (r != SDMMC_OK) {
 		printk("SDMMC write block %s\n", sdmmc_err_string(r));
 		return -2;
-	}*/
+	}
 
 	r = sdmmc_read_block(blk, cnt, buf);
 	if (r != SDMMC_OK) {
@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
 	printk(title);
 	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);
 
-	sdmmc_dbg(4, 2, 0x55);
+	sdmmc_dbg(4, 1, 0x55);
 
 	return 0;
 }

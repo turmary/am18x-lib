@@ -23,7 +23,7 @@
 
 #define MMC_RCA			0x1234
 
-#define SDMMC_REG_RETRY		1000
+#define SDMMC_REG_RETRY		100000
 #define SDMMC_CMD_RETRY		20
 #define SDMMC_ARG_NULL		0
 
@@ -173,6 +173,8 @@ static sdmmc_rt sdmmc_cmd(int nr, uint32_t arg) {
 			cmd.cflags |= MMCSD_CMD_F_READ;
 		} else {
 			cmd.cflags |= MMCSD_CMD_F_WRITE;
+			// am1808 bug fix
+			// cmd.cflags &= ~(MMCSD_CMD_F_RSP | MMCSD_CMD_F_LONG);
 		}
 	}
 
@@ -182,14 +184,6 @@ static sdmmc_rt sdmmc_cmd(int nr, uint32_t arg) {
 
 	mmcsd_send_cmd(MMCSDCON, &cmd);
 
-#if 0
-	if (srt == SDCARD_NONE_RSP) {
-		while ((stat = sdmmc_cmd_stat(nr)) != MMCSD_SC_SENT) {
-			printk("SDMMC cmd %d *** state = %d ***\n", nr, stat);
-		}
-		goto done;
-	}
-#endif
 	for(i = 0;;) {
 		stat = sdmmc_cmd_stat(nr);
 		if (stat == MMCSD_SC_RSP_TOUT || stat == MMCSD_SC_RSP_OK || stat == MMCSD_SC_CRC_ERR) {
@@ -478,6 +472,13 @@ static sdmmc_rt sdmmc_max_buswidth(void) {
 		sd_sm->is_bus4bit = 1;
 		sd_sm->ci_stat = SDP_TRAN;
 	}
+
+	if (sd_sm->is_bus4bit) {
+		mmcsd_misc_t misc;
+
+		misc.mflags = MMCSD_MISC_F_BUS4BIT;
+		mmcsd_cntl_misc(MMCSDCON, &misc);		
+	}
 	return r;
 }
 
@@ -489,10 +490,7 @@ sdmmc_rt sdmmc_read_block(uint32_t blk_nr, uint32_t blk_cnt, uint32_t* buf) {
 	int i;
 
 	misc.blkcnt = blk_cnt;
-	misc.mflags = MMCSD_MISC_F_READ | MMCSD_MISC_F_FIFO_RST;
-	if (sd_sm->is_bus4bit) {
-		misc.mflags |= MMCSD_MISC_F_BUS4BIT;
-	}
+	misc.mflags = MMCSD_MISC_F_READ | MMCSD_MISC_F_FIFO_RST | MMCSD_MISC_F_FIFO_32B;
 	mmcsd_cntl_misc(MMCSDCON, &misc);
 
 	cmd_nr = CMD17R1_READ_SINGLE_BLOCK;
@@ -519,6 +517,7 @@ sdmmc_rt sdmmc_read_block(uint32_t blk_nr, uint32_t blk_cnt, uint32_t* buf) {
 				buf[i++] = mmcsd_read(MMCSDCON);
 			}
 		}
+		printk("   *** ST1=0x%.8X ***\n", MMCSDCON->MMCST1);
 	}
 
 	while ((ds = mmcsd_rd_state(MMCSDCON)) != MMCSD_SD_OK);
@@ -542,20 +541,11 @@ sdmmc_rt sdmmc_write_block(uint32_t blk_nr, uint32_t blk_cnt, const uint32_t* bu
 	int cmd_nr;
 	int i;
 
-	// 6. Reset the FIFO
-	// 7. Set the FIFO direction to transmit
-	// 8. Set the access width
-	// 10. Enable the DXRDYINT interrupt
 	misc.blkcnt = blk_cnt;
-	misc.mflags = MMCSD_MISC_F_WRITE | MMCSD_MISC_F_FIFO_RST;
-	if (sd_sm->is_bus4bit) {
-		misc.mflags |= MMCSD_MISC_F_BUS4BIT;
-	}
+	misc.mflags = MMCSD_MISC_F_WRITE | MMCSD_MISC_F_FIFO_RST | MMCSD_MISC_F_FIFO_32B;
 	mmcsd_cntl_misc(MMCSDCON, &misc);
 
-	// 11. Write the first 32 bytes of the data block to
-	// the data transmit register
-	for (i = 0; i < 8; i++) {
+	for (i = 0; i < 32 / sizeof(uint32_t);) {
 		mmcsd_write(MMCSDCON, buf[i++]);
 	}
 
@@ -565,19 +555,28 @@ sdmmc_rt sdmmc_write_block(uint32_t blk_nr, uint32_t blk_cnt, const uint32_t* bu
 	r = sdmmc_cmd(cmd_nr, blk_nr << MASK_OFFSET(MMCSD_BLOCK_SIZE));
 	if (r != SDMMC_OK) return r;
 
-	while (i < blk_cnt * MMCSD_BLOCK_SIZE / sizeof(uint32_t)) {
-		ds = mmcsd_wr_state(MMCSDCON);
-		printk("   *** ST0=0x%.8X RSP=0x%.8X ***\n", MMCSDCON->MMCST0, MMCSDCON->MMCRSP[3]);
-		if (ds == MMCSD_SD_OK) break;
-		if (ds == MMCSD_SD_CRCS_ERR) return SDMMC_CRC_ERR;
-		if (ds == MMCSD_SD_SENT) {
-			mmcsd_write(MMCSDCON, buf[i++]);
+	while (i < 4 + blk_cnt * MMCSD_BLOCK_SIZE / sizeof(uint32_t)) {
+		if ((ds = mmcsd_wr_state(MMCSDCON)) == MMCSD_SD_OK) {
+			break;
+		}
+		if (ds == MMCSD_SD_TOUT) {
+			return SDMMC_NO_RSP;
+		}
+		printk("   *** ST1=0x%.8X ***\n", MMCSDCON->MMCST1);
+		if (i == 32 / sizeof(uint32_t) || ds == MMCSD_SD_SENT) {
+		// if (i == 0 || ds == MMCSD_SD_SENT) {
+			int ii;
+
+			for (ii = 0; ii < 32 / sizeof(uint32_t); ii++) {
+				mmcsd_write(MMCSDCON, buf[i++]);
+			}
 		}
 	}
 
-	do {
-		ds = mmcsd_wr_state(MMCSDCON);
-	} while (ds != MMCSD_SD_TOUT && ds != MMCSD_SD_OK && ds != MMCSD_SD_CRCS_ERR);
+	printk("Wait write complete!\n");
+	while ((ds = mmcsd_wr_state(MMCSDCON)) != MMCSD_SD_OK) {
+		printk("   *** ST1=0x%.8X ***\n", MMCSDCON->MMCST1);
+	}
 
 	printk("SDMMC WRITE %d bytes\n", i * sizeof(uint32_t));
 
@@ -585,22 +584,15 @@ sdmmc_rt sdmmc_write_block(uint32_t blk_nr, uint32_t blk_cnt, const uint32_t* bu
 		goto done;
 	}
 
-	misc.mflags = MMCSD_MISC_F_BUSY;
-	mmcsd_cntl_misc(MMCSDCON, &misc);
-	
 	r = sdmmc_cmd_noarg(CMD12R1b_STOP_TRANSMISSION);
 	if (r != SDMMC_OK) return r;
 
 	do {
 		ds = mmcsd_busy_state(MMCSDCON);
-		printk("   *** ST0=0x%.8X RSP=0x%.8X ***\n", MMCSDCON->MMCST0, MMCSDCON->MMCRSP[3]);
+		//printk("   *** ST0=0x%.8X RSP=0x%.8X ***\n", MMCSDCON->MMCST0, MMCSDCON->MMCRSP[3]);
 	} while (ds == MMCSD_SD_BUSY);
 
-
 done:
-	misc.mflags = MMCSD_MISC_F_STOP;
-	mmcsd_cntl_misc(MMCSDCON, &misc);
-
 	sd_sm->ci_stat = SDP_TRAN;
 
 	return SDMMC_OK;
