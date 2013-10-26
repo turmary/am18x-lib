@@ -107,6 +107,7 @@ am18x_rt mmcsd_send_cmd(MMCSD_con_t* mcon, const mmcsd_cmd_t* cmd) {
 	mcon->MMCRSP[3] = 0;
 
 	reg = mcon->MMCCMD;
+	// Bug Fix, DCLR_clear is going data shift 2 bytes
 	reg = FIELD_SET(reg, MMCCMD_DCLR_MASK, MMCCMD_DCLR_none);
 
 	if (cmd->cflags & MMCSD_CMD_F_BUSY) {
@@ -119,11 +120,11 @@ am18x_rt mmcsd_send_cmd(MMCSD_con_t* mcon, const mmcsd_cmd_t* cmd) {
 	if (cmd->cflags & MMCSD_CMD_F_DATA) {
 		reg = FIELD_SET(reg, msk, MMCCMD_WDATX_yes);
 		reg = FIELD_SET(reg, MMCCMD_STRMTP_MASK, MMCCMD_STRMTP_block);
-		reg = FIELD_SET(reg, MMCCMD_DMATRIG_MASK, MMCCMD_DMATRIG_triggered);
 
 		if (cmd->cflags & MMCSD_CMD_F_WRITE) {
 			reg = FIELD_SET(reg, MMCCMD_DTRW_MASK, MMCCMD_DTRW_write);
 		} else {
+			reg = FIELD_SET(reg, MMCCMD_DMATRIG_MASK, MMCCMD_DMATRIG_triggered);
 			reg = FIELD_SET(reg, MMCCMD_DTRW_MASK, MMCCMD_DTRW_read);
 		}
 	} else {
@@ -141,9 +142,6 @@ am18x_rt mmcsd_send_cmd(MMCSD_con_t* mcon, const mmcsd_cmd_t* cmd) {
 			v = MMCCMD_RSPFMT_48b;
 		}
 	}
-	if (cmd->cflags & MMCSD_CMD_F_DATA) {
-		v = MMCCMD_RSPFMT_none;
-	}
 	reg = FIELD_SET(reg, msk, v);
 
 	reg = FIELD_SET(reg, MMCCMD_CMD_MASK, MMCCMD_CMD_VAL(idx));
@@ -151,13 +149,8 @@ am18x_rt mmcsd_send_cmd(MMCSD_con_t* mcon, const mmcsd_cmd_t* cmd) {
 	mcon->MMCARGHL = cmd->arg;
 	mcon->MMCCMD = reg;
 
-	/* if (cmd->cflags & MMCSD_CMD_F_WRITE) {
-		reg = mcon->MMCCMD;
-		mcon->MMCCMD = FIELD_SET(reg, MMCCMD_DMATRIG_MASK, MMCCMD_DMATRIG_triggered);
-	} */
-
 	if (cmd->cflags & MMCSD_CMD_F_DATA) {
-		printk("MMCCMD = 0x%.8X\n", mcon->MMCCMD);
+		printk("*** MMCCMD = 0x%.8X ***\n", mcon->MMCCMD);
 	}
 
 	return AM18X_OK;
@@ -216,6 +209,23 @@ mmcsd_dat_state_t mmcsd_busy_state(const MMCSD_con_t* mcon) {
 }
 
 mmcsd_dat_state_t mmcsd_rd_state(const MMCSD_con_t* mcon) {
+#if 1
+	uint32_t reg;
+
+	reg = mcon->MMCST0;
+	if (FIELD_GET(reg, MMCST0_CRCRD_MASK) == MMCST0_CRCRD_detected) {
+		return MMCSD_SD_CRC_ERR;
+	}
+	if (FIELD_GET(reg, MMCST0_TOUTRD_MASK) == MMCST0_TOUTRD_occurred) {
+		return MMCSD_SD_TOUT;
+	}
+	if (FIELD_GET(reg, MMCST0_DRRDY_MASK) == MMCST0_DRRDY_ready) {
+		return MMCSD_SD_RECVED;
+	}
+	if (FIELD_GET(reg, MMCST0_DATDNE_MASK) == MMCST0_DATDNE_done) {
+		return MMCSD_SD_OK;
+	}
+#else
 	uint32_t reg_tracks[TRACK_SAVES];
 	int i, n = 0;
 
@@ -244,11 +254,12 @@ mmcsd_dat_state_t mmcsd_rd_state(const MMCSD_con_t* mcon) {
 			return MMCSD_SD_OK;
 		}
 	}
+#endif
 	return MMCSD_SD_NONE;
 }
 
 mmcsd_dat_state_t mmcsd_wr_state(const MMCSD_con_t* mcon) {
-#if 0
+#if 1
 	uint32_t reg;
 
 	reg = mcon->MMCST0;
@@ -358,18 +369,23 @@ am18x_rt mmcsd_cntl_misc(MMCSD_con_t* mcon, const mmcsd_misc_t* misc) {
 	}
 
 	mcon->MMCFIFOCTL = reg;
-	printk("MMCFIFOCTL = 0x%.8X\n", mcon->MMCFIFOCTL);
+
+	printk("*** MMCFIFOCTL = 0x%.8X ***\n", mcon->MMCFIFOCTL);
 
 	reg = mcon->MMCIM;
+	msk = MMCIM_ECRCRS_MASK | MMCIM_ETOUTRS_MASK | MMCIM_ERSPDNE_MASK | MMCIM_EDATDNE_MASK;
+	v = MMCIM_ECRCRS_enabled | MMCIM_ETOUTRS_enabled | MMCIM_ERSPDNE_enabled | MMCIM_EDATDNE_enabled;
+	reg = FIELD_SET(reg, msk, v);
 	if (misc->mflags & MMCSD_MISC_F_WRITE) {
 		// 10. Enable the DXRDYINT interrupt
-		msk = MMCIM_EDXRDY_MASK;
-		mcon->MMCIM = FIELD_SET(reg, msk, MMCIM_EDXRDY_enabled);
+		msk = MMCIM_EDXRDY_MASK | MMCIM_ECRCWR_MASK;
+		v = MMCIM_EDXRDY_enabled | MMCIM_ECRCWR_enabled;
 	} else {
 		// 11. Enable the DRRDYINT interrupt
-		msk = MMCIM_EDRRDY_MASK;
-		mcon->MMCIM = FIELD_SET(reg, msk, MMCIM_EDRRDY_enabled);
+		msk = MMCIM_EDRRDY_MASK | MMCIM_ECRCRD_MASK | MMCIM_ETOUTRD_MASK;
+		v = MMCIM_EDRRDY_enabled | MMCIM_ECRCRD_enabled | MMCIM_ETOUTRD_enabled;
 	}
+	mcon->MMCIM = FIELD_SET(reg, msk, v);
 
 	return AM18X_OK;
 }

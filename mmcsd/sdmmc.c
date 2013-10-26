@@ -517,7 +517,7 @@ sdmmc_rt sdmmc_read_block(uint32_t blk_nr, uint32_t blk_cnt, uint32_t* buf) {
 				buf[i++] = mmcsd_read(MMCSDCON);
 			}
 		}
-		printk("   *** ST1=0x%.8X ***\n", MMCSDCON->MMCST1);
+		// printk("   *** ST1=0x%.8X ***\n", MMCSDCON->MMCST1);
 	}
 
 	while ((ds = mmcsd_rd_state(MMCSDCON)) != MMCSD_SD_OK);
@@ -539,7 +539,8 @@ sdmmc_rt sdmmc_write_block(uint32_t blk_nr, uint32_t blk_cnt, const uint32_t* bu
 	mmcsd_misc_t misc;
 	sdmmc_rt r;
 	int cmd_nr;
-	int i, ii;
+	int i;
+	// int ii;
 
 	misc.blkcnt = blk_cnt;
 	misc.mflags = MMCSD_MISC_F_WRITE | MMCSD_MISC_F_FIFO_RST | MMCSD_MISC_F_FIFO_32B;
@@ -548,10 +549,13 @@ sdmmc_rt sdmmc_write_block(uint32_t blk_nr, uint32_t blk_cnt, const uint32_t* bu
 	cmd_nr = CMD24R1_WRITE_BLOCK;
 	if (blk_cnt > 1) cmd_nr = CMD25R1_WRITE_MULTIPLE_BLOCK;
 
+	for (i = 0; i < 32 / sizeof(uint32_t);) {
+		mmcsd_write(MMCSDCON, buf[i++]);
+	}
+
 	r = sdmmc_cmd(cmd_nr, blk_nr << MASK_OFFSET(MMCSD_BLOCK_SIZE));
 	if (r != SDMMC_OK) return r;
 
-	i = 0;
 	while (i < blk_cnt * MMCSD_BLOCK_SIZE / sizeof(uint32_t)) {
 		if ((ds = mmcsd_wr_state(MMCSDCON)) == MMCSD_SD_OK) {
 			break;
@@ -559,9 +563,10 @@ sdmmc_rt sdmmc_write_block(uint32_t blk_nr, uint32_t blk_cnt, const uint32_t* bu
 		if (ds == MMCSD_SD_TOUT) {
 			return SDMMC_NO_RSP;
 		}
-		printk("   *** ST1=0x%.8X ***\n", MMCSDCON->MMCST1);
-		// if (i == 32 / sizeof(uint32_t) || ds == MMCSD_SD_SENT) {
-		if (/* i == 0  || */ds == MMCSD_SD_SENT) {
+		// printk("   *** ST1=0x%.8X ***\n", MMCSDCON->MMCST1);
+		// if (/* i == 0  || */ds == MMCSD_SD_SENT) {
+		// lost the DXRDY status bit in the mmcsd_wr_state() call within sdmmc_cmd()
+		if (i == 32 / sizeof(uint32_t) || ds == MMCSD_SD_SENT) {
 			int ii;
 
 			for (ii = 0; ii < 32 / sizeof(uint32_t); ii++) {
@@ -570,18 +575,13 @@ sdmmc_rt sdmmc_write_block(uint32_t blk_nr, uint32_t blk_cnt, const uint32_t* bu
 		}
 	}
 
-	printk("Wait write complete!\n");
-	/* for (ii = 0; ii < 8; ii++) {
+	/* printk("Wait write complete!\n");
+	for (ii = 0; ii < 8; ii++) {
 		mmcsd_write(MMCSDCON, 0x0UL);	// dummy writes
-	} */
+	}
 	while ((ds = mmcsd_wr_state(MMCSDCON)) != MMCSD_SD_OK) {
 		printk("   *** ST1=0x%.8X ***\n", MMCSDCON->MMCST1);
-	}
-
-	for (ii = 0; ii < 10; ii++) {
-		printk("   *** ST1=0x%.8X ***\n", MMCSDCON->MMCST1);
-		mmcsd_wr_state(MMCSDCON);
-	}
+	} */
 
 	printk("SDMMC WRITE %d bytes\n", i * sizeof(uint32_t));
 
