@@ -539,15 +539,11 @@ sdmmc_rt sdmmc_write_block(uint32_t blk_nr, uint32_t blk_cnt, const uint32_t* bu
 	mmcsd_misc_t misc;
 	sdmmc_rt r;
 	int cmd_nr;
-	int i;
+	int i, ii;
 
 	misc.blkcnt = blk_cnt;
 	misc.mflags = MMCSD_MISC_F_WRITE | MMCSD_MISC_F_FIFO_RST | MMCSD_MISC_F_FIFO_32B;
 	mmcsd_cntl_misc(MMCSDCON, &misc);
-
-	for (i = 0; i < 32 / sizeof(uint32_t);) {
-		mmcsd_write(MMCSDCON, buf[i++]);
-	}
 
 	cmd_nr = CMD24R1_WRITE_BLOCK;
 	if (blk_cnt > 1) cmd_nr = CMD25R1_WRITE_MULTIPLE_BLOCK;
@@ -555,7 +551,8 @@ sdmmc_rt sdmmc_write_block(uint32_t blk_nr, uint32_t blk_cnt, const uint32_t* bu
 	r = sdmmc_cmd(cmd_nr, blk_nr << MASK_OFFSET(MMCSD_BLOCK_SIZE));
 	if (r != SDMMC_OK) return r;
 
-	while (i < 4 + blk_cnt * MMCSD_BLOCK_SIZE / sizeof(uint32_t)) {
+	i = 0;
+	while (i < blk_cnt * MMCSD_BLOCK_SIZE / sizeof(uint32_t)) {
 		if ((ds = mmcsd_wr_state(MMCSDCON)) == MMCSD_SD_OK) {
 			break;
 		}
@@ -563,8 +560,8 @@ sdmmc_rt sdmmc_write_block(uint32_t blk_nr, uint32_t blk_cnt, const uint32_t* bu
 			return SDMMC_NO_RSP;
 		}
 		printk("   *** ST1=0x%.8X ***\n", MMCSDCON->MMCST1);
-		if (i == 32 / sizeof(uint32_t) || ds == MMCSD_SD_SENT) {
-		// if (i == 0 || ds == MMCSD_SD_SENT) {
+		// if (i == 32 / sizeof(uint32_t) || ds == MMCSD_SD_SENT) {
+		if (/* i == 0  || */ds == MMCSD_SD_SENT) {
 			int ii;
 
 			for (ii = 0; ii < 32 / sizeof(uint32_t); ii++) {
@@ -574,8 +571,16 @@ sdmmc_rt sdmmc_write_block(uint32_t blk_nr, uint32_t blk_cnt, const uint32_t* bu
 	}
 
 	printk("Wait write complete!\n");
+	/* for (ii = 0; ii < 8; ii++) {
+		mmcsd_write(MMCSDCON, 0x0UL);	// dummy writes
+	} */
 	while ((ds = mmcsd_wr_state(MMCSDCON)) != MMCSD_SD_OK) {
 		printk("   *** ST1=0x%.8X ***\n", MMCSDCON->MMCST1);
+	}
+
+	for (ii = 0; ii < 10; ii++) {
+		printk("   *** ST1=0x%.8X ***\n", MMCSDCON->MMCST1);
+		mmcsd_wr_state(MMCSDCON);
 	}
 
 	printk("SDMMC WRITE %d bytes\n", i * sizeof(uint32_t));

@@ -100,8 +100,14 @@ am18x_rt mmcsd_send_cmd(MMCSD_con_t* mcon, const mmcsd_cmd_t* cmd) {
 
 	idx = cmd->index;
 
+	mcon->MMCCIDX = 0;
+	mcon->MMCRSP[0] = 0;
+	mcon->MMCRSP[1] = 0;
+	mcon->MMCRSP[2] = 0;
+	mcon->MMCRSP[3] = 0;
+
 	reg = mcon->MMCCMD;
-	reg = FIELD_SET(reg, MMCCMD_DCLR_MASK, MMCCMD_DCLR_clear);
+	reg = FIELD_SET(reg, MMCCMD_DCLR_MASK, MMCCMD_DCLR_none);
 
 	if (cmd->cflags & MMCSD_CMD_F_BUSY) {
 		reg = FIELD_SET(reg, MMCCMD_BSYEXP_MASK, MMCCMD_BSYEXP_expected);
@@ -113,11 +119,11 @@ am18x_rt mmcsd_send_cmd(MMCSD_con_t* mcon, const mmcsd_cmd_t* cmd) {
 	if (cmd->cflags & MMCSD_CMD_F_DATA) {
 		reg = FIELD_SET(reg, msk, MMCCMD_WDATX_yes);
 		reg = FIELD_SET(reg, MMCCMD_STRMTP_MASK, MMCCMD_STRMTP_block);
+		reg = FIELD_SET(reg, MMCCMD_DMATRIG_MASK, MMCCMD_DMATRIG_triggered);
 
 		if (cmd->cflags & MMCSD_CMD_F_WRITE) {
 			reg = FIELD_SET(reg, MMCCMD_DTRW_MASK, MMCCMD_DTRW_write);
 		} else {
-			reg = FIELD_SET(reg, MMCCMD_DMATRIG_MASK, MMCCMD_DMATRIG_triggered);
 			reg = FIELD_SET(reg, MMCCMD_DTRW_MASK, MMCCMD_DTRW_read);
 		}
 	} else {
@@ -135,6 +141,9 @@ am18x_rt mmcsd_send_cmd(MMCSD_con_t* mcon, const mmcsd_cmd_t* cmd) {
 			v = MMCCMD_RSPFMT_48b;
 		}
 	}
+	if (cmd->cflags & MMCSD_CMD_F_DATA) {
+		v = MMCCMD_RSPFMT_none;
+	}
 	reg = FIELD_SET(reg, msk, v);
 
 	reg = FIELD_SET(reg, MMCCMD_CMD_MASK, MMCCMD_CMD_VAL(idx));
@@ -142,10 +151,10 @@ am18x_rt mmcsd_send_cmd(MMCSD_con_t* mcon, const mmcsd_cmd_t* cmd) {
 	mcon->MMCARGHL = cmd->arg;
 	mcon->MMCCMD = reg;
 
-	if (cmd->cflags & MMCSD_CMD_F_WRITE) {
+	/* if (cmd->cflags & MMCSD_CMD_F_WRITE) {
 		reg = mcon->MMCCMD;
 		mcon->MMCCMD = FIELD_SET(reg, MMCCMD_DMATRIG_MASK, MMCCMD_DMATRIG_triggered);
-	}
+	} */
 
 	if (cmd->cflags & MMCSD_CMD_F_DATA) {
 		printk("MMCCMD = 0x%.8X\n", mcon->MMCCMD);
@@ -157,7 +166,7 @@ am18x_rt mmcsd_send_cmd(MMCSD_con_t* mcon, const mmcsd_cmd_t* cmd) {
 #define TRACK_SAMPLES    40000
 #define TRACK_SAVES    0x400
 mmcsd_cmd_state_t mmcsd_cmd_state(const MMCSD_con_t* mcon, am18x_bool need_crc) {
-#if 0
+#if 1
 	uint32_t reg;
 
 	reg = mcon->MMCST0;
@@ -220,6 +229,8 @@ mmcsd_dat_state_t mmcsd_rd_state(const MMCSD_con_t* mcon) {
 	printk("%s() \n", __func__);
 	for (i = 0; i < n; i++) {
 		printk("[%.3d] = 0x%.8X\n", i, reg_tracks[i]);
+	}
+	for (i = 0; i < n; i++) {
 		if (FIELD_GET(reg_tracks[i], MMCST0_CRCRD_MASK) == MMCST0_CRCRD_detected) {
 			return MMCSD_SD_CRC_ERR;
 		}
@@ -264,6 +275,8 @@ mmcsd_dat_state_t mmcsd_wr_state(const MMCSD_con_t* mcon) {
 	printk("%s() \n", __func__);
 	for (i = 0; i < n; i++) {
 		printk("[%.3d] = 0x%.8X\n", i, reg_tracks[i]);
+	}
+	for (i = 0; i < n; i++) {
 		if (FIELD_GET(reg_tracks[i], MMCST0_CRCWR_MASK) == MMCST0_CRCWR_detected) {
 			return MMCSD_SD_CRC_ERR;
 		}
@@ -301,19 +314,22 @@ am18x_rt mmcsd_get_resp(const MMCSD_con_t* mcon, mmcsd_resp_type_t type, mmcsd_r
 am18x_rt mmcsd_cntl_misc(MMCSD_con_t* mcon, const mmcsd_misc_t* misc) {
 	uint32_t reg, msk, v;
 
+	if (misc->mflags & MMCSD_MISC_F_BUS4BIT) {
+		// Initialize the MMC Control Register
+		reg = mcon->MMCCTL;
+		msk = MMCCTL_WIDTH0_MASK | MMCCTL_WIDTH1_MASK;
+		v = MMCCTL_WIDTH0_4bit | MMCCTL_WIDTH1_1_4bit;
+		mcon->MMCCTL = FIELD_SET(reg, msk, v);
+		return 0;
+	}
+
 	// setting block count
 	if (misc->blkcnt) {
 		mcon->MMCNBLK = misc->blkcnt;
 	}
 
-	// 6. Reset the FIFO
-	reg = mcon->MMCFIFOCTL;
-	msk = MMCFIFOCTL_FIFORST_MASK;
-	if (misc->mflags & MMCSD_MISC_F_FIFO_RST) {
-		mcon->MMCFIFOCTL = FIELD_SET(reg, msk, MMCFIFOCTL_FIFORST_reset);
-	}
-
 	// 7. Set the FIFO direction to transmit/receive
+	reg = 0;
 	msk = MMCFIFOCTL_FIFODIR_MASK;
 	if (misc->mflags & MMCSD_MISC_F_WRITE) {
 		v = MMCFIFOCTL_FIFODIR_write;
@@ -333,16 +349,16 @@ am18x_rt mmcsd_cntl_misc(MMCSD_con_t* mcon, const mmcsd_misc_t* misc) {
 	} else {
 		reg = FIELD_SET(reg, msk, MMCFIFOCTL_FIFOLEV_32B);
 	}
+
+	// 6. Reset the FIFO
+	// reg = mcon->MMCFIFOCTL;
+	msk = MMCFIFOCTL_FIFORST_MASK;
+	if (misc->mflags & MMCSD_MISC_F_FIFO_RST) {
+		mcon->MMCFIFOCTL = FIELD_SET(reg, msk, MMCFIFOCTL_FIFORST_reset);
+	}
+
 	mcon->MMCFIFOCTL = reg;
 	printk("MMCFIFOCTL = 0x%.8X\n", mcon->MMCFIFOCTL);
-
-	if (misc->mflags & MMCSD_MISC_F_BUS4BIT) {
-		// Initialize the MMC Control Register
-		reg = mcon->MMCCTL;
-		msk = MMCCTL_WIDTH0_MASK | MMCCTL_WIDTH1_MASK;
-		v = MMCCTL_WIDTH0_4bit | MMCCTL_WIDTH1_1_4bit;
-		mcon->MMCCTL = FIELD_SET(reg, msk, v);
-	}
 
 	reg = mcon->MMCIM;
 	if (misc->mflags & MMCSD_MISC_F_WRITE) {

@@ -44,13 +44,14 @@ typedef enum {
 } mmcsd_cmd_state_t;
 
 typedef enum {
-	MMCSD_SD_BUSY,
+	MMCSD_SD_NONE,
 	MMCSD_SD_SENT,
 	MMCSD_SD_RECVED,
 	MMCSD_SD_CRC_ERR,
 	MMCSD_SD_TOUT,
-	MMCSD_SD_NONE,
 	MMCSD_SD_OK,
+	MMCSD_SD_BUSY,
+	MMCSD_SD_DONE,
 } mmcsd_dat_state_t;
 
 typedef struct {
