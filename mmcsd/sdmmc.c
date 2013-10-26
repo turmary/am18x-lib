@@ -539,8 +539,7 @@ sdmmc_rt sdmmc_write_block(uint32_t blk_nr, uint32_t blk_cnt, const uint32_t* bu
 	mmcsd_misc_t misc;
 	sdmmc_rt r;
 	int cmd_nr;
-	int i;
-	// int ii;
+	int i, ii;
 
 	misc.blkcnt = blk_cnt;
 	misc.mflags = MMCSD_MISC_F_WRITE | MMCSD_MISC_F_FIFO_RST | MMCSD_MISC_F_FIFO_32B;
@@ -567,8 +566,6 @@ sdmmc_rt sdmmc_write_block(uint32_t blk_nr, uint32_t blk_cnt, const uint32_t* bu
 		// if (/* i == 0  || */ds == MMCSD_SD_SENT) {
 		// lost the DXRDY status bit in the mmcsd_wr_state() call within sdmmc_cmd()
 		if (i == 32 / sizeof(uint32_t) || ds == MMCSD_SD_SENT) {
-			int ii;
-
 			for (ii = 0; ii < 32 / sizeof(uint32_t); ii++) {
 				mmcsd_write(MMCSDCON, buf[i++]);
 			}
