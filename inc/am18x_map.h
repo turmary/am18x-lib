@@ -791,6 +791,144 @@ enum {
 	BIT_DEF(CONTROL,0,SOFTRESET,yes,no),
 };
 
+typedef struct {
+#define DDR0_REVID			(0x40311B1FUL)
+	vcuint32_t	REVID;
+	vcuint32_t	SDRSTAT;
+#define SDCR_DDR2TERM_MASK		((0x1UL << 27) | (0x1UL << 21))
+#define SDCR_DDR2TERM_disable		(0x0UL)
+#define SDCR_DDR2TERM_default		(0x1UL << 27)
+#define SDCR_DDRDRIVE_MASK		((0x1UL << 24) | (0x1UL << 18))
+#define SDCR_DDRDRIVE_full		((0x0UL << 24) | (0x0UL << 18))
+#define SDCR_DDRDRIVE_half		((0x0UL << 24) | (0x1UL << 18))
+#define SDCR_DDRDRIVE_quarter		((0x1UL << 24) | (0x0UL << 18))
+#define SDCR_DDRDRIVE_3quarter		((0x1UL << 24) | (0x1UL << 18))
+#define SDCR_CL_MASK			(0x7UL << 9)
+// x = 2..5
+#define SDCR_CL_VAL(x)			((x) << 9)
+#define SDCR_IBANK_MASK			(0x7UL << 4)
+#define SDCR_IBANK_1bank		(0x0UL << 4)
+#define SDCR_IBANK_2banks		(0x1UL << 4)
+#define SDCR_IBANK_4banks		(0x2UL << 4)
+#define SDCR_IBANK_8banks		(0x3UL << 4)
+#define SDCR_PAGESIZE_MASK		(0x7UL << 0)
+#define SDCR_PAGESIZE_256w8col		(0x0UL << 0)
+#define SDCR_PAGESIZE_512w9col		(0x0UL << 0)
+#define SDCR_PAGESIZE_1kw10col		(0x0UL << 0)
+#define SDCR_PAGESIZE_2kw11col		(0x0UL << 0)
+	vuint32_t	SDCR;
+#define SDRCR_RR_MASK			(0xFFFFUL << 0)
+#define SDRCR_RR_VAL(x)			((x) << 0)
+	vuint32_t	SDRCR;
+#define SDTIMR1_TRFC_MASK		(0x7UL << 25)
+#define SDTIMR1_TRFC_VAL(x)		((x) << 25)
+#define SDTIMR1_TRP_MASK		(0x7UL << 22)
+#define SDTIMR1_TRP_VAL(x)		((x) << 22)
+#define SDTIMR1_TRCD_MASK		(0x7UL << 19)
+#define SDTIMR1_TRCD_VAL(x)		((x) << 19)
+#define SDTIMR1_TWR_MASK		(0x7UL << 16)
+#define SDTIMR1_TWR_VAL(x)		((x) << 16)
+#define SDTIMR1_TRAS_MASK		(0x1FUL << 11)
+#define SDTIMR1_TRAS_VAL(x)		((x) << 11)
+#define SDTIMR1_TRC_MASK		(0x1FUL << 6)
+#define SDTIMR1_TRC_VAL(x)		((x) << 6)
+#define SDTIMR1_TRRD_MASK		(0x7UL << 3)
+#define SDTIMR1_TRRD_VAL(x)		((x) << 3)
+#define SDTIMR1_TWTR_MASK		(0x3UL << 0)
+#define SDTIMR1_TWTR_VAL(x)		((x) << 0)
+	vuint32_t	SDTIMR1;
+#define SDTIMR2_TRASMAX_MASK		(0xFUL << 27)
+#define SDTIMR2_TRASMAX_VAL(x)		((x) << 27)
+#define SDTIMR2_TXP_MASK		(0x3UL << 25)
+#define SDTIMR2_TXP_VAL(x)		((x) << 25)
+#define SDTIMR2_TODT_MASK		(0x3UL << 23)
+#define SDTIMR2_TODT_VAL(x)		((x) << 23)
+#define SDTIMR2_TXSNR_MASK		(0x7FUL << 16)
+#define SDTIMR2_TXSNR_VAL(x)		((x) << 16)
+#define SDTIMR2_TXSRD_MASK		(0xFFUL << 8)
+#define SDTIMR2_TXSRD_VAL(x)		((x) << 8)
+#define SDTIMR2_TRTP_MASK		(0x7UL << 5)
+#define SDTIMR2_TRTP_VAL(x)		((x) << 5)
+#define SDTIMR2_TCKE_MASK		(0x1FUL << 0)
+#define SDTIMR2_TCKE_VAL(x)		((x) << 0)
+	vuint32_t	SDTIMR2;
+	uint32_t	RESERVED0[_RS(0x1C, 0x14)];
+#define SDCR2_PASR_MASK			(0x7UL << 16)
+#define SDCR2_PASR_4banks		(0x0UL << 16)
+#define SDCR2_PASR_2banks		(0x1UL << 16)
+#define SDCR2_PASR_1banks		(0x2UL << 16)
+#define SDCR2_PASR_half_bank		(0x5UL << 16)
+#define SDCR2_PASR_quarter_bank		(0x6UL << 16)
+#define SDCR2_ROWSIZE_MASK		(0x7UL << 0)
+// x = 9..16
+#define SDCR2_ROWSIZE_VAL(x)		(((x) - 9) << 0)
+	vuint32_t	SDCR2;
+#define PBBPR_PROLDCOUNT_MASK		(0xFFUL << 0)
+// x = 1..256
+#define PBBPR_PROLDCOUNT_VAL		(((x) - 1) << 0)
+	vuint32_t	PBBPR;
+	uint32_t	RESERVED1[_RS(0x40, 0x20)];
+	vuint32_t	PC1;
+	vuint32_t	PC2;
+#define PCC_CNTR2CFG_MASK		(0xFUL << 16)
+#define PCC_CNTR2CFG_VAL(x)		((x) << 16)
+#define PCC_CNTR1CFG_MASK		(0xFUL << 0)
+#define PCC_CNTR1CFG_VAL(x)		((x) << 0)
+	vuint32_t	PCC;
+#define PCMRS_MSTID2_MASK		(0xFFUL << 24)
+#define PCMRS_MSTID2_VAL(x)		((x) << 24)
+#define PCMRS_REGIONSEL2_MASK		(0xFUL << 16)
+#define PCMRS_REGIONSEL2_access		(0x0UL << 16)
+#define PCMRS_REGIONSEL2_register	(0x7UL << 16)
+#define PCMRS_MSTID1_MASK		(0xFFUL << 8)
+#define PCMRS_MSTID1_VAL(x)		((x) << 8)
+#define PCMRS_REGIONSEL1_MASK		(0xFUL << 0)
+#define PCMRS_REGIONSEL1_access		(0x0UL << 0)
+#define PCMRS_REGIONSEL1_register	(0x7UL << 0)
+	vuint32_t	PCMRS;
+	vuint32_t	PCT;
+	uint32_t	RESERVED2[_RS(0x60, 0x50)];
+	vuint32_t	DRPYRCR;
+	uint32_t	RESERVED3[_RS(0xC0, 0x60)];
+	vuint32_t	IRR;
+	vuint32_t	IMR;
+	vuint32_t	IMSR;
+	vuint32_t	IMCR;
+	uint32_t	RESERVED4[_RS(0xE4, 0xCC)];
+#define DRPYC1R_RL_MASK			(0x7UL << 0)
+#define DRPYC1R_RL_VAL(x)		((x) << 0)
+	vuint32_t	DRPYC1R;
+} DDR_con_t;
+
+enum {
+	BIT_DEF(SDRSTAT,30,DUALCLK,none,async),
+	BIT_DEF(SDRSTAT,2,PHYRDY,no,yes),
+	BIT_DEF(SDCR,26,IBANKPOS,normal,special),
+	BIT_DEF(SDCR,25,MSDRAMEN,no,yes),
+	BIT_DEF(SDCR,23,BOOTUNLOCK,none,unlock),
+	BIT_DEF(SDCR,22,DDR2DDQS,single,none),
+	BIT_DEF(SDCR,20,DDR2EN,no,yes),
+	BIT_DEF(SDCR,19,DDRDLLDIS,no,yes),
+	BIT_DEF(SDCR,17,DDREN,no,yes),
+	BIT_DEF(SDCR,16,SDRAMEN,no,yes),
+	BIT_DEF(SDCR,15,TIMUNLOCK,none,unlock),
+	BIT_DEF(SDCR,14,NM,none,16bit),
+	BIT_DEF(SDRCR,31,LPMODEN,no,yes),
+	BIT_DEF(SDRCR,30,MCLKSTOPEN,no,yes),
+	BIT_DEF(SDRCR,23,SRPD,selfrefresh,powerdown),
+	BIT_DEF(PCC,31,CNTR2MSTIDEN,no,yes),
+	BIT_DEF(PCC,30,CNTR2REGIONEN,no,yes),
+	BIT_DEF(PCC,15,CNTR1MSTIDEN,no,yes),
+	BIT_DEF(PCC,14,CNTR1REGIONEN,no,yes),
+	BIT_DEF(DRPYRCR,10,RESETPHY,none,reset),
+	BIT_DEF(IRR,2,LT,none,illegal),
+	BIT_DEF(IMR,2,LTM,none,illegal),
+	BIT_DEF(IMSR,2,LTMSET,none,set),
+	BIT_DEF(IMCR,2,LTMCLR,none,clear),
+	BIT_DEF(DRPYC1R,7,EXTSTRBEN,internal,external),
+	BIT_DEF(DRPYC1R,6,PWRDNEN,powerup,powerdown),
+};
+
 // am1808.pdf, Page 52
 // 5.9.1 EDMA3 Channel Synchronization Events
 typedef enum {
@@ -1923,6 +2061,7 @@ typedef struct {
 #define EDMA3_1TC0_BASE			0x01E38000UL
 #define TIMER2_BASE			0x01F0C000UL
 #define TIMER3_BASE			0x01F0D000UL
+#define DDR0_BASE			0xB0000000UL
 #define ARMLocalROM_BASE		0xFFFD0000UL
 #define ARMLocalROM_SIZE		0x00010000UL
 #define AINTC_BASE			0xFFFEE000UL
@@ -1968,6 +2107,9 @@ typedef struct {
 #endif
 #ifdef _PRU1
 	#define PRU1			((PRU_con_t*)PRU1_BASE)
+#endif
+#ifdef _DDR0
+	#define DDR0			((DDR_con_t*)DDR0_BASE)
 #endif
 #ifdef _EDMA0
 	#define EDMA0			((EDMA_con_t*)EDMA3_0CC0_BASE)
@@ -2045,6 +2187,9 @@ typedef struct {
 #endif
 #ifdef _PRU1
 	_EXTERN PRU_con_t		*PRU1;
+#endif
+#ifdef _DDR0
+	_EXTERN DDR_con_t		*DDR0;
 #endif
 #ifdef _EDMA0
 	_EXTERN EDMA_con_t		*EDMA0;

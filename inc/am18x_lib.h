@@ -57,4 +57,8 @@
 #include "am18x_mmcsd.h"
 #endif
 
+#ifdef _DDR
+#include "am18x_ddr.h"
+#endif
+
 #endif//__AM18X_LIB_H__
