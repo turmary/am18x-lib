@@ -46,14 +46,22 @@ static int ddr_mem_test(void) {
 	for (i = 0; i < 16; i++) {
 		ddr_mem[i] = i;
 	}
-	dump_regs_word("A DDR", (unsigned)ddr_mem, 64);
+	dump_regs_word("CLOSE DDR", (unsigned)ddr_mem, 64);
 
 	ddr_initialize(DDR0, &mt46h64m16_6);
+	// dump_regs_word("DDR0.i", DDR0, 0xE8);
 
 	for (i = 0; i < 16; i++) {
 		ddr_mem[i] = i;
 	}
-	dump_regs_word("B DDR", (unsigned)ddr_mem, 64);
+	dump_regs_word("OPEN  DDR", (unsigned)ddr_mem, 64);
+
+	ddr_clock_off(DDR0);
+	dump_regs_word("OFF   DDR", (unsigned)ddr_mem, 64);
+
+	ddr_clock_on(DDR0);
+	// dump_regs_word("DDR0.o", DDR0, 0xE8);
+	dump_regs_word("ON    DDR", (unsigned)ddr_mem, 64);
 
 	return 0;
 }

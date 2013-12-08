@@ -39,5 +39,7 @@ typedef struct {
 } ddr_conf_t;
 
 am18x_rt ddr_initialize(DDR_con_t* dcon, const ddr_conf_t* conf);
+am18x_rt ddr_clock_off(DDR_con_t* dcon);
+am18x_rt ddr_clock_on(DDR_con_t* dcon);
 
 #endif//__AM18X_DDR_H__

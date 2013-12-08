@@ -187,5 +187,73 @@ am18x_rt ddr_initialize(DDR_con_t* dcon, const ddr_conf_t* conf) {
 	reg = FIELD_SET(reg, PBBPR_PROLDCOUNT_MASK, PBBPR_PROLDCOUNT_VAL(0x30));
 	dcon->PBBPR = reg;
 
+	
+	return AM18X_OK;
+}
+
+#define BYPASS_NOT_POWERDOWN		0
+am18x_rt ddr_clock_off(DDR_con_t* dcon) {
+	uint32_t reg, v;
+
+	// 14.2.16.1 DDR2/mDDR Memory Controller Clock Stop Procedure
+	// 1. Allow software to complete the desired DDR transfers
+	// 2. Change the SR_PD bit to 0 and set the LPMODEN bit to 1
+	// in the SDRCR to enable self-refresh mode
+	reg = dcon->SDRCR;
+	reg = FIELD_SET(reg, SDRCR_LPMODEN_MASK, SDRCR_LPMODEN_yes);
+	reg = FIELD_SET(reg, SDRCR_SRPD_MASK, SDRCR_SRPD_selfrefresh);
+	dcon->SDRCR = reg;
+
+	// 3. Set the MCLKSTOPEN bit in SDRCR to 1
+	reg = FIELD_SET(reg, SDRCR_MCLKSTOPEN_MASK, SDRCR_MCLKSTOPEN_yes);
+	dcon->SDRCR = reg;
+
+	// 4. Wait 150 CPU clock cycles to allow MCLK to stop
+	for (v = 0; v < 150; v++) asm volatile("nop");
+
+	// 5. Program the PSC to disable the DDR2/mDDR memory controller VCLK
+	psc_state_transition(PSC_DDR2, PSC_STATE_DISABLE);
+
+	// 6. For maximum power savings, the PLLC1 should be place in bypass and
+	// powered-down mode to disable 2X_CLK
+#if BYPASS_NOT_POWERDOWN
+	pll_cmd(PLL1, PLL_CMD_BYPASS, 0);
+#else
+	pll_cmd(PLL1, PLL_CMD_POWER_DOWN, 0);
+#endif
+	clk_node_recalc();
+
+	return AM18X_OK;
+}
+
+am18x_rt ddr_clock_on(DDR_con_t* dcon) {
+	uint32_t reg, v;
+
+	// To turn clocks back on
+	// 1. Place the PLLC1 in PLL mode to start 2X_CLK to the mDDR controller
+#if BYPASS_NOT_POWERDOWN
+	pll_cmd(PLL1, PLL_CMD_UNBYPASS, 0);
+#else
+	pll_set_conf(PLL1, pllconf);
+#endif
+	clk_node_recalc();
+
+	// 2. Once 2X_CLK is stable, program the PSC to enable VCLK
+	for (v = 0; v < 150; v++) asm volatile("nop");
+	psc_state_transition(PSC_DDR2, PSC_STATE_ENABLE);
+
+	// 3. Set the RESET_PHY bit in the DRPYRCR to 1
+	reg = dcon->DRPYRCR;
+	reg = FIELD_SET(reg, DRPYRCR_RESETPHY_MASK, DRPYRCR_RESETPHY_reset);
+	dcon->DRPYRCR = reg;
+
+	// 4. Clear the MCLKSTOPEN bit in SDRCR to 0
+	reg = dcon->SDRCR;
+	reg = FIELD_SET(reg, SDRCR_MCLKSTOPEN_MASK, SDRCR_MCLKSTOPEN_no);
+	dcon->SDRCR = reg;
+
+	// 5. Clear the LPMODEN bit in SDRCR to 0
+	reg = FIELD_SET(reg, SDRCR_LPMODEN_MASK, SDRCR_LPMODEN_no);
+	dcon->SDRCR = reg;
 	return AM18X_OK;
 }
