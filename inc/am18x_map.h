@@ -1605,6 +1605,31 @@ typedef struct {
 } I2C_con_t;
 
 typedef struct {
+#define LCDC_REVID			0x4C100100UL
+	vcuint32_t	REVID;
+	vuint32_t	LCD_CTRL;
+	vuint32_t	LCD_STAT;
+	vuint32_t	LIDD_CTRL;
+	vuint32_t	LIDD_CS0_CONF;
+	vuint32_t	LIDD_CS0_ADDR;
+	vuint32_t	LIDD_CS0_DATA;
+	vuint32_t	LIDD_CS1_CONF;
+	vuint32_t	LIDD_CS1_ADDR;
+	vuint32_t	LIDD_CS1_DATA;
+	vuint32_t	RASTER_CTRL;
+	vuint32_t	RASTER_TIMING_0;
+	vuint32_t	RASTER_TIMING_1;
+	vuint32_t	RASTER_TIMING_2;
+	vuint32_t	RASTER_SUBPANEL;
+	uint32_t	RESERVED0[1];
+	vuint32_t	LCDDMA_CTRL;
+	vuint32_t	LCDDMA_FB0_BASE;
+	vuint32_t	LCDDMA_FB0_CEILING;
+	vuint32_t	LCDDMA_FB1_BASE;
+	vuint32_t	LCDDMA_FB1_CEILING;
+} LCD_con_t;
+
+typedef struct {
 #define MMCCTL_DATEG_MASK		(0x3UL << 6)
 #define MMCCTL_DATEG_disabled		(0x0UL << 6)
 #define MMCCTL_DATEG_rising		(0x1UL << 6)
@@ -2076,6 +2101,7 @@ typedef struct {
 #define UART0_BASE			0x01C42000UL
 #define UART1_BASE			0x01D0C000UL
 #define UART2_BASE			0x01D0D000UL
+#define LCD0_BASE			0x01E13000UL
 #define MPU1_BASE			0x01E14000UL
 #define MPU2_BASE			0x01E15000UL
 #define PLL1_BASE			0x01E1A000UL
@@ -2152,6 +2178,9 @@ typedef struct {
 #endif
 #ifdef _I2C1
 	#define I2C1			((I2C_con_t*)I2C1_BASE)
+#endif
+#ifdef _LCD0
+	#define LCD0			((LCD_con_t*)LCD0_BASE)
 #endif
 #ifdef _MMCSD0
 	#define MMCSD0 			((MMCSD_con_t*)MMCSD0_BASE)
@@ -2232,6 +2261,9 @@ typedef struct {
 #endif
 #ifdef _I2C1
 	_EXTERN I2C_con_t		*I2C1;
+#endif
+#ifdef _LCD0
+	_EXTERN LCD_con_t		*LCD0;
 #endif
 #ifdef _MMCSD0
 	_EXTERN MMCSD_con_t		*MMCSD0;
