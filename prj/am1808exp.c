@@ -9,6 +9,38 @@
 // 1015640A_AM1808_SOM-M1_Schematic.pdf
 #define BUFF_OEn			GPIO_BANK2,GPIO_PIN_6
 
+static const ddr_conf_t mt46h64m16_6 = {
+	.ddr2_not_mddr = AM18X_FALSE,
+	.page_size = 10,
+	.row_size  = 14,
+	.bank_cnt  = 4,
+
+	.freq_ck = 166000000,
+	.trefi   = 7812, // ns
+
+	.cl   = 3,
+	.trfc = 100,
+	.trp  = 18,
+	.trcd = 18,
+
+	.twr  = 15,
+	.tras = 42,
+	.trc  = 60,
+	.trrd = 12,
+
+	.twtr = 6,
+	.todt = 0,
+	.txsnr = 132,
+	.trtp = 18,
+
+	.txp   = 2,
+	.txsrd = 22,
+	.tcke  = 1,
+
+	.trasmax = 70000,
+	.pasr = 0,
+};
+
 static int buff_en_enable(am18x_bool on_noff) {
 	uint32_t v = on_noff? GPIO_LOW: GPIO_HIGH;
 
@@ -35,6 +67,8 @@ int low_level_init(void) {
 
 	clk_node_init();
 	uart_init();
+
+	ddr_initialize(DDR0, &mt46h64m16_6);
 
 	if (AM18X_OK != (r = systick_init(SYSTICK_PERIOD))) {
 		printk("systick_init() error\n");

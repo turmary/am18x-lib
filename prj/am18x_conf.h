@@ -46,6 +46,9 @@ extern const uint32_t f_osc;
 #define _I2C0
 #define _I2C1
 
+#define _LCD
+#define _LCD0
+
 #define _MMCSD
 #define _MMCSD0
 #define _MMCSD1

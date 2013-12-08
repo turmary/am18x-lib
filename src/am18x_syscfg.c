@@ -71,7 +71,7 @@ int32_t syscfg_bootmode(void) {
 }
 
 am18x_rt syscfg_vtpio_calibrate(void) {
-	uint32_t reg, msk, v;
+	uint32_t reg, msk;
 
 	reg = SYSCFG1->VTPIO_CTL;
 	// a) Clear POWERDN bit in the VTPIO_CTL

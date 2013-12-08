@@ -6,7 +6,7 @@
 
 const uint32_t f_osc = F_OSCIN;
 
-static const ddr_conf_t mt46h64m16_6 = {
+/* static const ddr_conf_t mt46h64m16_6 = {
 	.ddr2_not_mddr = AM18X_FALSE,
 	.page_size = 10,
 	.row_size  = 14,
@@ -36,20 +36,21 @@ static const ddr_conf_t mt46h64m16_6 = {
 
 	.trasmax = 70000,
 	.pasr = 0,
-};
+}; */
 
 static unsigned long* ddr_mem = (unsigned long*)0xC0000000UL;
 
 static int ddr_mem_test(void) {
 	int i;
 
-	for (i = 0; i < 16; i++) {
+	/*for (i = 0; i < 16; i++) {
 		ddr_mem[i] = i;
 	}
 	dump_regs_word("CLOSE DDR", (unsigned)ddr_mem, 64);
 
 	ddr_initialize(DDR0, &mt46h64m16_6);
 	// dump_regs_word("DDR0.i", DDR0, 0xE8);
+	*/
 
 	for (i = 0; i < 16; i++) {
 		ddr_mem[i] = i;
