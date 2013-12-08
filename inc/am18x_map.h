@@ -530,14 +530,41 @@ typedef struct {
 } SYSCFG0_con_t;
 
 typedef struct {
+#define CFGCHIP1_EDMA31TC0DBS_MASK	(0x3UL << 13)
+#define CFGCHIP1_EDMA31TC0DBS_16B	(0x0UL << 13)
+#define CFGCHIP1_EDMA31TC0DBS_32B	(0x1UL << 13)
+#define CFGCHIP1_EDMA31TC0DBS_64B	(0x2UL << 13)
+
+#define VTPIO_CTL_F_MASK		(0x7UL << 0)
+#define VTPIO_CTL_F_Enable		(0x7UL << 0)
+#define VTPIO_CTL_D_MASK		(0x7UL << 3)
+#define VTPIO_CTL_D_100PS		(0x6UL << 3)
+#define VTPIO_CTL_VREFTAP_MASK		(0x3UL << 16)
+#define VTPIO_CTL_VREFTAP_50PS		(0x0UL << 16)
 	vuint32_t	VTPIO_CTL;
 	vuint32_t	DDR_SLEW;
+#define DEEPSLEEP_SLEEPCOUNT_MASK	(0xFFFFUL << 0)
+#define DEEPSLEEP_SLEEPCOUNT_VAL(x)	(((x) & 0xFFFFUL) << 0)
 	vuint32_t	DEEPSLEEP;
 	vuint32_t	PUPD_ENA;
 	vuint32_t	PUPD_SEL;
 	vuint32_t	RXACTIVE;
 	vuint32_t	PWRDN;
 } SYSCFG1_con_t;
+
+enum {
+	BIT_DEF(VTPIO_CTL,18,VREFEN,pad,none),
+	BIT_DEF(VTPIO_CTL,15,READY,no,yes),
+	BIT_DEF(VTPIO_CTL,14,IOPWRDN,no,yes),
+	BIT_DEF(VTPIO_CTL,13,CLKRZ,clear,none),
+	BIT_DEF(VTPIO_CTL,8,PWRSAVE,no,yes),
+	BIT_DEF(VTPIO_CTL,7,LOCK,no,yes),
+	BIT_DEF(VTPIO_CTL,6,POWERDN,no,yes),
+	BIT_DEF(DDR_SLEW,5,PDENA,no,yes),
+	BIT_DEF(DDR_SLEW,4,CMOSEN,SSTL,LVCMOS),
+	BIT_DEF(DEEPSLEEP,31,ENABLE,no,yes),
+	BIT_DEF(DEEPSLEEP,30,COMPLETE,no,yes),
+};
 
 typedef enum {
 	AINTC_COMMTX = 0,		// 0
@@ -813,9 +840,9 @@ typedef struct {
 #define SDCR_IBANK_8banks		(0x3UL << 4)
 #define SDCR_PAGESIZE_MASK		(0x7UL << 0)
 #define SDCR_PAGESIZE_256w8col		(0x0UL << 0)
-#define SDCR_PAGESIZE_512w9col		(0x0UL << 0)
-#define SDCR_PAGESIZE_1kw10col		(0x0UL << 0)
-#define SDCR_PAGESIZE_2kw11col		(0x0UL << 0)
+#define SDCR_PAGESIZE_512w9col		(0x1UL << 0)
+#define SDCR_PAGESIZE_1kw10col		(0x2UL << 0)
+#define SDCR_PAGESIZE_2kw11col		(0x3UL << 0)
 	vuint32_t	SDCR;
 #define SDRCR_RR_MASK			(0xFFFFUL << 0)
 #define SDRCR_RR_VAL(x)			((x) << 0)
@@ -865,7 +892,7 @@ typedef struct {
 	vuint32_t	SDCR2;
 #define PBBPR_PROLDCOUNT_MASK		(0xFFUL << 0)
 // x = 1..256
-#define PBBPR_PROLDCOUNT_VAL		(((x) - 1) << 0)
+#define PBBPR_PROLDCOUNT_VAL(x)		(((x) - 1) << 0)
 	vuint32_t	PBBPR;
 	uint32_t	RESERVED1[_RS(0x40, 0x20)];
 	vuint32_t	PC1;

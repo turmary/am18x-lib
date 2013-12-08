@@ -69,3 +69,58 @@ am18x_rt syscfg_pinmux(uint32_t mux, uint32_t pos, uint32_t val) {
 int32_t syscfg_bootmode(void) {
 	return __field_xget(SYSCFG0->BOOTCFG, BOOTCFG_BOOTMODE_MASK);
 }
+
+am18x_rt syscfg_vtpio_calibrate(void) {
+	uint32_t reg, msk, v;
+
+	reg = SYSCFG1->VTPIO_CTL;
+	// a) Clear POWERDN bit in the VTPIO_CTL
+	reg = FIELD_SET(reg, VTPIO_CTL_POWERDN_MASK, VTPIO_CTL_POWERDN_no);
+	SYSCFG1->VTPIO_CTL = reg;
+
+	// b) Clear LOCK bit in VTPIO_CTL
+	reg = FIELD_SET(reg, VTPIO_CTL_LOCK_MASK, VTPIO_CTL_LOCK_no);
+	SYSCFG1->VTPIO_CTL = reg;
+
+	// c) Pulse CLKRZ bit in VTPIO_CTL
+	msk = VTPIO_CTL_CLKRZ_MASK;
+	reg = FIELD_SET(SYSCFG1->VTPIO_CTL, msk, VTPIO_CTL_CLKRZ_none);
+	SYSCFG1->VTPIO_CTL = reg;
+	reg = FIELD_SET(SYSCFG1->VTPIO_CTL, msk, VTPIO_CTL_CLKRZ_clear);
+	SYSCFG1->VTPIO_CTL = reg;
+	reg = FIELD_SET(SYSCFG1->VTPIO_CTL, msk, VTPIO_CTL_CLKRZ_none);
+	SYSCFG1->VTPIO_CTL = reg;
+
+	// d) Poll READY bit in VTPIO_CTL until it changes to 1
+	do {
+		reg = FIELD_GET(SYSCFG1->VTPIO_CTL, VTPIO_CTL_READY_MASK);
+	} while (reg != VTPIO_CTL_READY_yes);
+
+	// e) Set LOCK bit in VTPIO_CTL is locked
+	// and dynamic calibration is disabled
+	reg = SYSCFG1->VTPIO_CTL;
+	reg = FIELD_SET(reg, VTPIO_CTL_LOCK_MASK, VTPIO_CTL_LOCK_yes);
+	SYSCFG1->VTPIO_CTL = reg;
+
+	// f) Set POWERDN bit in VTPIO_CTL to save power
+	reg = FIELD_SET(reg, VTPIO_CTL_POWERDN_MASK, VTPIO_CTL_POWERDN_yes);
+	SYSCFG1->VTPIO_CTL = reg;
+
+	reg = FIELD_SET(reg, VTPIO_CTL_IOPWRDN_MASK, VTPIO_CTL_IOPWRDN_yes);
+	SYSCFG1->VTPIO_CTL = reg;
+	
+	return AM18X_OK;
+}
+
+am18x_rt syscfg_ddr_slew(am18x_bool ddr2_not_mddr) {
+	uint32_t reg, v;
+
+	reg = SYSCFG1->DDR_SLEW;
+	if (ddr2_not_mddr) {
+		v = DDR_SLEW_CMOSEN_SSTL;
+	} else {
+		v = DDR_SLEW_CMOSEN_LVCMOS;
+	}
+	SYSCFG1->DDR_SLEW = FIELD_SET(reg, DDR_SLEW_CMOSEN_MASK, v);
+	return AM18X_OK;
+}
