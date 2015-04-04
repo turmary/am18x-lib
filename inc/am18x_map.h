@@ -1607,6 +1607,8 @@ typedef struct {
 typedef struct {
 #define LCDC_REVID			0x4C100100UL
 	vcuint32_t	REVID;
+#define LCD_CTRL_CLKDIV_MASK		(0xFFUL << 8)
+#define LCD_CTRL_CLKDIV_X(x)		(((x) & 0xFFUL) << 8)
 	vuint32_t	LCD_CTRL;
 	vuint32_t	LCD_STAT;
 	vuint32_t	LIDD_CTRL;
@@ -1616,18 +1618,99 @@ typedef struct {
 	vuint32_t	LIDD_CS1_CONF;
 	vuint32_t	LIDD_CS1_ADDR;
 	vuint32_t	LIDD_CS1_DATA;
+#define RASTER_CTRL_PLM_MASK		(0x3UL << 20)
+#define RASTER_CTRL_PLM_PaletteData	(0x0UL << 20)
+#define RASTER_CTRL_PLM_Palette		(0x1UL << 20)
+#define RASTER_CTRL_PLM_Data		(0x2UL << 20)
+#define RASTER_CTRL_FDD_MASK		(0xFFUL << 12)
+#define RASTER_CTRL_FDD_X(x)		(((x) & 0xFFUL) << 12)
 	vuint32_t	RASTER_CTRL;
+#define RT0_HBP_MASK			(0xFFUL << 24)
+#define RT0_HBP_VAL(x)			(((x) & 0xFFUL) << 24)
+#define RT0_HFP_MASK			(0xFFUL << 16)
+#define RT0_HFP_VAL(x)			(((x) & 0xFFUL) << 16)
+#define RT0_HSW_MASK			(0x3FUL << 10)
+#define RT0_HSW_VAL(x)			(((x) & 0x3FUL) << 10)
+#define RT0_PPL_MASK			(0x3FUL << 4)
+#define RT0_PPL_VAL(x)			(((x) & 0x3FUL) << 4)
 	vuint32_t	RASTER_TIMING_0;
+#define RT1_VBP_MASK			(0xFFUL << 24)
+#define RT1_VBP_VAL(x)			(((x) & 0xFFUL) << 24)
+#define RT1_VFP_MASK			(0xFFUL << 16)
+#define RT1_VFP_VAL(x)			(((x) & 0xFFUL) << 16)
+#define RT1_VSW_MASK			(0x3FUL << 10)
+#define RT1_VSW_VAL(x)			(((x) & 0x3FUL) << 10)
+#define RT1_LPP_MASK			(0x3FFUL << 0)
+#define RT1_LPP_VAL(x)			(((x) & 0x3FFUL) << 0)
 	vuint32_t	RASTER_TIMING_1;
+#define RT2_ACBI_MASK			(0xFUL << 16)
+#define RT2_ACBI_VAL(x)			(((x) & 0xFUL) << 16)
+#define RT2_ACB_MASK			(0xFFUL << 8)
+#define RT2_ACB_VAL(x)			(((x) & 0xFFUL) << 8)
 	vuint32_t	RASTER_TIMING_2;
+#define RSP_LPPT_MASK			(0x3FFUL << 16)
+#define RSP_LPPT_VAL(x)			(((x) & 0x3FFUL) << 16)
+#define RSP_DPD_MASK			(0xFFFUL << 4)
+#define RSP_DPD_VAL(x)			(((x) & 0xFFFUL) << 4)
 	vuint32_t	RASTER_SUBPANEL;
 	uint32_t	RESERVED0[1];
+#define LDMAC_TFR_MASK			(0x7UL << 8)
+#define LDMAC_TFR_VAL(x)		(((x) & 0x7UL) << 8)
+#define LDMAC_TFR_8dwords		(0x0UL << 8)
+#define LDMAC_TFR_16dwords		(0x1UL << 8)
+#define LDMAC_TFR_32dwords		(0x2UL << 8)
+#define LDMAC_TFR_64dwords		(0x3UL << 8)
+#define LDMAC_TFR_128dwords		(0x4UL << 8)
+#define LDMAC_TFR_256dwords		(0x5UL << 8)
+#define LDMAC_TFR_512dwords		(0x6UL << 8)
+#define LDMAC_BURSTSIZE_MASK		(0x7UL << 4)
+#define LDMAC_BURSTSIZE_VAL(x)		(((x) & 0x7UL) << 4)
+#define LDMAC_BURSTSIZE_1		(0x0UL << 4)
+#define LDMAC_BURSTSIZE_2		(0x1UL << 4)
+#define LDMAC_BURSTSIZE_4		(0x2UL << 4)
+#define LDMAC_BURSTSIZE_8		(0x3UL << 4)
+#define LDMAC_BURSTSIZE_16		(0x4UL << 4)
 	vuint32_t	LCDDMA_CTRL;
 	vuint32_t	LCDDMA_FB0_BASE;
 	vuint32_t	LCDDMA_FB0_CEILING;
 	vuint32_t	LCDDMA_FB1_BASE;
 	vuint32_t	LCDDMA_FB1_CEILING;
 } LCD_con_t;
+
+enum {
+	BIT_DEF(LCD_CTRL,0,MODESEL,LIDD,Raster),
+	BIT_DEF(LCD_STAT,9,EOF1,no,yes),
+	BIT_DEF(LCD_STAT,8,EOF0,no,yes),
+	BIT_DEF(LCD_STAT,6,PL,no,yes),
+	BIT_DEF(LCD_STAT,5,FUF,no,yes),
+	BIT_DEF(LCD_STAT,3,ABC,none,zero),
+	BIT_DEF(LCD_STAT,2,SYNC,none,lost),
+	BIT_DEF(LCD_STAT,0,DONE,no,yes),
+	BIT_DEF(RASTER_CTRL,24,STN565,disabled,enabled),
+	BIT_DEF(RASTER_CTRL,23,ALTMAP,D11_0,D15_0),
+	BIT_DEF(RASTER_CTRL,22,NIB,disabled,enabled),
+	BIT_DEF(RASTER_CTRL,9,MONO8B,4bits,8bits),
+	BIT_DEF(RASTER_CTRL,8,RDORDER,Little,Big),
+	BIT_DEF(RASTER_CTRL,7,TS,STN,TFT),
+	BIT_DEF(RASTER_CTRL,6,FUFEN,no,yes),
+	BIT_DEF(RASTER_CTRL,5,SLEN,no,yes),
+	BIT_DEF(RASTER_CTRL,4,PLEN,no,yes),
+	BIT_DEF(RASTER_CTRL,3,DONEEN,no,yes),
+	BIT_DEF(RASTER_CTRL,2,ACEN,no,yes),
+	BIT_DEF(RASTER_CTRL,1,MC,Color,Mono),
+	BIT_DEF(RASTER_CTRL,0,EN,no,yes),
+	BIT_DEF(RT2,25,SYNCCTRL,Inactive,Active),
+	BIT_DEF(RT2,24,SYNCEDGE,Rising,Falling),
+	BIT_DEF(RT2,23,BIAS,high,low),
+	BIT_DEF(RT2,22,IPC,rising,falling),
+	BIT_DEF(RT2,21,IHS,high,low),
+	BIT_DEF(RT2,20,IVS,high,low),
+	BIT_DEF(RSP,31,SPEN,disabled,enabled),
+	BIT_DEF(RSP,29,HOLS,below,above),
+	BIT_DEF(LDMAC,2,EOFINTEN,disabled,enabled),
+	BIT_DEF(LDMAC,1,BIGENDIAN,disabled,enabled),
+	BIT_DEF(LDMAC,0,FRAMEMODE,one,two),
+};
 
 typedef struct {
 #define MMCCTL_DATEG_MASK		(0x3UL << 6)
