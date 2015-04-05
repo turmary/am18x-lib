@@ -1,5 +1,6 @@
 // tary, 15:46 2015/4/5
 #include "am18x_lib.h"
+#include "arm920t.h"
 #include "tft43.h"
 #include "auxlib.h"
 #include "am18x_lcd.h"
@@ -49,6 +50,10 @@ uint32_t lcdc_pins[][3] = {
 
 #define DDR_RAM_BASE	0xC0000000UL
 
+#define _16BPP_R_MASK	0xF800
+#define _16BPP_G_MASK	0x07E0
+#define _16BPP_B_MASK	0x001F
+
 lcd_conf_t lcd_cf[] = {
 {
 	.pclk = 480*720*45,
@@ -65,8 +70,52 @@ lcd_conf_t lcd_cf[] = {
 },
 };
 
+static kv_t intrs_kv[] = {
+	KV(LCD_INTR_AC),
+	KV(LCD_INTR_DONE),
+	KV(LCD_INTR_PL),
+	KV(LCD_INTR_SL),
+	KV(LCD_INTR_FUF),
+	KV(LCD_INTR_EOF),
+	KV(LCD_INTR_EOF1),
+};
+
+static void lcdc_isr(void) {
+	int i;
+
+	for (i = 0; i < countof(intrs_kv); i++) {
+		if (lcd_intr_state(LCD0, intrs_kv[i].key) == AM18X_TRUE) {
+			printk("LCD INT %s\n", intrs_kv[i].val);
+		}
+	}
+	lcd_intr_clear(LCD0, LCD_INTR_ALL);
+	return;
+}
+
+int lcd_intr_init(void) {
+	int i;
+
+	lcd_intr_enable(LCD0, LCD_INTR_AC);
+	lcd_intr_enable(LCD0, LCD_INTR_DONE);
+	lcd_intr_enable(LCD0, LCD_INTR_PL);
+	lcd_intr_enable(LCD0, LCD_INTR_SL);
+	lcd_intr_enable(LCD0, LCD_INTR_FUF);
+	lcd_intr_enable(LCD0, LCD_INTR_EOF);
+
+	isr_set_hander(AINTC_LCDC_INT, lcdc_isr);
+
+	for (i = 0; i < countof(intrs_kv); i++) {
+		intrs_kv[i].val += get_exec_base();
+	}
+
+	aintc_sys_enable(AINTC_LCDC_INT);
+	return 0;
+}
+
 int tft43_init(void) {
-	int i, r;
+	int i;
+	uint16_t* palette = (uint16_t)DDR_RAM_BASE;
+	uint16_t* fb0;
 
 	psc_state_transition(PSC_GPIO, PSC_STATE_ENABLE);
 	psc_state_transition(PSC_LCDC, PSC_STATE_ENABLE);
@@ -84,7 +133,17 @@ int tft43_init(void) {
 
 	lcd_conf(LCD0, lcd_cf);
 
-	lcd_cmd(LCD0, LCD_CMD_RASTER_EN, 0);
+	palette[0] = 0x4000;
 
+	fb0 = &palette[16];
+	for (i = 0; i < lcd_cf->width * lcd_cf->height; i++) {
+		fb0[i] = _16BPP_G_MASK;
+	}
+
+	lcd_intr_init();
+
+	arm_intr_enable();
+	lcd_cmd(LCD0, LCD_CMD_RASTER_EN, 0);
+	
 	return 0;
 }
