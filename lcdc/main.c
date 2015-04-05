@@ -27,6 +27,7 @@ int main(int argc, char* argv[]) {
 	printk("PINMUXx[19] = 0x%.8X\n", SYSCFG0->PINMUXx[19]);
 	*/
 
+	tft43_colors();
 	
 	return 0;
 }

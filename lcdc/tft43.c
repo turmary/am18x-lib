@@ -56,7 +56,7 @@ uint32_t lcdc_pins[][3] = {
 
 lcd_conf_t lcd_cf[] = {
 {
-	.pclk = 480 * 272 * 20,
+	.pclk = 480 * 272 * 3,
 	.width = 480, .height = 272,
 	.hfp = 2, 41, 2,
 	.vfp = 3, 10, 3,
@@ -69,6 +69,9 @@ lcd_conf_t lcd_cf[] = {
 	.fb0_base = DDR_RAM_BASE,
 },
 };
+
+static uint16_t* palette = (uint16_t*)DDR_RAM_BASE;
+static uint16_t* fb0;
 
 static kv_t intrs_kv[] = {
 	KV(LCD_INTR_AC),
@@ -88,7 +91,19 @@ static void lcdc_isr(void) {
 			printk("LCD INT %s\n", intrs_kv[i].val);
 		}
 	}
-	lcd_intr_clear(LCD0, LCD_INTR_ALL);
+	if (lcd_intr_state(LCD0, LCD_INTR_PL) == AM18X_TRUE) {
+		lcd_cmd(LCD0, LCD_CMD_RASTER_DIS, 0);
+		lcd_cmd(LCD0, LCD_CMD_DATA, 0);
+		lcd_cmd(LCD0, LCD_CMD_RASTER_EN, 0);
+		lcd_intr_clear(LCD0, LCD_INTR_PL);
+	}
+	if (lcd_intr_state(LCD0, LCD_INTR_FUF) == AM18X_TRUE) {
+		for (;;);
+	}
+	if (lcd_intr_state(LCD0, LCD_INTR_EOF) == AM18X_TRUE) {
+		lcd_intr_clear(LCD0, LCD_INTR_EOF);
+	}
+	// lcd_intr_clear(LCD0, LCD_INTR_ALL);
 	return;
 }
 
@@ -153,10 +168,8 @@ static int dvfs_set_opp(int opp) {
 
 int tft43_init(void) {
 	int i;
-	uint16_t* palette = (uint16_t*)DDR_RAM_BASE;
-	uint16_t* fb0;
 
-	dvfs_set_opp(2);
+	// dvfs_set_opp(2);
 
 	psc_state_transition(PSC_GPIO, PSC_STATE_ENABLE);
 	psc_state_transition(PSC_LCDC, PSC_STATE_ENABLE);
@@ -179,21 +192,46 @@ int tft43_init(void) {
 	for (i = 1; i < 16; i++) {
 		palette[i] = 0x0;
 	}
-
 	fb0 = &palette[16];
-	for (i = 0; i < lcd_cf->width * lcd_cf->height; i++) {
-		fb0[i] = _16BPP_G_MASK;
-	}
 
 	lcd_intr_init();
 
-	arm_intr_enable();
-
-	for (i = 0; i < 32; i++) {
-		printk("[0x%X] = 0x%X\n", &palette[i], palette[i]);
-	}
 	dump_regs_word("FB0", palette, 64);
+	arm_intr_enable();
 	lcd_cmd(LCD0, LCD_CMD_RASTER_EN, 0);
 
+	return 0;
+}
+
+static int set_color(uint16_t color) {
+	int i;
+
+	for (i = 0; i < lcd_cf->width * lcd_cf->height; i++) {
+		fb0[i] = color;
+	}
+	return 0;
+}
+
+int tft43_colors(void) {
+	uint16_t color;
+
+	color = 0;
+	for (;;) {
+		switch(color) {
+		case _16BPP_R_MASK:
+			color = _16BPP_G_MASK;
+			break;
+		case _16BPP_G_MASK:
+			color = _16BPP_B_MASK;
+			break;
+		case _16BPP_B_MASK:
+		default:
+			color = _16BPP_R_MASK;
+			break;
+		}
+		set_color(color);
+
+		systick_sleep(1000);
+	}
 	return 0;
 }

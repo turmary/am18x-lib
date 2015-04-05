@@ -5,5 +5,6 @@
 #include "am18x_lib.h"
 
 int tft43_init(void);
+int tft43_colors(void);
 
 #endif//__TFT_H__
