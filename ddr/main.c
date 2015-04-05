@@ -38,7 +38,7 @@ const uint32_t f_osc = F_OSCIN;
 	.pasr = 0,
 }; */
 
-static unsigned long* ddr_mem = (unsigned long*)0xC0000000UL;
+static unsigned short* ddr_mem = (unsigned short*)0xC0000000UL;
 
 static int ddr_mem_test(void) {
 	int i;
@@ -49,10 +49,10 @@ static int ddr_mem_test(void) {
 	dump_regs_word("CLOSE DDR", (unsigned)ddr_mem, 64);
 
 	ddr_initialize(DDR0, &mt46h64m16_6);
-	// dump_regs_word("DDR0.i", DDR0, 0xE8);
 	*/
+	dump_regs_word("DDR0.i", DDR0, 0xE8);
 
-	for (i = 0; i < 16; i++) {
+	for (i = 0; i < 32; i++) {
 		ddr_mem[i] = i;
 	}
 	dump_regs_word("OPEN  DDR", (unsigned)ddr_mem, 64);

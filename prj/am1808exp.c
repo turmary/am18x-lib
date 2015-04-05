@@ -12,7 +12,7 @@
 static const ddr_conf_t mt46h64m16_6 = {
 	.ddr2_not_mddr = AM18X_FALSE,
 	.page_size = 10,
-	.row_size  = 14,
+	.row_size  = 9,
 	.bank_cnt  = 4,
 
 	.freq_ck = 166000000,

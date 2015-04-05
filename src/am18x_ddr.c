@@ -54,7 +54,7 @@ am18x_rt ddr_initialize(DDR_con_t* dcon, const ddr_conf_t* conf) {
 	reg = dcon->DRPYC1R;
 	reg = FIELD_SET(reg, DRPYC1R_EXTSTRBEN_MASK, DRPYC1R_EXTSTRBEN_external);
 	reg = FIELD_SET(reg, DRPYC1R_PWRDNEN_MASK, DRPYC1R_PWRDNEN_powerdown);
-	reg = FIELD_SET(reg, DRPYC1R_RL_MASK, DRPYC1R_RL_VAL(conf->cl));
+	reg = FIELD_SET(reg, DRPYC1R_RL_MASK, DRPYC1R_RL_VAL(conf->cl + 1));
 	dcon->DRPYC1R = reg;
 
 	// 6. Configure the DDR_SLEW
@@ -76,14 +76,14 @@ am18x_rt ddr_initialize(DDR_con_t* dcon, const ddr_conf_t* conf) {
 		reg = FIELD_SET(reg, SDCR_MSDRAMEN_MASK, SDCR_MSDRAMEN_no);
 		reg = FIELD_SET(reg, SDCR_DDR2EN_MASK, SDCR_DDR2EN_yes);
 	} else {
-		reg = FIELD_SET(reg, SDCR_IBANKPOS_MASK, SDCR_IBANKPOS_special);
+		reg = FIELD_SET(reg, SDCR_IBANKPOS_MASK, SDCR_IBANKPOS_normal);
 		reg = FIELD_SET(reg, SDCR_MSDRAMEN_MASK, SDCR_MSDRAMEN_yes);
 		reg = FIELD_SET(reg, SDCR_DDR2EN_MASK, SDCR_DDR2EN_no);
 	}
 	reg = FIELD_SET(reg, SDCR_DDRDLLDIS_MASK, SDCR_DDRDLLDIS_no);
 	reg = FIELD_SET(reg, SDCR_DDREN_MASK, SDCR_DDREN_yes);
 	reg = FIELD_SET(reg, SDCR_SDRAMEN_MASK, SDCR_SDRAMEN_yes);
-
+	reg = FIELD_SET(reg, SDCR_NM_MASK, SDCR_NM_16bit);
 	reg = FIELD_SET(reg, SDCR_CL_MASK, SDCR_CL_VAL(conf->cl));
 	switch (conf->bank_cnt) {
 	case 2:  v = SDCR_IBANK_2banks;break;
@@ -114,7 +114,7 @@ am18x_rt ddr_initialize(DDR_con_t* dcon, const ddr_conf_t* conf) {
 		}
 		reg = FIELD_SET(reg, SDCR2_PASR_MASK, v);
 
-		v = SDCR2_ROWSIZE_VAL(conf->row_size - 9);
+		v = SDCR2_ROWSIZE_VAL(conf->row_size);
 		reg = FIELD_SET(reg, SDCR2_ROWSIZE_MASK, v);
 	}
 	dcon->SDCR2 = reg;
