@@ -6,11 +6,11 @@
 #include "am18x_map.h"
 
 typedef enum {
-	LCD_BPP_1,
-	LCD_BPP_2,
-	LCD_BPP_4,
-	LCD_BPP_8,
-	LCD_BPP_16,
+	LCD_BPP_1 = 1,
+	LCD_BPP_2 = 2,
+	LCD_BPP_4 = 4,
+	LCD_BPP_8 = 8,
+	LCD_BPP_16 = 16,
 } lcd_bpp_t;
 
 typedef enum {

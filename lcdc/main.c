@@ -3,6 +3,7 @@
 #include "arm920t.h"
 #include "systick.h"
 #include "auxlib.h"
+#include "tft43.h"
 
 const uint32_t f_osc = F_OSCIN;
 
@@ -17,5 +18,15 @@ int main(int argc, char* argv[]) {
 	printk(title);
 	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);
 
+	tft43_init();
+
+	/* printk("PINMUXx[5]  = 0x%.8X\n", SYSCFG0->PINMUXx[5]);
+	printk("PINMUXx[16] = 0x%.8X\n", SYSCFG0->PINMUXx[16]);
+	printk("PINMUXx[17] = 0x%.8X\n", SYSCFG0->PINMUXx[17]);
+	printk("PINMUXx[18] = 0x%.8X\n", SYSCFG0->PINMUXx[18]);
+	printk("PINMUXx[19] = 0x%.8X\n", SYSCFG0->PINMUXx[19]);
+	*/
+
+	
 	return 0;
 }
