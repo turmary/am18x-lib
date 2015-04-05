@@ -56,7 +56,7 @@ uint32_t lcdc_pins[][3] = {
 
 lcd_conf_t lcd_cf[] = {
 {
-	.pclk = 480*720*45,
+	.pclk = 480 * 272 * 20,
 	.width = 480, .height = 272,
 	.hfp = 2, 41, 2,
 	.vfp = 3, 10, 3,
@@ -66,7 +66,7 @@ lcd_conf_t lcd_cf[] = {
 		LCD_CFLAG_PIXEL_RISING |
 		LCD_CFLAG_HSYNC_HIGH |
 		LCD_CFLAG_VSYNC_HIGH,
-	.fb0_base = DDR_RAM_BASE,	
+	.fb0_base = DDR_RAM_BASE,
 },
 };
 
@@ -112,10 +112,51 @@ int lcd_intr_init(void) {
 	return 0;
 }
 
+// am1808.pdf
+// 4.2 Recommanded Operating Conditions
+// Operating Frequency
+typedef struct {
+	uint32_t	freq;
+	uint16_t	volt;
+} opp_t;
+
+static opp_t opps[] = {
+	{F_OSCIN,     1000},
+	{100000000UL, 1000},
+	{200000000UL, 1100},
+	{375000000UL, 1200},
+	{456000000UL, 1300},
+};
+
+#define _1K		1000UL
+#define _1M		1000000UL
+
+static int dvfs_set_opp(int opp) {
+	pll_conf_t pcf[1];
+
+	pll_get_conf(PLL0, pcf);
+	pcf->pllm = opps[opp].freq * pcf->prediv * pcf->postdiv / F_OSCIN;
+	// am1808.pdf
+	// Page 79,
+	// The multiplier values must be chosen such that the PLL output
+	// frequency is between 300 and 600 MHz
+	if (F_OSCIN * pcf->pllm / pcf->prediv > 600 * _1M) {
+		pcf->pllm /= 2;
+		pcf->postdiv /= 2;
+	}
+	pll_set_conf(PLL0, pcf);
+
+	clk_node_recalc();
+	uart_init();
+	return 0;
+}
+
 int tft43_init(void) {
 	int i;
-	uint16_t* palette = (uint16_t)DDR_RAM_BASE;
+	uint16_t* palette = (uint16_t*)DDR_RAM_BASE;
 	uint16_t* fb0;
+
+	dvfs_set_opp(2);
 
 	psc_state_transition(PSC_GPIO, PSC_STATE_ENABLE);
 	psc_state_transition(PSC_LCDC, PSC_STATE_ENABLE);
@@ -133,7 +174,11 @@ int tft43_init(void) {
 
 	lcd_conf(LCD0, lcd_cf);
 
+	// 23.2.5.2 Frame Buffer
 	palette[0] = 0x4000;
+	for (i = 1; i < 16; i++) {
+		palette[i] = 0x0;
+	}
 
 	fb0 = &palette[16];
 	for (i = 0; i < lcd_cf->width * lcd_cf->height; i++) {
@@ -143,7 +188,12 @@ int tft43_init(void) {
 	lcd_intr_init();
 
 	arm_intr_enable();
+
+	for (i = 0; i < 32; i++) {
+		printk("[0x%X] = 0x%X\n", &palette[i], palette[i]);
+	}
+	dump_regs_word("FB0", palette, 64);
 	lcd_cmd(LCD0, LCD_CMD_RASTER_EN, 0);
-	
+
 	return 0;
 }

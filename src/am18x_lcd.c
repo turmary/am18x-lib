@@ -1,6 +1,7 @@
 // tary, 22:33 2015/4/4
 #include "am18x_lcd.h"
 #include "am18x_dclk.h"
+#include "auxlib.h"
 
 #define WIDTH_2_PPL(w)		(((w) >> 4) - 1)
 
@@ -9,6 +10,7 @@ static am18x_rt lcd_set_pclk(LCD_con_t* lcon, uint32_t freq) {
 	uint32_t reg, v;
 
 	lcd_clk = dev_get_freq(DCLK_ID_LCDC);
+	printk("LCD_CLK = %d\n", lcd_clk);
 	v = lcd_clk / freq;
 
 	reg = lcon->LCD_CTRL;
@@ -63,6 +65,9 @@ am18x_rt lcd_conf(LCD_con_t* lcon, const lcd_conf_t* conf) {
 	reg = FIELD_SET(reg, RT2_IHS_MASK, v);
 	v = conf->cflag & LCD_CFLAG_VSYNC_LOW? RT2_IVS_high: RT2_IVS_low;
 	reg = FIELD_SET(reg, RT2_IVS_MASK, v);
+	/* reg = FIELD_SET(reg, RT2_ACBI_MASK, RT2_ACBI_VAL(0));
+	reg = FIELD_SET(reg, RT2_ACB_MASK, RT2_ACB_VAL(0xFF));
+	*/
 	lcon->RASTER_TIMING_2 = reg;
 
 	reg = lcon->RASTER_CTRL;
@@ -70,8 +75,8 @@ am18x_rt lcd_conf(LCD_con_t* lcon, const lcd_conf_t* conf) {
 	reg = FIELD_SET(reg, RASTER_CTRL_ALTMAP_MASK, RASTER_CTRL_ALTMAP_D15_0);
 	v = conf->bpp < 8? RASTER_CTRL_NIB_enabled: RASTER_CTRL_NIB_disabled;
 	reg = FIELD_SET(reg, RASTER_CTRL_NIB_MASK, v);
-	reg = FIELD_SET(reg, RASTER_CTRL_PLM_MASK, RASTER_CTRL_PLM_Data);
-	reg = FIELD_SET(reg, RASTER_CTRL_FDD_MASK, RASTER_CTRL_FDD_X(0));
+	reg = FIELD_SET(reg, RASTER_CTRL_PLM_MASK, RASTER_CTRL_PLM_Palette);
+	reg = FIELD_SET(reg, RASTER_CTRL_FDD_MASK, RASTER_CTRL_FDD_X(2));
 	reg = FIELD_SET(reg, RASTER_CTRL_RDORDER_MASK, RASTER_CTRL_RDORDER_Little);
 	reg = FIELD_SET(reg, RASTER_CTRL_TS_MASK, RASTER_CTRL_TS_TFT);
 	reg = FIELD_SET(reg, RASTER_CTRL_MC_MASK, RASTER_CTRL_MC_Color);
