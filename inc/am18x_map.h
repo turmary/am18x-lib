@@ -1707,7 +1707,7 @@ enum {
 	BIT_DEF(RT2,20,IVS,high,low),
 	BIT_DEF(RSP,31,SPEN,disabled,enabled),
 	BIT_DEF(RSP,29,HOLS,below,above),
-	BIT_DEF(LDMAC,2,EOFINTEN,disabled,enabled),
+	BIT_DEF(LDMAC,2,EOFINTEN,no,yes),
 	BIT_DEF(LDMAC,1,BIGENDIAN,disabled,enabled),
 	BIT_DEF(LDMAC,0,FRAMEMODE,one,two),
 };
