@@ -21,6 +21,11 @@ static am18x_rt lcd_set_pclk(LCD_con_t* lcon, uint32_t freq) {
 am18x_rt lcd_conf(LCD_con_t* lcon, const lcd_conf_t* conf) {
 	uint32_t reg, msk, v;
 
+	// disable raster controller
+	reg = lcon->RASTER_CTRL;
+	reg = FIELD_SET(reg, RASTER_CTRL_EN_MASK, RASTER_CTRL_EN_no);
+	lcon->RASTER_CTRL = reg;
+
 	reg = lcon->LCD_CTRL;
 	v = LCD_CTRL_MODESEL_Raster;
 	lcon->LCD_CTRL = FIELD_SET(reg, LCD_CTRL_MODESEL_MASK, v);
@@ -57,17 +62,16 @@ am18x_rt lcd_conf(LCD_con_t* lcon, const lcd_conf_t* conf) {
 	}
 	reg = FIELD_SET(reg, msk, v);
 
-	v = conf->cflag & LCD_CFLAG_BIAS_LOW? RT2_BIAS_high: RT2_BIAS_low;
+	v = conf->cflag & LCD_CFLAG_BIAS_LOW? RT2_BIAS_low: RT2_BIAS_high;
 	reg = FIELD_SET(reg, RT2_BIAS_MASK, v);
 	v = conf->cflag & LCD_CFLAG_PIXEL_FALLING? RT2_IPC_falling: RT2_IPC_rising;
 	reg = FIELD_SET(reg, RT2_IPC_MASK, v);
-	v = conf->cflag & LCD_CFLAG_HSYNC_LOW? RT2_IHS_high: RT2_IHS_low;
+	v = conf->cflag & LCD_CFLAG_HSYNC_LOW? RT2_IHS_low: RT2_IHS_high;
 	reg = FIELD_SET(reg, RT2_IHS_MASK, v);
-	v = conf->cflag & LCD_CFLAG_VSYNC_LOW? RT2_IVS_high: RT2_IVS_low;
+	v = conf->cflag & LCD_CFLAG_VSYNC_LOW? RT2_IVS_low: RT2_IVS_high;
 	reg = FIELD_SET(reg, RT2_IVS_MASK, v);
-	/* reg = FIELD_SET(reg, RT2_ACBI_MASK, RT2_ACBI_VAL(0));
+	reg = FIELD_SET(reg, RT2_ACBI_MASK, RT2_ACBI_VAL(0));
 	reg = FIELD_SET(reg, RT2_ACB_MASK, RT2_ACB_VAL(0xFF));
-	*/
 	lcon->RASTER_TIMING_2 = reg;
 
 	reg = lcon->RASTER_CTRL;
@@ -80,8 +84,6 @@ am18x_rt lcd_conf(LCD_con_t* lcon, const lcd_conf_t* conf) {
 	reg = FIELD_SET(reg, RASTER_CTRL_RDORDER_MASK, RASTER_CTRL_RDORDER_Little);
 	reg = FIELD_SET(reg, RASTER_CTRL_TS_MASK, RASTER_CTRL_TS_TFT);
 	reg = FIELD_SET(reg, RASTER_CTRL_MC_MASK, RASTER_CTRL_MC_Color);
-	// disable raster controller
-	reg = FIELD_SET(reg, RASTER_CTRL_EN_MASK, RASTER_CTRL_EN_no);
 
 	// disable all interrupt
 	msk = RASTER_CTRL_FUFEN_MASK | RASTER_CTRL_SLEN_MASK | RASTER_CTRL_PLEN_MASK;
@@ -136,8 +138,12 @@ am18x_rt lcd_cmd(LCD_con_t* lcon, uint32_t cmd, uint32_t arg) {
 		reg = FIELD_SET(reg, RASTER_CTRL_PLM_MASK, RASTER_CTRL_PLM_PaletteData);
 		lcon->RASTER_CTRL = reg;
 		break;
-	case LCD_CMD_FB_RESET:
-		lcon->LCDDMA_FB0_BASE = lcon->LCDDMA_FB0_BASE;
+	case LCD_CMD_FB_SET:
+		if (arg == 0) {
+			lcon->LCDDMA_FB0_BASE = lcon->LCDDMA_FB0_BASE;
+		} else {
+			lcon->LCDDMA_FB0_BASE = arg;
+		}
 		break;
 	default:
 		break;

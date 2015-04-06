@@ -57,7 +57,7 @@ uint32_t lcdc_pins[][3] = {
 
 lcd_conf_t lcd_cf[] = {
 {
-	.pclk = 480 * 272 * 20,
+	.pclk = 480 * 272 * 10,
 	.width = 480, .height = 272,
 	.hfp = 2,
 	.hsw = 41,
@@ -66,11 +66,11 @@ lcd_conf_t lcd_cf[] = {
 	.vsw = 10,
 	.vbp = 3,
 	.bpp = LCD_BPP_16,
-	.hvsync = LCD_HVSYNC_PCLK,
+	.hvsync = LCD_HVSYNC_RISING,
 	.cflag = LCD_CFLAG_BIAS_HIGH |
-		LCD_CFLAG_PIXEL_RISING |
-		LCD_CFLAG_HSYNC_HIGH |
-		LCD_CFLAG_VSYNC_HIGH,
+		LCD_CFLAG_PIXEL_FALLING |
+		LCD_CFLAG_HSYNC_LOW |
+		LCD_CFLAG_VSYNC_LOW,
 	.fb0_base = DDR_RAM_BASE,
 },
 };
@@ -78,14 +78,15 @@ lcd_conf_t lcd_cf[] = {
 static uint16_t* palette = (uint16_t*)DDR_RAM_BASE;
 static uint16_t* fb0;
 
+#define KV_LCD(x)	{LCD_INTR_##x, #x}
 static kv_t intrs_kv[] = {
-	KV(LCD_INTR_AC),
-	KV(LCD_INTR_DONE),
-	KV(LCD_INTR_PL),
-	KV(LCD_INTR_SL),
-	KV(LCD_INTR_FUF),
-	KV(LCD_INTR_EOF),
-	KV(LCD_INTR_EOF1),
+	KV_LCD(AC),
+	KV_LCD(DONE),
+	KV_LCD(PL),
+	KV_LCD(SL),
+	KV_LCD(FUF),
+	KV_LCD(EOF),
+	KV_LCD(EOF1),
 };
 
 static void lcdc_isr(void) {
@@ -97,17 +98,26 @@ static void lcdc_isr(void) {
 		}
 	}
 	if (lcd_intr_state(LCD0, LCD_INTR_PL) == AM18X_TRUE) {
+		// lcd_intr_clear(LCD0, LCD_INTR_ALL);
 		lcd_cmd(LCD0, LCD_CMD_RASTER_DIS, 0);
+		// lcd_intr_disable(LCD0, LCD_INTR_PL);
 		lcd_cmd(LCD0, LCD_CMD_DATA, 0);
+		// lcd_cmd(LCD0, LCD_CMD_FB_SET, lcd_cf->fb0_base + 32);
 		lcd_cmd(LCD0, LCD_CMD_RASTER_EN, 0);
-		lcd_intr_clear(LCD0, LCD_INTR_PL);
+		//lcd_intr_clear(LCD0, LCD_INTR_PL);
 	}
-	if (lcd_intr_state(LCD0, LCD_INTR_FUF) == AM18X_TRUE) {
-		//for (;;);
+	if (lcd_intr_state(LCD0, LCD_INTR_SL) == AM18X_TRUE) {
+		// lcd_cmd(LCD0, LCD_CMD_RASTER_DIS, 0);
+		// lcd_intr_clear(LCD0, LCD_INTR_SL);
+		/*psc_state_transition(PSC_LCDC, PSC_STATE_DISABLE);
+		psc_state_transition(PSC_LCDC, PSC_STATE_ENABLE);
+		lcd_cmd(LCD0, LCD_CMD_RASTER_EN, 0);
+		*/
+		// for (;;);
 	}
 	if (lcd_intr_state(LCD0, LCD_INTR_EOF) == AM18X_TRUE) {
-		lcd_cmd(LCD0, LCD_CMD_FB_RESET, 0);
-		lcd_intr_clear(LCD0, LCD_INTR_EOF);
+		lcd_cmd(LCD0, LCD_CMD_FB_SET, 0);
+		// lcd_intr_clear(LCD0, LCD_INTR_EOF);
 	}
 	lcd_intr_clear(LCD0, LCD_INTR_ALL);
 	return;
