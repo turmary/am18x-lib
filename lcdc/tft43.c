@@ -66,9 +66,9 @@ lcd_conf_t lcd_cf[] = {
 	.vsw = 10,
 	.vbp = 3,
 	.bpp = LCD_BPP_16,
-	.hvsync = LCD_HVSYNC_RISING,
-	.cflag = LCD_CFLAG_BIAS_HIGH |
-		LCD_CFLAG_PIXEL_FALLING |
+	.hvsync = LCD_HVSYNC_PCLK,
+	.cflag = LCD_CFLAG_BIAS_LOW |
+		LCD_CFLAG_PIXEL_RISING |
 		LCD_CFLAG_HSYNC_LOW |
 		LCD_CFLAG_VSYNC_LOW,
 	.fb0_base = DDR_RAM_BASE,
@@ -90,13 +90,19 @@ static kv_t intrs_kv[] = {
 };
 
 static void lcdc_isr(void) {
-	int i;
+	int i, k;
 
+	k = 0;
 	for (i = 0; i < countof(intrs_kv); i++) {
 		if (lcd_intr_state(LCD0, intrs_kv[i].key) == AM18X_TRUE) {
-			printk("*%s\n", intrs_kv[i].val);
+			printk("*%s ", intrs_kv[i].val);
+			k++;
 		}
 	}
+	if (k) {
+		printk("\n");
+	}
+
 	if (lcd_intr_state(LCD0, LCD_INTR_PL) == AM18X_TRUE) {
 		// lcd_intr_clear(LCD0, LCD_INTR_ALL);
 		lcd_cmd(LCD0, LCD_CMD_RASTER_DIS, 0);
@@ -104,7 +110,7 @@ static void lcdc_isr(void) {
 		lcd_cmd(LCD0, LCD_CMD_DATA, 0);
 		// lcd_cmd(LCD0, LCD_CMD_FB_SET, lcd_cf->fb0_base + 32);
 		lcd_cmd(LCD0, LCD_CMD_RASTER_EN, 0);
-		//lcd_intr_clear(LCD0, LCD_INTR_PL);
+		lcd_intr_clear(LCD0, LCD_INTR_PL);
 	}
 	if (lcd_intr_state(LCD0, LCD_INTR_SL) == AM18X_TRUE) {
 		// lcd_cmd(LCD0, LCD_CMD_RASTER_DIS, 0);
@@ -117,7 +123,7 @@ static void lcdc_isr(void) {
 	}
 	if (lcd_intr_state(LCD0, LCD_INTR_EOF) == AM18X_TRUE) {
 		lcd_cmd(LCD0, LCD_CMD_FB_SET, 0);
-		// lcd_intr_clear(LCD0, LCD_INTR_EOF);
+		lcd_intr_clear(LCD0, LCD_INTR_EOF);
 	}
 	lcd_intr_clear(LCD0, LCD_INTR_ALL);
 	return;
