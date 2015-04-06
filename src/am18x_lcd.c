@@ -75,7 +75,7 @@ am18x_rt lcd_conf(LCD_con_t* lcon, const lcd_conf_t* conf) {
 	reg = FIELD_SET(reg, RASTER_CTRL_ALTMAP_MASK, RASTER_CTRL_ALTMAP_D15_0);
 	v = conf->bpp < 8? RASTER_CTRL_NIB_enabled: RASTER_CTRL_NIB_disabled;
 	reg = FIELD_SET(reg, RASTER_CTRL_NIB_MASK, v);
-	reg = FIELD_SET(reg, RASTER_CTRL_PLM_MASK, RASTER_CTRL_PLM_Palette);
+	reg = FIELD_SET(reg, RASTER_CTRL_PLM_MASK, RASTER_CTRL_PLM_PaletteData);
 	reg = FIELD_SET(reg, RASTER_CTRL_FDD_MASK, RASTER_CTRL_FDD_X(2));
 	reg = FIELD_SET(reg, RASTER_CTRL_RDORDER_MASK, RASTER_CTRL_RDORDER_Little);
 	reg = FIELD_SET(reg, RASTER_CTRL_TS_MASK, RASTER_CTRL_TS_TFT);
@@ -92,8 +92,8 @@ am18x_rt lcd_conf(LCD_con_t* lcon, const lcd_conf_t* conf) {
 	lcon->RASTER_CTRL = reg;
 
 	reg = lcon->LCDDMA_CTRL;
-	reg = FIELD_SET(reg, LDMAC_TFR_MASK, LDMAC_TFR_8dwords);
-	reg = FIELD_SET(reg, LDMAC_BURSTSIZE_MASK, LDMAC_BURSTSIZE_1);
+	reg = FIELD_SET(reg, LDMAC_TFR_MASK, LDMAC_TFR_128dwords);
+	reg = FIELD_SET(reg, LDMAC_BURSTSIZE_MASK, LDMAC_BURSTSIZE_16);
 	reg = FIELD_SET(reg, LDMAC_EOFINTEN_MASK, LDMAC_EOFINTEN_no);
 	reg = FIELD_SET(reg, LDMAC_BIGENDIAN_MASK, LDMAC_BIGENDIAN_disabled);
 	v = conf->fb1_base? LDMAC_FRAMEMODE_two: LDMAC_FRAMEMODE_one;
@@ -133,8 +133,11 @@ am18x_rt lcd_cmd(LCD_con_t* lcon, uint32_t cmd, uint32_t arg) {
 		break;
 	case LCD_CMD_DATA:
 		reg = lcon->RASTER_CTRL;
-		reg = FIELD_SET(reg, RASTER_CTRL_PLM_MASK, RASTER_CTRL_PLM_Data);
+		reg = FIELD_SET(reg, RASTER_CTRL_PLM_MASK, RASTER_CTRL_PLM_PaletteData);
 		lcon->RASTER_CTRL = reg;
+		break;
+	case LCD_CMD_FB_RESET:
+		lcon->LCDDMA_FB0_BASE = lcon->LCDDMA_FB0_BASE;
 		break;
 	default:
 		break;

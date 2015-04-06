@@ -47,6 +47,7 @@ typedef enum {
 	LCD_CMD_RASTER_DIS,
 	LCD_CMD_PALETTE,
 	LCD_CMD_DATA,
+	LCD_CMD_FB_RESET,
 } lcd_cmd_t;
 
 typedef enum {

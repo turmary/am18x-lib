@@ -3,7 +3,8 @@
 #include "arm920t.h"
 #include "tft43.h"
 #include "auxlib.h"
-#include "am18x_lcd.h"
+#include "uart.h"
+#include "systick.h"
 
 // AM1808 LCDC pins
 
@@ -56,10 +57,14 @@ uint32_t lcdc_pins[][3] = {
 
 lcd_conf_t lcd_cf[] = {
 {
-	.pclk = 480 * 272 * 3,
+	.pclk = 480 * 272 * 20,
 	.width = 480, .height = 272,
-	.hfp = 2, 41, 2,
-	.vfp = 3, 10, 3,
+	.hfp = 2,
+	.hsw = 41,
+	.hbp = 2,
+	.vfp = 3,
+	.vsw = 10,
+	.vbp = 3,
 	.bpp = LCD_BPP_16,
 	.hvsync = LCD_HVSYNC_PCLK,
 	.cflag = LCD_CFLAG_BIAS_HIGH |
@@ -88,7 +93,7 @@ static void lcdc_isr(void) {
 
 	for (i = 0; i < countof(intrs_kv); i++) {
 		if (lcd_intr_state(LCD0, intrs_kv[i].key) == AM18X_TRUE) {
-			printk("LCD INT %s\n", intrs_kv[i].val);
+			printk("*%s\n", intrs_kv[i].val);
 		}
 	}
 	if (lcd_intr_state(LCD0, LCD_INTR_PL) == AM18X_TRUE) {
@@ -98,12 +103,13 @@ static void lcdc_isr(void) {
 		lcd_intr_clear(LCD0, LCD_INTR_PL);
 	}
 	if (lcd_intr_state(LCD0, LCD_INTR_FUF) == AM18X_TRUE) {
-		for (;;);
+		//for (;;);
 	}
 	if (lcd_intr_state(LCD0, LCD_INTR_EOF) == AM18X_TRUE) {
+		lcd_cmd(LCD0, LCD_CMD_FB_RESET, 0);
 		lcd_intr_clear(LCD0, LCD_INTR_EOF);
 	}
-	// lcd_intr_clear(LCD0, LCD_INTR_ALL);
+	lcd_intr_clear(LCD0, LCD_INTR_ALL);
 	return;
 }
 
@@ -169,7 +175,7 @@ static int dvfs_set_opp(int opp) {
 int tft43_init(void) {
 	int i;
 
-	// dvfs_set_opp(2);
+	dvfs_set_opp(1);
 
 	psc_state_transition(PSC_GPIO, PSC_STATE_ENABLE);
 	psc_state_transition(PSC_LCDC, PSC_STATE_ENABLE);
@@ -212,6 +218,25 @@ static int set_color(uint16_t color) {
 	return 0;
 }
 
+static int paint_quadrangle(void) {
+	uint16_t color;
+	int x, y;
+
+	for (x = 0; x < lcd_cf->width; x++) {
+		for (y = 0; y < lcd_cf->height; y++) {
+			if (x < lcd_cf->width / 3 || x >= lcd_cf->width * 2 / 3) {
+				color = _16BPP_R_MASK;
+			} else if (y < lcd_cf->height / 3 || y >= lcd_cf->height * 2 / 3) {
+				color = _16BPP_G_MASK;
+			} else {
+				color = _16BPP_B_MASK;
+			}
+			fb0[y * lcd_cf->width + x] = color;
+		}
+	}
+	return 0;
+}
+
 int tft43_colors(void) {
 	uint16_t color;
 
@@ -229,7 +254,10 @@ int tft43_colors(void) {
 			color = _16BPP_R_MASK;
 			break;
 		}
-		set_color(color);
+		// lcd_cmd(LCD0, LCD_CMD_RASTER_DIS, 0);
+		// set_color(color);
+		paint_quadrangle();
+		// lcd_cmd(LCD0, LCD_CMD_RASTER_EN, 0);
 
 		systick_sleep(1000);
 	}
