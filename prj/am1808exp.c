@@ -3,6 +3,7 @@
 #include "systick.h"
 #include "uart.h"
 #include "auxlib.h"
+#include "tps6507x.h"
 
 #define SYSTICK_PERIOD			10/* milli seconds */
 
@@ -86,5 +87,8 @@ int low_level_init(void) {
 #ifdef _M_BOOT_DELAY
 	delay(284091 * 3);
 #endif
+
+	tps6507x_conf();
+
 	return AM18X_OK;
 }

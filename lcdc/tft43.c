@@ -5,6 +5,7 @@
 #include "auxlib.h"
 #include "uart.h"
 #include "systick.h"
+#include "dvfs.h"
 
 // AM1808 LCDC pins
 
@@ -149,49 +150,10 @@ int lcd_intr_init(void) {
 	return 0;
 }
 
-// am1808.pdf
-// 4.2 Recommanded Operating Conditions
-// Operating Frequency
-typedef struct {
-	uint32_t	freq;
-	uint16_t	volt;
-} opp_t;
-
-static opp_t opps[] = {
-	{F_OSCIN,     1000},
-	{100000000UL, 1000},
-	{200000000UL, 1100},
-	{375000000UL, 1200},
-	{456000000UL, 1300},
-};
-
-#define _1K		1000UL
-#define _1M		1000000UL
-
-static int dvfs_set_opp(int opp) {
-	pll_conf_t pcf[1];
-
-	pll_get_conf(PLL0, pcf);
-	pcf->pllm = opps[opp].freq * pcf->prediv * pcf->postdiv / F_OSCIN;
-	// am1808.pdf
-	// Page 79,
-	// The multiplier values must be chosen such that the PLL output
-	// frequency is between 300 and 600 MHz
-	if (F_OSCIN * pcf->pllm / pcf->prediv > 600 * _1M) {
-		pcf->pllm /= 2;
-		pcf->postdiv /= 2;
-	}
-	pll_set_conf(PLL0, pcf);
-
-	clk_node_recalc();
-	uart_init();
-	return 0;
-}
-
 int tft43_init(void) {
 	int i;
 
-	dvfs_set_opp(1);
+	dvfs_set_opp(OPP_100M);
 
 	psc_state_transition(PSC_GPIO, PSC_STATE_ENABLE);
 	psc_state_transition(PSC_LCDC, PSC_STATE_ENABLE);
