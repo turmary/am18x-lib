@@ -129,7 +129,7 @@ int dump_regs_word(const char* head, unsigned base, size_t size) {
 	int i;
 
 	for (i = 0; i < size / sizeof (unsigned long); i++) {
-		printk("%s[0x%.2x] = 0x%.8x\n", head, i << 2, ((volatile unsigned*)base)[i]);
+		printk("%s[0x%.2X] = 0x%.8X\n", head, i << 2, ((volatile unsigned*)base)[i]);
 	}
 	return 0;
 }
