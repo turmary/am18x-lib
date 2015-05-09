@@ -58,11 +58,11 @@ uint32_t lcdc_pins[][3] = {
 
 #define PALETTE_DATA	0
 #define DATA_ONLY	1
-#define FRAME_MODE	PALETTE_DATA
+#define FRAME_MODE	DATA_ONLY
 
 lcd_conf_t lcd_cf[] = {
 {
-	.pclk = 480 * 272 * 15,
+	.pclk = 480 * 272,
 	.width = 480, .height = 272,
 	.hfp = 2,
 	.hsw = 41,
@@ -152,7 +152,7 @@ int lcd_intr_init(void) {
 int tft43_init(void) {
 	int i;
 
-	dvfs_set_opp(OPP_100M);
+	dvfs_set_opp(OPP_OSC);
 
 	psc_state_transition(PSC_GPIO, PSC_STATE_ENABLE);
 	psc_state_transition(PSC_LCDC, PSC_STATE_ENABLE);
