@@ -50,7 +50,7 @@ uint32_t lcdc_pins[][3] = {
 #define LCDC_BL_PWR	GPIO_BANK2, GPIO_PIN_15
 #define LCDC_BL_PWM	GPIO_BANK2, GPIO_PIN_14
 
-#define DDR_RAM_BASE	0xC0000000UL
+#define DDR_RAM_BASE	0xC1081338UL
 
 #define _16BPP_R_MASK	0xF800
 #define _16BPP_G_MASK	0x07E0
@@ -58,21 +58,22 @@ uint32_t lcdc_pins[][3] = {
 
 lcd_conf_t lcd_cf[] = {
 {
-	.pclk = 480 * 272 * 10,
+	.pclk = 480 * 272 * 72,
 	.width = 480, .height = 272,
 	.hfp = 2,
 	.hsw = 41,
 	.hbp = 2,
-	.vfp = 3,
+	.vfp = 4,
 	.vsw = 10,
-	.vbp = 3,
+	.vbp = 4,
 	.bpp = LCD_BPP_16,
-	.hvsync = LCD_HVSYNC_PCLK,
-	.cflag = LCD_CFLAG_BIAS_LOW |
-		LCD_CFLAG_PIXEL_RISING |
+	.hvsync = LCD_HVSYNC_RISING,
+	.cflag = LCD_CFLAG_BIAS_HIGH |
+		LCD_CFLAG_PIXEL_FALLING |
 		LCD_CFLAG_HSYNC_LOW |
 		LCD_CFLAG_VSYNC_LOW,
 	.fb0_base = DDR_RAM_BASE,
+	.fb1_base = DDR_RAM_BASE,
 },
 };
 
@@ -92,7 +93,7 @@ static kv_t intrs_kv[] = {
 
 static void lcdc_isr(void) {
 	int i, k;
-
+#if 1
 	k = 0;
 	for (i = 0; i < countof(intrs_kv); i++) {
 		if (lcd_intr_state(LCD0, intrs_kv[i].key) == AM18X_TRUE) {
@@ -103,28 +104,31 @@ static void lcdc_isr(void) {
 	if (k) {
 		printk("\n");
 	}
-
+#endif
 	if (lcd_intr_state(LCD0, LCD_INTR_PL) == AM18X_TRUE) {
-		// lcd_intr_clear(LCD0, LCD_INTR_ALL);
+		/*lcd_intr_clear(LCD0, LCD_INTR_PL);
 		lcd_cmd(LCD0, LCD_CMD_RASTER_DIS, 0);
-		// lcd_intr_disable(LCD0, LCD_INTR_PL);
 		lcd_cmd(LCD0, LCD_CMD_DATA, 0);
-		// lcd_cmd(LCD0, LCD_CMD_FB_SET, lcd_cf->fb0_base + 32);
+		lcd_cmd(LCD0, LCD_CMD_FB_SET, (uint32_t)fb0);
 		lcd_cmd(LCD0, LCD_CMD_RASTER_EN, 0);
-		lcd_intr_clear(LCD0, LCD_INTR_PL);
+		*/
 	}
 	if (lcd_intr_state(LCD0, LCD_INTR_SL) == AM18X_TRUE) {
 		// lcd_cmd(LCD0, LCD_CMD_RASTER_DIS, 0);
-		// lcd_intr_clear(LCD0, LCD_INTR_SL);
-		/*psc_state_transition(PSC_LCDC, PSC_STATE_DISABLE);
+		/*lcd_intr_clear(LCD0, LCD_INTR_SL);
+		psc_state_transition(PSC_LCDC, PSC_STATE_DISABLE);
 		psc_state_transition(PSC_LCDC, PSC_STATE_ENABLE);
 		lcd_cmd(LCD0, LCD_CMD_RASTER_EN, 0);
 		*/
 		// for (;;);
 	}
 	if (lcd_intr_state(LCD0, LCD_INTR_EOF) == AM18X_TRUE) {
-		lcd_cmd(LCD0, LCD_CMD_FB_SET, 0);
-		lcd_intr_clear(LCD0, LCD_INTR_EOF);
+		//printk("FB0 = 0x%.8X\n", LCD0->LCDDMA_FB0_BASE);
+		lcd_cmd(LCD0, LCD_CMD_FB_SET, (uint32_t)palette);
+		//lcd_intr_clear(LCD0, LCD_INTR_EOF);
+	}
+	if (lcd_intr_state(LCD0, LCD_INTR_EOF1) == AM18X_TRUE) {
+		//lcd_intr_clear(LCD0, LCD_INTR_EOF1);
 	}
 	lcd_intr_clear(LCD0, LCD_INTR_ALL);
 	return;
@@ -133,11 +137,11 @@ static void lcdc_isr(void) {
 int lcd_intr_init(void) {
 	int i;
 
-	lcd_intr_enable(LCD0, LCD_INTR_AC);
-	lcd_intr_enable(LCD0, LCD_INTR_DONE);
-	lcd_intr_enable(LCD0, LCD_INTR_PL);
-	lcd_intr_enable(LCD0, LCD_INTR_SL);
-	lcd_intr_enable(LCD0, LCD_INTR_FUF);
+	//lcd_intr_enable(LCD0, LCD_INTR_AC);
+	//lcd_intr_enable(LCD0, LCD_INTR_DONE);
+	//lcd_intr_enable(LCD0, LCD_INTR_PL);
+	//lcd_intr_enable(LCD0, LCD_INTR_SL);
+	//lcd_intr_enable(LCD0, LCD_INTR_FUF);
 	lcd_intr_enable(LCD0, LCD_INTR_EOF);
 
 	isr_set_hander(AINTC_LCDC_INT, lcdc_isr);
@@ -153,7 +157,7 @@ int lcd_intr_init(void) {
 int tft43_init(void) {
 	int i;
 
-	dvfs_set_opp(OPP_100M);
+	dvfs_set_opp(OPP_375M);
 
 	psc_state_transition(PSC_GPIO, PSC_STATE_ENABLE);
 	psc_state_transition(PSC_LCDC, PSC_STATE_ENABLE);
@@ -183,6 +187,8 @@ int tft43_init(void) {
 	dump_regs_word("FB0", palette, 64);
 	arm_intr_enable();
 	lcd_cmd(LCD0, LCD_CMD_RASTER_EN, 0);
+
+	dump_regs_word("LCD0", LCD0, 0x54);
 
 	return 0;
 }
