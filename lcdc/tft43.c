@@ -82,6 +82,11 @@ lcd_conf_t lcd_cf[] = {
 
 static uint16_t* palette = (uint16_t*)DDR_RAM_BASE;
 static uint16_t* fb0;
+static uint16_t colors[] = {
+	_16BPP_R_MASK,
+	_16BPP_G_MASK,
+	_16BPP_B_MASK,
+};
 
 #define KV_LCD(x)	{LCD_INTR_##x, #x}
 static kv_t intrs_kv[] = {
@@ -189,7 +194,7 @@ int tft43_init(void) {
 	return 0;
 }
 
-static int set_color(uint16_t color) {
+int set_color(uint16_t color) {
 	int i;
 
 	for (i = 0; i < lcd_cf->width * lcd_cf->height; i++) {
@@ -198,18 +203,29 @@ static int set_color(uint16_t color) {
 	return 0;
 }
 
-static int paint_quadrangle(void) {
+int switch_colors(void) {
+	int i, c, n = countof(colors);
+
+	c = colors[0];
+	for (i = 0; i < n - 1; i++) {
+		colors[i] = colors[i + 1];
+	}
+	colors[i] = c;
+	return 0;
+}
+
+int paint_quadrangle(void) {
 	uint16_t color;
 	int x, y;
 
 	for (x = 0; x < lcd_cf->width; x++) {
 		for (y = 0; y < lcd_cf->height; y++) {
 			if (x < lcd_cf->width / 3 || x >= lcd_cf->width * 2 / 3) {
-				color = _16BPP_R_MASK;
+				color = colors[0];
 			} else if (y < lcd_cf->height / 3 || y >= lcd_cf->height * 2 / 3) {
-				color = _16BPP_G_MASK;
+				color = colors[1];
 			} else {
-				color = _16BPP_B_MASK;
+				color = colors[2];
 			}
 			fb0[y * lcd_cf->width + x] = color;
 		}
@@ -222,6 +238,7 @@ int tft43_colors(void) {
 
 	color = 0;
 	for (;;) {
+#if 0
 		switch(color) {
 		case _16BPP_R_MASK:
 			color = _16BPP_G_MASK;
@@ -234,11 +251,11 @@ int tft43_colors(void) {
 			color = _16BPP_R_MASK;
 			break;
 		}
-		// lcd_cmd(LCD0, LCD_CMD_RASTER_DIS, 0);
-		// set_color(color);
+		set_color(color);
+#else
 		paint_quadrangle();
-		// lcd_cmd(LCD0, LCD_CMD_RASTER_EN, 0);
-
+		switch_colors();
+#endif
 		systick_sleep(1000);
 	}
 	return 0;
