@@ -65,4 +65,8 @@
 #include "am18x_lcd.h"
 #endif
 
+#ifdef _USB
+#include "am18x_usb.h"
+#endif
+
 #endif//__AM18X_LIB_H__

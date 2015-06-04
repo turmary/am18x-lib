@@ -23,7 +23,7 @@ typedef struct {
 	vuint32_t	MPEAR;
 // n = 0..11
 #define PROGxMPPA_AIDn_MASK(n)		(0x1UL << (10 + (n)))
-#define PROGxMPPA_AIDn_denied(n)	(0x1UL << (10 + (n)))
+#define PROGxMPPA_AIDn_denied(n)	(0x0UL << (10 + (n)))
 #define PROGxMPPA_AIDn_granted(n)	(0x1UL << (10 + (n)))
 	vuint32_t	MPPA;
 	uint32_t	RESERVED0;
@@ -500,6 +500,21 @@ typedef struct {
 #define CFGCHIP1_EDMA31TC0DBS_32B	(0x1UL << 13)
 #define CFGCHIP1_EDMA31TC0DBS_64B	(0x2UL << 13)
 	vuint32_t	CFGCHIP1;
+#define CFGCHIP2_USB0OTGMODE_MASK	(0x3UL << 13)
+#define CFGCHIP2_USB0OTGMODE_none	(0x0UL << 13)
+#define CFGCHIP2_USB0OTGMODE_host	(0x1UL << 13)
+#define CFGCHIP2_USB0OTGMODE_device	(0x2UL << 13)
+#define CFGCHIP2_USB0OTGMODE_VBUSlow	(0x3UL << 13)
+#define CFGCHIP2_USB0REFFREQ_MASK	(0xFUL << 0)
+#define CFGCHIP2_USB0REFFREQ_12MHz	(0x1UL << 0)
+#define CFGCHIP2_USB0REFFREQ_24MHz	(0x2UL << 0)
+#define CFGCHIP2_USB0REFFREQ_48MHz	(0x3UL << 0)
+#define CFGCHIP2_USB0REFFREQ_19_2MHz	(0x4UL << 0)
+#define CFGCHIP2_USB0REFFREQ_38_4MHz	(0x5UL << 0)
+#define CFGCHIP2_USB0REFFREQ_13MHz	(0x6UL << 0)
+#define CFGCHIP2_USB0REFFREQ_26MHz	(0x7UL << 0)
+#define CFGCHIP2_USB0REFFREQ_20MHz	(0x8UL << 0)
+#define CFGCHIP2_USB0REFFREQ_40MHz	(0x9UL << 0)
 	vuint32_t	CFGCHIP2;
 #define CFGCHIP3_RMII_SEL_MASK		(0x1UL << 8)
 #define CFGCHIP3_RMII_SEL_mii		(0x0UL << 8)
@@ -528,6 +543,21 @@ typedef struct {
 #define CFGCHIP4_AMUTECLR0_clr_int	(0x1UL << 0)
 	vuint32_t	CFGCHIP4;
 } SYSCFG0_con_t;
+
+enum {
+	BIT_DEF(CFGCHIP2,17,USB0PHYCLKGD,no,yes),	// Readonly
+	BIT_DEF(CFGCHIP2,16,USB0VBUSSENSE,no,yes),	// Readonly
+	BIT_DEF(CFGCHIP2,15,RESET,no,yes),
+	BIT_DEF(CFGCHIP2,12,USB1PHYCLKMUX,USB0PHY,REFCLKIN),
+	BIT_DEF(CFGCHIP2,11,USB0PHYCLKMUX,REFCLKIN,AUXCLK),
+	BIT_DEF(CFGCHIP2,10,USB0PHYPWDN,none,down),
+	BIT_DEF(CFGCHIP2,9,USB0OTGPWRDN,none,down),
+	BIT_DEF(CFGCHIP2,8,USB0DATPOL,interted,none),
+	BIT_DEF(CFGCHIP2,7,USB1SUSPENDM,yes,no),
+	BIT_DEF(CFGCHIP2,6,USB0PHY_PLLON,no,yes),
+	BIT_DEF(CFGCHIP2,5,USB0SESNDEN,disabled,enabled),
+	BIT_DEF(CFGCHIP2,4,USB0VBDTCTEN,disabled,enabled),
+};
 
 typedef struct {
 #define CFGCHIP1_EDMA31TC0DBS_MASK	(0x3UL << 13)
@@ -2153,6 +2183,270 @@ typedef struct {
 	vuint32_t	MDR;
 } UART_con_t;
 
+typedef struct {
+// TXMAXP, RXMAAXP
+#define xXMAXP_MAXPAYLOAD_MASK		(0x7FFUL << 0)
+	vuint16_t	TXMAXP;
+	// PERI_CSR0, HOST_CSR0
+	// PERI_TXCSR, HOST_TXCSR
+	vuint16_t	TXCSR;
+	vuint16_t	RXMAXP;
+	// PERI_RXCSR, HOST_RXCSR
+	vuint16_t	RXCSR;
+	// COUNT0
+#define COUNT0_EP0RXCOUNT_MASK		(0x7FUL << 0)
+#define RXCOUNT_EPRXCOUNT_MASK		(0x1FFFUL << 0)
+	vcuint16_t	RXCOUNT;
+	// HOST_TYPE0, HOST_TXTYPE
+	vuint8_t	TXTYPE;
+	// HOST_NAKLIMIT0, HOST_TXINTERVAL
+	vuint8_t	TXINTERVAL;
+	vuint8_t	RXTYPE;
+	vuint8_t	RXINTERVAL;
+	uint8_t		RESERVED0;
+	vcuint8_t	CONFIGDATA;
+} USB0_endp_t;
+
+enum {
+	INTUSB_SUSPEND,
+	INTUSB_RESUME,
+	INTUSB_RESET,
+	INTUSB_SOF,
+	INTUSB_CONN,
+	INTUSB_DISCON,
+	INTUSB_SESSREQ,
+	INTUSB_VBUSERR,
+	INTUSB_DRVVBUS,
+} INTUSB_t;
+
+typedef struct {
+#define USB0_REVID			0x4EA10800UL
+	vcuint32_t	REVID;
+	vuint32_t	CTRLR;
+	vcuint32_t	STATR;
+	vuint32_t	EMUR;
+// ep = 1..4
+#define MODE_MODE_TX_MASK(ep)		(0x3UL << (((ep) - 1) << 2))
+#define MODE_MODE_RX_MASK(ep)		(0x30000UL << (((ep) - 1) << 2))
+#define MODE_xMODE_Transparent		(0x0UL << 0)
+#define MODE_xMODE_RNDIS		(0x1UL << 0)
+#define MODE_xMODE_CDC			(0x2UL << 0)
+#define MODE_xMODE_GenericRNDIS		(0x3UL << 0)
+	vuint32_t	MODE;
+#define AUTOREQ_AUTREQ_MASK(ep)		(0x3UL << (((ep) - 1) << 1))
+#define AUTOREQ_xAUTREQ_None		(0x0UL << 0)
+#define AUTOREQ_xAUTREQ_NotEOP		(0x1UL << 0)
+#define AUTOREQ_xAUTREQ_Always		(0x3UL << 0)
+	vuint32_t	AUTOREQ;
+	vuint32_t	SPRFIXTIME;
+#define TEARDOWN_RX_MASK(ep)		(0x1UL << (ep))
+#define TEARDOWN_RX_diable(ep)		(0x0UL << (ep))
+#define TEARDOWN_RX_enable(ep)		(0x1UL << (ep))
+#define TEARDOWN_TX_MASK(ep)		(0x10000UL << (ep))
+#define TEARDOWN_TX_diable(ep)		(0x00000UL << (ep))
+#define TEARDOWN_TX_enable(ep)		(0x10000UL << (ep))
+	vuint32_t	TEARDOWN;
+// INTSRCR, INTSETR, INTCLRR
+// INTMSKR, INTMSKSETR, INTMSKCLRR
+// INTMSKEDR
+// ep = 0..4
+#define INTxR_TXEPn_MASK(ep)		(0x1UL << (ep))
+#define INTxR_TXEPn_no(ep)		(0x0UL << (ep))
+#define INTxR_TXEPn_yes(ep)		(0x1UL << (ep))
+// ep = 1..4
+#define INTxR_RXEPn_MASK(ep)		(0x1UL << ((ep) + 8))
+#define INTxR_RXEPn_no(ep)		(0x0UL << ((ep) + 8))
+#define INTxR_RXEPn_yes(ep)		(0x1UL << ((ep) + 8))
+// ir = INTUSB_XXX
+#define INTxR_INTUSB_MASK(ir)		(0x1UL << ((ir) + 16))
+#define INTxR_INTUSB_no(ir)		(0x0UL << ((ir) + 16))
+#define INTxR_INTUSB_yes(ir)		(0x1UL << ((ir) + 16))
+	vcuint32_t	INTSRCR;
+	vuint32_t	INTSETR;
+	vuint32_t	INTCLRR;
+	vcuint32_t	INTMSKR;
+	vuint32_t	INTMSKSETR;
+	vuint32_t	INTMSKCLRR;
+	vcuint32_t	INTMASKEDR;
+#define EOIR_EOI_MASK(ir)		(0x1UL << ((ir) + 16))
+#define EOIR_EOI_no(ir)			(0x0UL << ((ir) + 16))
+#define EOIR_EOI_yes(ir)		(0x1UL << ((ir) + 16))
+	vuint32_t	EOIR;
+	uint32_t	RESERVED0[_RS(0x04C,0x03C)];
+#define GENRNDISSZx_SIZE_MASK		(0x1FFFFUL << 0)
+	vuint32_t	GENRNDISSZx[5];
+	uint32_t	RESERVED1[_RS(0x400,0x05C)];
+	// Common USB Registers
+#define FADDR_FUNCADDR_MASK		(0x7FUL << 0)
+	vuint8_t	FADDR;
+	vuint8_t	POWER;
+// INTRTX, INTRRX, INTRTXE, INTRRXE
+// ep = 0..4
+#define INTRx_EP_MASK(ep)		(0x1UL << (ep))
+#define INTRx_EP_disable(ep)		(0x0UL << (ep))
+#define INTRx_EP_enable(ep)		(0x1UL << (ep))
+	vcuint16_t	INTRTX;
+	vcuint16_t	INTRRX;
+	vuint16_t	INTRTXE;
+	vuint16_t	INTRRXE;
+// ir = INTUSB_XXX
+#define INTRUSBx_INTUSB_MASK(ir)	(0x1UL << (ir))
+#define INTRUSBx_INTUSB_no(ir)		(0x0UL << (ir))
+#define INTRUSBx_INTUSB_yes(ir)		(0x1UL << (ir))
+	vcuint8_t	INTRUSB;
+	vuint8_t	INTRUSBE;
+#define FRAME_FRAMENUMBER_MASK		(0x7FFUL << 0)
+	vcuint16_t	FRAME;
+#define INDEX_EPSEL_MASK		(0xFUL << 0)
+// ep = 0..4
+#define INDEX_EPSEL_VAL(ep)		((ep) << 0)
+	vuint8_t	INDEX;
+
+	vuint8_t	TESTMODE;
+	// Indexed Registers
+	USB0_endp_t	INDXEP;
+	// FIFOn
+	vuint32_t	FIFOx[5];
+	uint32_t	RESERVED2[_RS(0x460,0x430)];
+	// OTG Device Control
+#define DEVCTL_VBUS_MASK		(0x3UL << 3)
+#define DEVCTL_VBUS_BelowSEnd		(0x0UL << 3)
+#define DEVCTL_VBUS_SEnd_AValid		(0x1UL << 3)
+#define DEVCTL_VBUS_AValid_VBusValid	(0x2UL << 3)
+#define DEVCTL_VBUS_AboveVbusValid	(0x3UL << 3)
+	vcuint8_t	DEVCTL;
+	uint8_t		RESERVED3;
+	// Dynamic FIFO Control
+	struct {
+// TXFIFOSZ, RXFIFOSZ
+#define xXFIFOSZ_SZ_MASK		(0xFUL << 0)
+#define xXFIFOSZ_SZ_8B			(0x0UL << 0)
+#define xXFIFOSZ_SZ_16B			(0x1UL << 0)
+#define xXFIFOSZ_SZ_32B			(0x2UL << 0)
+#define xXFIFOSZ_SZ_64B			(0x3UL << 0)
+#define xXFIFOSZ_SZ_128B		(0x4UL << 0)
+#define xXFIFOSZ_SZ_256B		(0x5UL << 0)
+#define xXFIFOSZ_SZ_512B		(0x6UL << 0)
+#define xXFIFOSZ_SZ_1KB			(0x7UL << 0)
+#define xXFIFOSZ_SZ_2KB			(0x8UL << 0)
+#define xXFIFOSZ_SZ_4KB			(0x9UL << 0)
+#define xXFIFOSZ_SZ_8KB			(0xAUL << 0)
+#define xXFIFOSZ_SZ_16KB		(0xBUL << 0)
+#define xXFIFOSZ_SZ_32KB		(0xCUL << 0)
+#define xXFIFOSZ_SZ_64KB		(0xDUL << 0)
+#define xXFIFOSZ_SZ_128KB		(0xEUL << 0)
+#define xXFIFOSZ_SZ_256KB		(0xFUL << 0)
+	vuint8_t	TXFIFOSZ;
+	vuint8_t	RXFIFOSZ;
+// TXFIFOADDR, RXFIFOADDR
+#define xXFIFOADDR_ADDR_MASK		(0x1FFFUL << 0)
+#define xXFIFOADDR_ADDR_VAL(adr)	(((adr) >> 3) << 0)
+	vuint16_t	TXFIFOADDR;
+	vuint16_t	RXFIFOADDR;
+	} INDXF;
+	uint8_t		RESERVED4[0x46C - 0x468];
+#define HWVERS_REVMAJ_MASK		(0x1FUL << 10)
+#define HWVERS_REVMIN_MASK		(0x3FFUL << 0)
+	vcuint16_t	HWVERS;
+	uint16_t	RESERVED5;
+	uint32_t	RESERVED6[_RS(0x500,0x470)];
+	// ignore
+	// Target Endpoint x Control Registers, Valid Only in Host Mode
+	//
+	// Control and Status Registers for Endpoint x
+	USB0_endp_t	EPx[5];
+	// CDMA Registers
+	// Queue Manager (QMGR) Registers
+} USB0_con_t;
+
+enum {
+	BIT_DEF(CTRLR,4,RNDIS,disabled,enabled),
+	BIT_DEF(CTRLR,3,UINT,PDR,non_PDR),
+	BIT_DEF(CTRLR,1,CLKFACK,disabled,enabled),
+	BIT_DEF(CTRLR,0,RESET,none,reset),
+	BIT_DEF(STATR,0,DRVVBUS,0,1),
+	BIT_DEF(EMUR,2,RT_SEL,yes,no),
+	BIT_DEF(EMUR,1,SOFT,no,yes),
+	BIT_DEF(EMUR,0,FREERUN,no,yes),
+	BIT_DEF(INTxR,24,USBDRVVBUS,no,yes),
+	BIT_DEF(INTxR,23,VBUSERR,no,yes),
+	BIT_DEF(INTxR,22,SESSREQ,no,yes),
+	BIT_DEF(INTxR,21,DISCON,no,yes),
+	BIT_DEF(INTxR,20,CONN,no,yes),
+	BIT_DEF(INTxR,19,SOF,no,yes),
+	BIT_DEF(INTxR,18,BABBLE,no,yes),
+	BIT_DEF(INTxR,17,RESUME,no,yes),
+	BIT_DEF(INTxR,16,SUSPEND,no,yes),
+	BIT_DEF(POWER,7,ISOUPDATE,no,yes),
+	BIT_DEF(POWER,6,SOFTCONN,no,yes),
+	BIT_DEF(POWER,5,HSEN,full,high),
+	BIT_DEF(POWER,4,HSMODE,no,yes),			// Read only
+	BIT_DEF(POWER,3,RESET,no,yes),			// Read only in Peripheral
+	BIT_DEF(POWER,2,RESUME,no,gen),
+	BIT_DEF(POWER,1,SUSPENDM,no,entry),
+	BIT_DEF(POWER,0,ENSUSPM,disabled,enabled),
+	BIT_DEF(TESTMODE,7,FORCE_HOST,no,yes),
+	BIT_DEF(TESTMODE,6,FORCE_ACCESS,no,yes),
+	BIT_DEF(TESTMODE,5,FORCE_FS,no,yes),
+	BIT_DEF(TESTMODE,4,FORCE_HS,no,yes),
+	BIT_DEF(TESTMODE,3,TEST_PACKET,no,yes),
+	BIT_DEF(TESTMODE,2,TEST_K,no,yes),
+	BIT_DEF(TESTMODE,1,TEST_J,no,yes),
+	BIT_DEF(TESTMODE,0,TEST_SE0_NAK,no,yes),
+	BIT_DEF(PERI_CSR0,8,FLUSHFIFO,none,flush),
+	BIT_DEF(PERI_CSR0,7,SERV_SETUPEND,none,clear),
+	BIT_DEF(PERI_CSR0,6,SERV_RXPKTRDY,none,clear),
+	BIT_DEF(PERI_CSR0,5,SENDSTALL,none,terminate),
+	BIT_DEF(PERI_CSR0,4,SETUPEND,no,yes),
+	BIT_DEF(PERI_CSR0,3,DATAEND,no,yes),
+	BIT_DEF(PERI_CSR0,2,SENTSTALL,no,yes),
+	BIT_DEF(PERI_CSR0,1,TXPKTRDY,no,yes),
+	BIT_DEF(PERI_CSR0,0,RXPKTRDY,no,yes),
+	BIT_DEF(PERI_TXCSR,15,AUTOSET,DMA,CPU),
+	BIT_DEF(PERI_TXCSR,14,ISO,no,yes),
+	BIT_DEF(PERI_TXCSR,13,MODE,Rx,Tx),
+	BIT_DEF(PERI_TXCSR,12,DMAEN,disabled,enabled),
+	BIT_DEF(PERI_TXCSR,11,FRCDATATOG,no,yes),
+	BIT_DEF(PERI_TXCSR,10,DMAMODE,no,yes),
+	BIT_DEF(PERI_TXCSR,6,CLRDATATOG,none,clear),
+	BIT_DEF(PERI_TXCSR,5,SENTSTALL,no,yes),
+	BIT_DEF(PERI_TXCSR,4,SENDSTALL,none,issue),
+	BIT_DEF(PERI_TXCSR,3,FLUSHFIFO,none,flush),
+	BIT_DEF(PERI_TXCSR,2,UNDERRUN,no,yes),
+	BIT_DEF(PERI_TXCSR,1,FIFO,empty,notempty),
+	BIT_DEF(PERI_TXCSR,0,TXPKTRDY,no,yes),
+	BIT_DEF(PERI_RXCSR,15,AUTOCLEAR,DMA,CPU),
+	BIT_DEF(PERI_RXCSR,14,ISO,no,yes),
+	BIT_DEF(PERI_RXCSR,13,DMAEN,disabled,enabled),
+	BIT_DEF(PERI_RXCSR,12,DISNYET,diable,enable),
+	BIT_DEF(PERI_RXCSR,12,PID_ERROR,no,yes),
+	BIT_DEF(PERI_RXCSR,11,DMAMODE,true,none),
+	BIT_DEF(PERI_RXCSR,7,CLRDATATOG,none,clear),
+	BIT_DEF(PERI_RXCSR,6,SENTSTALL,no,yes),
+	BIT_DEF(PERI_RXCSR,5,SENDSTALL,none,issue),
+	BIT_DEF(PERI_RXCSR,4,FLUSHFIFO,none,flush),
+	BIT_DEF(PERI_RXCSR,3,DATA,none,error),
+	BIT_DEF(PERI_RXCSR,2,OVERRUN,no,yes),
+	BIT_DEF(PERI_RXCSR,1,FIFO,none,full),
+	BIT_DEF(PERI_RXCSR,0,RXPKTRDY,no,yes),
+	BIT_DEF(CONFIGDATA,7,MPRXE,none,amalgamation),
+	BIT_DEF(CONFIGDATA,6,MPTXE,none,splitting),
+	BIT_DEF(CONFIGDATA,5,BIGENDIAN,Little,Big),
+	BIT_DEF(CONFIGDATA,4,HBRXE,no,yes),
+	BIT_DEF(CONFIGDATA,3,HBTXE,no,yes),
+	BIT_DEF(CONFIGDATA,2,DYNFIFO,no,yes),
+	BIT_DEF(CONFIGDATA,1,SOFTCONE,no,yes),
+	BIT_DEF(CONFIGDATA,0,UTMIDATAWIDTH,8b,16b),
+	BIT_DEF(DEVCTL,7,BDEVICE,A,B),
+	BIT_DEF(DEVCTL,6,FSDEV,none,full_or_high),
+	BIT_DEF(DEVCTL,5,LSDEV,none,low),
+	BIT_DEF(DEVCTL,2,HOSTMODE,no,yes),
+	BIT_DEF(DEVCTL,1,HOSTREQ,none,initiate),	// 'B' device only
+	BIT_DEF(DEVCTL,0,SESSION,none,start),
+	BIT_DEF(xXFIFOSZ,4,DPB,single,double),
+	BIT_DEF(HWVERS,15,RC,full,Candicate),
+};
+
 #undef _RS
 
 /*----------------------------------------------------------------------------*/
@@ -2184,6 +2478,7 @@ typedef struct {
 #define UART0_BASE			0x01C42000UL
 #define UART1_BASE			0x01D0C000UL
 #define UART2_BASE			0x01D0D000UL
+#define USB0_BASE			0x01E00000UL
 #define LCD0_BASE			0x01E13000UL
 #define MPU1_BASE			0x01E14000UL
 #define MPU2_BASE			0x01E15000UL
@@ -2292,6 +2587,9 @@ typedef struct {
 #ifdef _UART2
 	#define UART2			((UART_con_t*)UART2_BASE)
 #endif
+#ifdef _USB0
+	#define USB0			((USB0_con_t*)USB0_BASE)
+#endif
 
 #else//__MEM_REMAP
 #ifdef _MPU1
@@ -2374,6 +2672,9 @@ typedef struct {
 #endif
 #ifdef _UART2
 	_EXTERN UART_con_t		*UART2;
+#endif
+#ifdef _USB0
+	_EXTERN USB0_con_t		*USB0;
 #endif
 #endif//__MEM_REMAP
 
