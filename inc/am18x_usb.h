@@ -5,4 +5,11 @@
 
 #include "am18x_map.h"
 
+typedef struct {
+	am18x_bool highspeed;
+	am18x_bool host_n_device;
+} usb0_conf_t;
+
+am18x_rt usb0_conf(const usb0_conf_t* conf);
+
 #endif//__AM18X_USB_H__

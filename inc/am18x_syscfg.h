@@ -14,5 +14,6 @@ am18x_rt syscfg_pinmux(uint32_t mux, uint32_t pos, uint32_t val);
 int32_t syscfg_bootmode(void);
 am18x_rt syscfg_vtpio_calibrate(void);
 am18x_rt syscfg_ddr_slew(am18x_bool ddr2_not_mddr);
+am18x_rt syscfg_init_usb0phy(uint32_t freq);
 
 #endif//__AM18X_SYSCFG_H__

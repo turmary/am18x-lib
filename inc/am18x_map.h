@@ -2184,7 +2184,7 @@ typedef struct {
 } UART_con_t;
 
 typedef struct {
-// TXMAXP, RXMAAXP
+// TXMAXP, RXMAXP
 #define xXMAXP_MAXPAYLOAD_MASK		(0x7FFUL << 0)
 	vuint16_t	TXMAXP;
 	// PERI_CSR0, HOST_CSR0
@@ -2207,8 +2207,8 @@ typedef struct {
 	vcuint8_t	CONFIGDATA;
 } USB0_endp_t;
 
-enum {
-	INTUSB_SUSPEND,
+typedef enum {
+	INTUSB_SUSPEND = 0,
 	INTUSB_RESUME,
 	INTUSB_RESET,
 	INTUSB_SOF,
@@ -2217,6 +2217,7 @@ enum {
 	INTUSB_SESSREQ,
 	INTUSB_VBUSERR,
 	INTUSB_DRVVBUS,
+	INTUSB_CNT,
 } INTUSB_t;
 
 typedef struct {
@@ -2226,6 +2227,7 @@ typedef struct {
 	vcuint32_t	STATR;
 	vuint32_t	EMUR;
 // ep = 1..4
+#define USB0_EP_CNT			5
 #define MODE_MODE_TX_MASK(ep)		(0x3UL << (((ep) - 1) << 2))
 #define MODE_MODE_RX_MASK(ep)		(0x30000UL << (((ep) - 1) << 2))
 #define MODE_xMODE_Transparent		(0x0UL << 0)
@@ -2268,9 +2270,9 @@ typedef struct {
 	vuint32_t	INTMSKSETR;
 	vuint32_t	INTMSKCLRR;
 	vcuint32_t	INTMASKEDR;
-#define EOIR_EOI_MASK(ir)		(0x1UL << ((ir) + 16))
-#define EOIR_EOI_no(ir)			(0x0UL << ((ir) + 16))
-#define EOIR_EOI_yes(ir)		(0x1UL << ((ir) + 16))
+#define EOIR_EOI_MASK(ir)		(0x1UL << (ir))
+#define EOIR_EOI_no(ir)			(0x0UL << (ir))
+#define EOIR_EOI_yes(ir)		(0x1UL << (ir))
 	vuint32_t	EOIR;
 	uint32_t	RESERVED0[_RS(0x04C,0x03C)];
 #define GENRNDISSZx_SIZE_MASK		(0x1FFFFUL << 0)
