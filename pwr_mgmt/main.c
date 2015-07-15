@@ -43,7 +43,7 @@ static void arm_clock_off_isr(void) {
 	// 2. Enable the interrupt to be used as the wake-up interrupt
 	// that will be used to wake-up the ARM during the ARM
 	// clock-on sequence.
-	isr_set_hander(AINTC_SYSCFG_CHIPINT0, chipsig0_isr);
+	isr_set_handler(AINTC_SYSCFG_CHIPINT0, chipsig0_isr);
 	aintc_sys_enable(AINTC_SYSCFG_CHIPINT0);
 
 	// 3. Execute the wait-for-interrupt (WFI) ARM instruction.
@@ -61,7 +61,7 @@ static uint32_t arm_clock_off_and_on(void) {
 	// 1. The ARM must have the ARM Clock Stop Request interrupt
 	// enabled and the associated interrupt serive routine (ISR)
 	// set up before the folloing ARM clock shutdown procedure.
-	isr_set_hander(AINTC_ARMCLKSTOPREQ, arm_clock_off_isr);
+	isr_set_handler(AINTC_ARMCLKSTOPREQ, arm_clock_off_isr);
 	aintc_sys_enable(AINTC_ARMCLKSTOPREQ);
 
 	psc_state_transition(PSC_PRU, PSC_STATE_ENABLE);
@@ -73,7 +73,7 @@ static uint32_t arm_clock_off_and_on(void) {
 	pram[0] = 2;
 #else
 	pram[0] = 0;
-	isr_set_hander(AINTC_SYSCFG_CHIPINT0, chipsig0_isr);
+	isr_set_handler(AINTC_SYSCFG_CHIPINT0, chipsig0_isr);
 	aintc_sys_enable(AINTC_SYSCFG_CHIPINT0);
 	// SYSCFG0->CHIPSIG = FIELD_SET(0, CHIPSIG_X_MASK(0), CHIPSIG_X_assert(0));
 #endif

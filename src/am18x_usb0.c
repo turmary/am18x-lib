@@ -34,9 +34,6 @@ am18x_rt usb0_conf(const usb0_conf_t* conf) {
 	v = (conf->highspeed)? POWER_HSEN_high: POWER_HSEN_full;
 	ucon->POWER = FIELD_SET(reg, POWER_HSEN_MASK, v);
 
-	// Clear all pending interrupts
-	ucon->INTCLRR = ucon->INTSRCR;
-
 	// Enable PDR2.0 Interrupt
 	reg = ucon->CTRLR;
 	ucon->CTRLR = FIELD_SET(reg, CTRLR_UINT_MASK, CTRLR_UINT_PDR);
@@ -104,19 +101,6 @@ am18x_rt usb0_conf(const usb0_conf_t* conf) {
 	ucon->INTMSKSETR = FIELD_SET(reg, msk, v);
 
 	reg = ucon->CTRLR;
-	ucon->CTRLR = FIELD_SET(reg, CTRLR_UINT_MASK, CTRLR_UINT_PDR);
-
-	printk( "### PDR ###\n"
-		"INTRTXE =    0x%.8X\n"
-		"INTRRXE =    0x%.8X\n"
-		"INTRUSBE =   0x%.8X\n"
-		"INTMSKSETR = 0x%.8X\n",
-		ucon->INTRTXE,
-		ucon->INTRRXE,
-		ucon->INTRUSBE,
-		ucon->INTMSKSETR);
-
-	reg = ucon->CTRLR;
 	ucon->CTRLR = FIELD_SET(reg, CTRLR_UINT_MASK, CTRLR_UINT_non_PDR);
 
 	printk( "### non_PDR ###\n"
@@ -129,10 +113,29 @@ am18x_rt usb0_conf(const usb0_conf_t* conf) {
 		ucon->INTRUSBE,
 		ucon->INTMSKSETR);
 
+	reg = ucon->CTRLR;
+	ucon->CTRLR = FIELD_SET(reg, CTRLR_UINT_MASK, CTRLR_UINT_PDR);
+
+	printk( "### PDR ###\n"
+		"INTRTXE =    0x%.8X\n"
+		"INTRRXE =    0x%.8X\n"
+		"INTRUSBE =   0x%.8X\n"
+		"INTMSKSETR = 0x%.8X\n",
+		ucon->INTRTXE,
+		ucon->INTRRXE,
+		ucon->INTRUSBE,
+		ucon->INTMSKSETR);
 
 	// Enable SUSPENDM so that suspend can be seen UTMI signal
 	reg = ucon->POWER;
 	ucon->POWER = FIELD_SET(reg, POWER_SUSPENDM_MASK, POWER_SUSPENDM_entry);
+
+	// Clear all pending interrupts
+	ucon->INTCLRR = reg = ucon->INTSRCR;
+	ucon->EOIR = 0x0UL;
+
+	printk( "INTSRCR =    0x%.8X\n",
+		ucon->INTSRCR);
 
 	// Set softconn bit
 	reg = ucon->POWER;
@@ -142,5 +145,15 @@ am18x_rt usb0_conf(const usb0_conf_t* conf) {
 	msk = DEVCTL_SESSION_MASK;
 	while (FIELD_GET(ucon->DEVCTL, msk) == DEVCTL_SESSION_none);
 
+	return AM18X_OK;
+}
+
+uint32_t usb0_intr_state(void) {
+	return ucon->INTMASKEDR;
+}
+
+am18x_rt usb0_intr_clear(void) {
+	ucon->INTCLRR = ucon->INTSRCR;
+	ucon->EOIR = 0x0UL;
 	return AM18X_OK;
 }

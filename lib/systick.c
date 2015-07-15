@@ -32,7 +32,7 @@ int systick_init(unsigned period) {
 
 	systick_set_handler(NULL);
 
-	isr_set_hander(TIMER_INTR_NR, systick_isr);
+	isr_set_handler(TIMER_INTR_NR, systick_isr);
 
 	aintc_sys_enable(TIMER_INTR_NR);
 

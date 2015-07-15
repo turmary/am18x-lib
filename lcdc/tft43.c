@@ -144,7 +144,7 @@ int lcd_intr_init(void) {
 	lcd_intr_enable(LCD0, LCD_INTR_FUF);
 	lcd_intr_enable(LCD0, LCD_INTR_EOF);
 
-	isr_set_hander(AINTC_LCDC_INT, lcdc_isr);
+	isr_set_handler(AINTC_LCDC_INT, lcdc_isr);
 
 	for (i = 0; i < countof(intrs_kv); i++) {
 		intrs_kv[i].val += get_exec_base();

@@ -77,7 +77,7 @@ void assert_failed(uint8_t* file, uint32_t line);
 
 typedef void (*none_arg_handler_t)(void);
 
-int isr_set_hander(int intr_nr, none_arg_handler_t handle);
+int isr_set_handler(int intr_nr, none_arg_handler_t handle);
 
 
 #endif//__AM18X_CONF_H__

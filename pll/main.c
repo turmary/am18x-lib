@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 	clk_node_recalc();
 	uart_init();
 
-	printk("After dll opened\n");
+	printk("After pll opened\n");
 	check_delay();
 
 	pll_cmd(PLL0, PLL_CMD_SOFT_RESET, 0);
