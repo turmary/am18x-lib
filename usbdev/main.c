@@ -35,12 +35,50 @@ static kv_t intrs_kv[] = {
 	INTxR_INTUSB_yes(INTUSB_DRVVBUS), "DRVVBUS",
 };
 
-static void usb0_isr(void) {
-	uint32_t intr;
-	int i, k;
+#define QUEUE_SIZE	1024
+uint32_t queue[QUEUE_SIZE];
+vuint32_t queue_front = 0, queue_rear = 0;
 
-	intr = usb0_intr_state();
-	usb0_intr_clear();
+int queue_push(uint32_t data) {
+	uint32_t front;
+
+	front = (queue_front + 1) % QUEUE_SIZE;
+	if (front == queue_rear ) {
+		printk("*");
+		return -1;
+	}
+
+	queue[queue_front] = data;
+
+	// arm_intr_disable();
+	queue_front = front;
+	// arm_intr_enable();
+
+	return 0;
+}
+
+int queue_pop(uint32_t* pdata) {
+	uint32_t data;
+
+	if (queue_rear == queue_front) {
+		return -1;
+	}
+
+	data = queue[queue_rear];
+
+	arm_intr_disable();
+	queue_rear = (queue_rear + 1) % QUEUE_SIZE;
+	arm_intr_enable();
+
+	if (pdata) {
+		*pdata = data;
+	}
+
+	return 0;
+}
+
+int print_intrs(uint32_t intr) {
+	int i, k;
 
 	k = 0;
 	for (i = 0; i < countof(intrs_kv); i++) {
@@ -53,7 +91,17 @@ static void usb0_isr(void) {
 		printk("\n");
 	}
 
+	return 0;
+}
+
+static void usb0_isr(void) {
+	uint32_t intr;
+
+	intr = usb0_intr_state();
+	usb0_intr_clear();
+
 	// printk("intr =    0x%.8X\n", intr);
+	queue_push(intr);
 	/*
 	printk("INTRTX =  0x%.8X\n", USB0->INTRTX);
 	printk("INTRRX =  0x%.8X\n", USB0->INTRRX);
@@ -82,7 +130,13 @@ int main(int argc, char* argv[]) {
 	isr_set_handler(AINTC_USB0_INT, usb0_isr);
 	aintc_sys_enable(AINTC_USB0_INT);
 
-	for(;;);
+	for(;;) {
+		uint32_t intr;
+
+		if (queue_pop(&intr) == 0) {
+			print_intrs(intr);
+		}
+	}
 
 	return 0;
 }
