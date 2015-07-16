@@ -142,6 +142,18 @@ am18x_rt syscfg_init_usb0phy(uint32_t freq) {
 	int i;
 	
 	reg = SYSCFG0->CFGCHIP2;
+
+	// RESET: Hold PHY in Reset
+	reg = FIELD_SET(reg, CFGCHIP2_RESET_MASK, CFGCHIP2_RESET_yes);
+	SYSCFG0->CFGCHIP2 = reg;
+	// Drive Reset for few clock cycles
+	for (v = 0; v < 50; v++) {
+		asm volatile ("nop");
+	}
+	// RESET: Release PHY from Reset
+	reg = FIELD_SET(reg, CFGCHIP2_RESET_MASK, CFGCHIP2_RESET_no);
+	SYSCFG0->CFGCHIP2 = reg;
+
 	// Do Not Override PHY Values
 	reg = FIELD_SET(reg, CFGCHIP2_USB0OTGMODE_MASK, CFGCHIP2_USB0OTGMODE_none);
 	reg = FIELD_SET(reg, CFGCHIP2_USB0PHYPWDN_MASK, CFGCHIP2_USB0PHYPWDN_none);
@@ -167,9 +179,14 @@ am18x_rt syscfg_init_usb0phy(uint32_t freq) {
 	reg = FIELD_SET(reg, CFGCHIP2_USB0PHYCLKMUX_MASK, CFGCHIP2_USB0PHYCLKMUX_AUXCLK);
 	SYSCFG0->CFGCHIP2 = reg;
 
-	// Wait Until PHY Clock is Good
+	// PHY_PLLON: On Simulation PHY PLL is OFF
 	msk = CFGCHIP2_USB0PHY_PLLON_MASK;
-	while (FIELD_GET(SYSCFG0->CFGCHIP2, msk) == CFGCHIP2_USB0PHY_PLLON_yes);
+	reg = FIELD_SET(reg, msk, CFGCHIP2_USB0PHY_PLLON_yes);
+	SYSCFG0->CFGCHIP2 = reg;
+
+	// Wait Until PHY Clock is Good
+	msk = CFGCHIP2_USB0PHYCLKGD_MASK;
+	while (FIELD_GET(SYSCFG0->CFGCHIP2, msk) == CFGCHIP2_USB0PHYCLKGD_no);
 
 	return AM18X_OK;
 }
