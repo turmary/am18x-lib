@@ -1,5 +1,7 @@
 // tary, 21:20 2015/6/4
 #include "am18x_lib.h"
+#include "arm920t.h"
+#include "systick.h"
 #include "auxlib.h"
 #include "uart.h"
 
@@ -16,14 +18,22 @@ static void usb0_isr(void) {
 	uint32_t intr;
 
 	intr = usb0_intr_state();
-	printk("intr = 0x%.8X\n", intr);
-
 	usb0_intr_clear();
+
+	printk("intr =    0x%.8X\n", intr);
+	/*
+	printk("INTRTX =  0x%.8X\n", USB0->INTRTX);
+	printk("INTRRX =  0x%.8X\n", USB0->INTRRX);
+	printk("INTRUSB = 0x%.8X\n", USB0->INTRUSB);
+	*/
 	return;
 }
 
 int main(int argc, char* argv[]) {
 	const char* title = "\nam18x library for am1808 usb device!\n";
+
+	arm_intr_enable();
+	systick_start();
 
 	printk(title);
 	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);

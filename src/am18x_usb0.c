@@ -132,10 +132,12 @@ am18x_rt usb0_conf(const usb0_conf_t* conf) {
 
 	// Clear all pending interrupts
 	ucon->INTCLRR = reg = ucon->INTSRCR;
-	ucon->EOIR = 0x0UL;
-
-	printk( "INTSRCR =    0x%.8X\n",
+	reg = ucon->INTRTX | ucon->INTRRX;
+	printk( "\nINTSRCR =    0x%.8X\n",
 		ucon->INTSRCR);
+
+	printk( "\n&INTRUSBE =  0x%.8X\n",
+		&ucon->INTRUSBE);
 
 	// Set softconn bit
 	reg = ucon->POWER;
@@ -149,11 +151,13 @@ am18x_rt usb0_conf(const usb0_conf_t* conf) {
 }
 
 uint32_t usb0_intr_state(void) {
-	return ucon->INTMASKEDR;
+	uint32_t reg;
+
+	ucon->INTCLRR = reg = ucon->INTSRCR;
+	return reg;
 }
 
 am18x_rt usb0_intr_clear(void) {
-	ucon->INTCLRR = ucon->INTSRCR;
 	ucon->EOIR = 0x0UL;
 	return AM18X_OK;
 }
