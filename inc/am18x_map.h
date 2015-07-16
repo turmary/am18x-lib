@@ -2221,6 +2221,7 @@ typedef enum {
 } INTUSB_t;
 
 typedef struct {
+	// OTG memmory mapped Registers
 #define USB0_REVID			0x4EA10800UL
 	vcuint32_t	REVID;
 	vuint32_t	CTRLR;
@@ -2263,13 +2264,13 @@ typedef struct {
 #define INTxR_INTUSB_MASK(ir)		(0x1UL << ((ir) + 16))
 #define INTxR_INTUSB_no(ir)		(0x0UL << ((ir) + 16))
 #define INTxR_INTUSB_yes(ir)		(0x1UL << ((ir) + 16))
-	vcuint32_t	INTSRCR;
-	vuint32_t	INTSETR;
-	vuint32_t	INTCLRR;
-	vcuint32_t	INTMSKR;
-	vuint32_t	INTMSKSETR;
-	vuint32_t	INTMSKCLRR;
-	vcuint32_t	INTMASKEDR;
+	vcuint32_t	INTSRCR;	// PDR
+	vuint32_t	INTSETR;	// PDR
+	vuint32_t	INTCLRR;	// PDR
+	vcuint32_t	INTMSKR;	// PDR
+	vuint32_t	INTMSKSETR;	// PDR
+	vuint32_t	INTMSKCLRR;	// PDR
+	vcuint32_t	INTMASKEDR;	// PDR
 #define EOIR_EOI_MASK(ir)		(0x1UL << (ir))
 #define EOIR_EOI_no(ir)			(0x0UL << (ir))
 #define EOIR_EOI_yes(ir)		(0x1UL << (ir))
@@ -2278,7 +2279,9 @@ typedef struct {
 #define GENRNDISSZx_SIZE_MASK		(0x1FFFFUL << 0)
 	vuint32_t	GENRNDISSZx[5];
 	uint32_t	RESERVED1[_RS(0x400,0x05C)];
+
 	// Common USB Registers
+	// MUSB memmory mapped Registers
 #define FADDR_FUNCADDR_MASK		(0x7FUL << 0)
 	vuint8_t	FADDR;
 	vuint8_t	POWER;
@@ -2287,15 +2290,15 @@ typedef struct {
 #define INTRx_EP_MASK(ep)		(0x1UL << (ep))
 #define INTRx_EP_disable(ep)		(0x0UL << (ep))
 #define INTRx_EP_enable(ep)		(0x1UL << (ep))
-	vcuint16_t	INTRTX;
-	vcuint16_t	INTRRX;
+	vcuint16_t	INTRTX;		// non-PDR
+	vcuint16_t	INTRRX;		// non-PDR
 	vuint16_t	INTRTXE;
 	vuint16_t	INTRRXE;
 // ir = INTUSB_XXX
 #define INTRUSBx_INTUSB_MASK(ir)	(0x1UL << (ir))
 #define INTRUSBx_INTUSB_no(ir)		(0x0UL << (ir))
 #define INTRUSBx_INTUSB_yes(ir)		(0x1UL << (ir))
-	vcuint8_t	INTRUSB;
+	vcuint8_t	INTRUSB;	// non-PDR
 	vuint8_t	INTRUSBE;
 #define FRAME_FRAMENUMBER_MASK		(0x7FFUL << 0)
 	vcuint16_t	FRAME;
