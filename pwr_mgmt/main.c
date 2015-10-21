@@ -31,11 +31,25 @@ static void chipsig0_isr(void) {
 	return;
 }
 
+static void psc0_isr(void) {
+	printk("%s()\n", __func__);
+	return;
+}
+
 // 9.6.2 ARM Clock OFF
 // The following sequence should be executed by the ARM within
 // the ARM Clock Stop Request interrupt ISR
 static void arm_clock_off_isr(void) {
-	// printk("%s()\n", __func__);
+	int i;
+	/*
+	printk("%s()\n", __func__);
+	psc_dump_regs(PSC0);
+	*/
+
+	// clear pending
+	aintc_clear(AINTC_ARMCLKSTOPREQ);
+	aintc_sys_disable(AINTC_ARMCLKSTOPREQ);
+
 	// 1. Check for completion of all ARM master requests
 	// (the ARM polls transfer completion statuses of all
 	// Master peripherals).
@@ -47,7 +61,17 @@ static void arm_clock_off_isr(void) {
 	aintc_sys_enable(AINTC_SYSCFG_CHIPINT0);
 
 	// 3. Execute the wait-for-interrupt (WFI) ARM instruction.
-	arm_wfi();
+	for (i = 0; i < 1000; i++) {
+		asm volatile("nop");
+	}
+	// arm_wfi();
+	asm volatile(
+	"mov	r0, #0\n"
+	"mcr	p15, 0, r0, c7, c0, 4\n"	/* wait for interrupt */
+	::: "r0"
+	);
+
+	puts("&");
 
 	return;
 }
@@ -64,34 +88,56 @@ static uint32_t arm_clock_off_and_on(void) {
 	isr_set_handler(AINTC_ARMCLKSTOPREQ, arm_clock_off_isr);
 	aintc_sys_enable(AINTC_ARMCLKSTOPREQ);
 
+	/*
+	psc_enable_interrupt(PSC_ARM);
+	isr_set_handler(AINTC_PSC0_ALLINT, psc0_isr);
+	aintc_sys_enable(AINTC_PSC0_ALLINT);
+	*/
+
+#if 0
+	psc_state_transition(PSC_ARM, PSC_STATE_DISABLE);
+	// SYSCFG0->CHIPSIG = FIELD_SET(0, CHIPSIG_X_MASK(0), CHIPSIG_X_assert(0));
+	psc_state_transition(PSC_ARM, PSC_STATE_ENABLE);
+
+#else
 	psc_state_transition(PSC_PRU, PSC_STATE_ENABLE);
 
 	pru_cmd(pru, PRU_CMD_ENABLE, 0);
 
 	pram = (uint32_t*)PRU_DataRAM0_BASE;
-#if 1
 	pram[0] = 2;
-#else
-	pram[0] = 0;
-	isr_set_handler(AINTC_SYSCFG_CHIPINT0, chipsig0_isr);
-	aintc_sys_enable(AINTC_SYSCFG_CHIPINT0);
-	// SYSCFG0->CHIPSIG = FIELD_SET(0, CHIPSIG_X_MASK(0), CHIPSIG_X_assert(0));
-#endif
-	// psc_state_transition(PSC_ARM, PSC_STATE_DISABLE);
 	pram[1] = ((0) << 24)	|
 		((0) << 16)	|
 		((PSC_ARM) << 8)|
 		((MDSTATx_STATE_Disable) << 0);
-	// psc_state_transition(PSC_ARM, PSC_STATE_ENABLE);
 	pram[2] = ((0) << 24)	|
 		((0) << 16)	|
 		((PSC_ARM) << 8)|
 		((MDSTATx_STATE_Enable) << 0);
 	pru_load(pru, (const uint32_t*)pru_code, countof(pru_code));
 
+	/*
+	// prepare to trigger chipsig0
+	isr_set_handler(AINTC_SYSCFG_CHIPINT0, chipsig0_isr);
+	aintc_sys_enable(AINTC_SYSCFG_CHIPINT0);
+	*/
+
 	pru_cmd(pru, PRU_CMD_RUN, 0);
-	delay(1000000);
-	while ((r = pru_cmd(pru, PRU_CMD_IS_HALT, 0)) != AM18X_OK);
+	do {
+		static int pru_dbg = 0;
+
+		delay(100000);
+		if (pru_dbg++ < 3) {
+			pru_dump_regs(pru);
+			printk("\n");
+			psc_dump_regs(PSC0);
+			printk("\n");
+		} else {
+			break;
+		}
+		// puts("@");
+	} while ((r = pru_cmd(pru, PRU_CMD_IS_HALT, 0)) != AM18X_OK);
+#endif
 
 	return 0;
 }

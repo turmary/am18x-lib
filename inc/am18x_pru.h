@@ -14,5 +14,6 @@ typedef enum {
 
 am18x_rt pru_load(PRU_con_t* pcon, const uint32_t* inst, uint32_t count);
 am18x_rt pru_cmd(PRU_con_t* pcon, pru_cmd_t cmd, uint32_t arg);
+am18x_rt pru_dump_regs(PRU_con_t* pcon);
 
 #endif//__AM18X_PRU_H__

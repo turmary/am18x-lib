@@ -20,13 +20,15 @@
 #define DBG_PRINT(...)
 #endif//LBP_DBG
 
+#include <stddef.h>
 #define KV(x)		{ x, #x }
+#define KOF(s,x)	{ offsetof(s,x), #x }
 typedef struct {
 	int key;
 	char* val;
 } kv_t;
 
-typedef unsigned long size_t;
+// typedef unsigned long size_t;
 
 int delay(int d);
 int puts(const char* s);

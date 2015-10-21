@@ -40,6 +40,8 @@ PSC_CONFIG:
 	MOV	pscRegs.PTCMD,  #0x120
 	MOV	pscRegs.PTSTAT, #0x128
 
+	// MOV32	WAKEUP, 0x2
+
 NEXT_LPSC:
 	// If count is zero, exit
 	QBEQ	PSC_CONFIG_EXIT, global.count, #0x00
@@ -89,12 +91,17 @@ WAIT_DONE1:
 	SET	global.scratch.b0, pscParams.domain
 	SBBO	global.scratch, global.pscRegBase, pscRegs.PTCMD, 4
 
+	MOV32	DLY_CNT, 1000000
+SUB1:
+	SUB	DLY_CNT, DLY_CNT, 0x01
+	QBNE	SUB1, DLY_CNT, 0x0
+
 WAIT_DONE2:
 	// Wait for transition to complete
 	// while ( (PSC->PTSTAT) & (0x00000001 << domain) );
 	LBBO	global.scratch, global.pscRegBase, pscRegs.PTSTAT, 4
 	QBBS	WAIT_DONE2, global.scratch, pscParams.domain
-  
+
 WAIT_DONE3:
 	// Wait and verify the state
 	// while (((PSC->MDSTAT[module]) & 0x1F) != state);
@@ -107,19 +114,21 @@ DEC_CNT:
 	SUB	global.count, global.count, 0x01
 	ADD	global.offset, global.offset, 0x04
 
-	MOV32	DLY_CNT, 1000000
-SUB1:
-	SUB	DLY_CNT, DLY_CNT, 0x01
-	QBNE	SUB1, DLY_CNT, 0x0
-
-	// Get next LPSC transition
-	QBA	NEXT_LPSC
-
-PSC_CONFIG_EXIT:
 	// Set bit CHIPSIG.CHIPSIG0
 	MOV32	CHIPSIG_R, CHIPSIG_ADDR
 	LBBO	CHIPSIG_V, CHIPSIG_R, 0, 4
 	SET	CHIPSIG_V, CHIPSIG_V, 0
 	SBBO	CHIPSIG_V, CHIPSIG_R, 0, 4
+
+	// Get next LPSC transition
+	QBA	NEXT_LPSC
+
+PSC_CONFIG_EXIT:
+	// tary, 22:02 2015/10/21
+	// MOV	global.count, 0x0001
+	// MOV	global.offset, 0x0008
+
+	// SUB	WAKEUP, WAKEUP, 0x01
+	// QBNE	NEXT_LPSC, WAKEUP, 0x0
 
 	HALT

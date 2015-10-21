@@ -1,5 +1,6 @@
 // tary, 22:52 2013/5/10
 #include "am18x_pru.h"
+#include "auxlib.h"
 
 am18x_rt pru_load(PRU_con_t* pcon, const uint32_t* inst, uint32_t count) {
 	uint32_t* pram;
@@ -60,5 +61,41 @@ am18x_rt pru_cmd(PRU_con_t* pcon, pru_cmd_t cmd, uint32_t arg) {
 	default:
 		break;
 	}
+	return AM18X_OK;
+}
+
+#define KOFP(x)		KOF(PRU_con_t, x)
+static kv_t of_regs[] = {
+	KOFP(CONTROL),
+	KOFP(STATUS),
+	KOFP(WAKEUP),
+	KOFP(CYCLECNT),
+	KOFP(STALLCNT),
+	KOFP(CONTABBLKIDX0),
+	KOFP(CONTABPROPTR),
+	KOFP(INTGPR),
+	KOFP(INTCTER),
+};
+
+am18x_rt pru_dump_regs(PRU_con_t* pcon) {
+	static am18x_bool string_reloc = AM18X_FALSE;
+	uint32_t* ptr;
+	int i;
+
+	if (!string_reloc) {
+		for (i = 0; i < countof(of_regs); i++) {
+			of_regs[i].val += get_exec_base();
+		}
+		string_reloc = AM18X_TRUE;
+	}
+
+	for (i = 0; i < countof(of_regs); i++) {
+		int of;
+
+		of = of_regs[i].key;
+		ptr = (uint32_t*)pcon + (of >> 2);
+		printk("%-14s[0x%.8X] = 0x%.8X\n", of_regs[i].val, ptr, *ptr);
+	}
+
 	return AM18X_OK;
 }

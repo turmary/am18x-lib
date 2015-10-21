@@ -1,5 +1,6 @@
 // tary, 0:35 2012/12/27
 #include "am18x_psc.h"
+#include "auxlib.h"
 
 static PSC_con_t* module_to_psc(psc_module_t module, uint32_t* nr) {
 	if (module < MODULE_NR_PER_PSC) {
@@ -51,6 +52,29 @@ am18x_rt psc_state_transition(psc_module_t module, psc_state_t state) {
 	return AM18X_OK;
 }
 
+am18x_rt psc_enable_interrupt(psc_module_t module) {
+	PSC_con_t* psc;
+	uint32_t nr;
+	uint32_t reg, msk, val;
+
+	psc = module_to_psc(module, &nr);
+
+	// 1. Set the EMUIHBIE bit in PDCTLn,
+	reg = psc->PDCTL0;
+	val = PDCTLx_EMUIHBIE_enable;
+	psc->PDCTL0 = FIELD_SET(reg, PDCTLx_EMUIHBIE_MASK, val);
+	// the EMUIHBIE and the EMURSTIE bits in MDCTLn
+	// to enable the interrupt events that you want.
+	reg = psc->MDCTLx[nr];
+	msk = MDCTLx_EMUIHBIE_MASK | MDCTLx_EMURSTIE_MASK;
+	val = MDCTLx_EMUIHBIE_enable | MDCTLx_EMURSTIE_enable;
+	psc->MDCTLx[nr] = FIELD_SET(reg, msk, val);
+
+	// 2. Enable the power sleep controller interrupt (PSCn_ALLINT)
+	// in the device interrupt controller.
+	return AM18X_OK;
+}
+
 psc_state_t psc_get_state(psc_module_t module) {
 	PSC_con_t* psc;
 	uint32_t nr;
@@ -79,4 +103,57 @@ psc_state_t psc_get_state(psc_module_t module) {
 	}
 
 	return s;
+}
+
+#define KOFP(x)		KOF(PSC_con_t, x)
+static kv_t of_regs[] = {
+	KOFP(REVID),
+	KOFP(INTEVAL),
+	KOFP(MERRPR0),
+	KOFP(MERRCR0),
+	KOFP(PERRPR),
+	KOFP(PERRCR),
+	KOFP(PTCMD),
+	KOFP(PTSTAT),
+	KOFP(PDSTAT0),
+	KOFP(PDSTAT1),
+	KOFP(PDCTL0),
+	KOFP(PDCTL1),
+	KOFP(PDCFG0),
+	KOFP(PDCFG1),
+	KOFP(MDSTATx),
+	KOFP(MDCTLx),
+};
+
+am18x_rt psc_dump_regs(PSC_con_t* pcon) {
+	static am18x_bool string_reloc = AM18X_FALSE;
+	uint32_t* ptr;
+	int i, s;
+
+	if (!string_reloc) {
+		for (i = 0; i < countof(of_regs); i++) {
+			of_regs[i].val += get_exec_base();
+		}
+		string_reloc = AM18X_TRUE;
+	}
+
+	for (i = 0; i < countof(of_regs) - 2; i++) {
+		int of;
+
+		of = of_regs[i].key;
+		ptr = (uint32_t*)pcon + (of >> 2);
+		printk("%-8s[0x%.8X] = 0x%.8X\n", of_regs[i].val, ptr, *ptr);
+	}
+
+	s = MODULE_NR_PER_PSC;
+	if (pcon == PSC0) s = s / 2;
+	ptr = &pcon->MDSTATx;
+	for (i = 0; i < s; i++) {
+		printk("MDSTAT%-2d[0x%.8X] = 0x%.8X\n", i, ptr + i, ptr[i]);
+	}
+	ptr = &pcon->MDCTLx;
+	for (i = 0; i < s; i++) {
+		printk("MDCTL%-3d[0x%.8X] = 0x%.8X\n", i, ptr + i, ptr[i]);
+	}
+	return AM18X_OK;
 }
