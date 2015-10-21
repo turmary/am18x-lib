@@ -28,6 +28,7 @@ static uint32_t one_second_counter(am18x_bool with_wfi) {
 static void chipsig0_isr(void) {
 	SYSCFG0->CHIPSIG_CLR = FIELD_SET(0, CHIPSIG_X_MASK(0), CHIPSIG_X_clear(0));
 	printk("%s()\n", __func__);
+	pru_dump_regs(PRU0);
 	return;
 }
 
@@ -137,6 +138,17 @@ static uint32_t arm_clock_off_and_on(void) {
 		}
 		// puts("@");
 	} while ((r = pru_cmd(pru, PRU_CMD_IS_HALT, 0)) != AM18X_OK);
+	/*
+	one second counter
+	pll enabled counter = 172194
+	pll bypass  counter = 42964
+	one second counter
+	without wfi counter = 42887
+	chipsig0_isr()
+	with    wfi counter = 101
+
+	***** PSC_ARM work normal after operations above ******
+	*/
 #endif
 
 	return 0;
