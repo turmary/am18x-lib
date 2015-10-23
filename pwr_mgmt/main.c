@@ -7,9 +7,12 @@
 #include "uart.h"
 #include "dvfs.h"
 #include "psc_config.h"
+#include "tca6416.h"
 
 const uint32_t f_osc = F_OSCIN;
 
+// Page 199, 9.6 ARM Sleep Mode Management
+// 9.6.1 ARM Wait-For-Interrupt Sleep Mode
 static uint32_t one_second_counter(am18x_bool with_wfi) {
 	uint32_t milli_seconds = 1000;
 	uint32_t counter;
@@ -33,10 +36,12 @@ static void chipsig0_isr(void) {
 	return;
 }
 
+/*
 static void psc0_isr(void) {
 	printk("%s()\n", __func__);
 	return;
 }
+*/
 
 // 9.6.2 ARM Clock OFF
 // The following sequence should be executed by the ARM within
@@ -79,6 +84,7 @@ static void arm_clock_off_isr(void) {
 }
 
 // should be executed by other master as dsp, pru, etc.
+// 9.6.3 ARM Subsystem Clock ON
 static uint32_t arm_clock_off_and_on(void) {
 	PRU_con_t* pru = PRU0;
 	am18x_rt r;
@@ -240,6 +246,7 @@ static int pmu_init(void) {
 	return 0;
 }
 
+// Page 201, 9.8 Dynamic Voltage and Frequency Scaling(DVFS)
 static int dvfs_test(void) {
 	int cnt = 0;
 
@@ -263,6 +270,128 @@ static int dvfs_test(void) {
 	}
 
 	return cnt;
+}
+
+// Page 202, 9.9 Deep Sleep Mode
+// This device supports a Deep Sleep mode where all device clocks
+// are stopped and the on-chip oscillator is
+// shutdown to save power.
+// Registers and memory are preserved, thus, upon recovery, the
+// program may continue from where it left off with minimal overhead involved.
+
+// 9.9.1.1 Entering Deep Sleep Mode
+static int deepsleep_externally_enter(void) {
+	uint32_t reg, msk;
+
+	// 1. To preserve DDR2/mDDR memory contents, activate the self-refresh mode
+	// and gate the clocks to the DDR2/mDDR memory controller.
+	// You can use partial array self-refresh(PARS) for additional power
+	// savings for mDDR memory.
+	ddr_clock_off(DDR0);
+
+	// 2. The SATA PHY should be disabled.
+	// 3. The USB2.0(USB0) PHY should be disabled, if this interface is used and
+	// internal clocks are selected.
+	// 4. The USB1.1(USB1) PHY should be disabled, if this interface is used and
+	// internal clocks are selected.
+
+	// 5. PLL/PLLC0 and PLL/PLLC1 should be placed in bypass mode(clear the PLLEN
+	// bit in the PLL control register(PLLCTL) of each PLLC to 0).
+	pll_cmd(PLL0, PLL_CMD_BYPASS, 0);
+	pll_cmd(PLL1, PLL_CMD_BYPASS, 0);
+
+	// 6. PLL/PLLC0 and PLL/PLLC1 should be powered down(set the PLLPWRDN
+	// bit in PLLCTL of each PLLC to 1).
+	pll_cmd(PLL0, PLL_CMD_POWER_DOWN, 0);
+	pll_cmd(PLL1, PLL_CMD_POWER_DOWN, 0);
+	clk_node_recalc();
+	uart_init();
+
+	// 7. Configure the nDEEPSLEEP pin as input-only using the PINMUX0_31_28 bits
+	// in the PINMUX0 register in the System Configuration(SYSCFG) Module chapter.
+	syscfg_pinmux(0, 28, 0);
+
+	// 8. The external controller should drive nDEEPSLEEP pin high(not in Deep Sleep).
+
+	// 9. Configure the desired delay in the SLEEPCOUNT bit field in the
+	// deep sleep register(DEEPSLEEP) in the System Configuration(SYSCFG) Module
+	// chapter. This count determines the delay before the
+	// Deep Sleep logic releases the clocks to the device during wake up
+	// (allowing the oscillator to stabilize).
+	reg = SYSCFG1->DEEPSLEEP;
+	msk = DEEPSLEEP_SLEEPCOUNT_MASK;
+	reg = FIELD_SET(reg, msk, DEEPSLEEP_SLEEPCOUNT_VAL(0x8000));
+	SYSCFG1->DEEPSLEEP = reg;
+
+	// 10. Set the SLEEPENABLE bit in DEEPSLEEP to 1.
+	// This automatically clears the SLEEPCOMPLETE bit.
+	msk = DEEPSLEEP_ENABLE_MASK;
+	reg = FIELD_SET(reg, msk, DEEPSLEEP_ENABLE_yes);
+	SYSCFG1->DEEPSLEEP = reg;
+
+	// 11. Begin polling the SLEEPCOMPLETE bit until it is set to 1.
+	// This bit set once the device is woken up from Deep Sleep mode.
+	printk("%s() step 11\n", __func__);
+	msk = DEEPSLEEP_COMPLETE_MASK;
+	do {
+		delay(100000);
+		printk("&");
+		// 12. The external controller drives the nDEEPSLEEP pin low to initiate
+		// Deep Sleep mode.
+		reg = FIELD_GET(SYSCFG1->DEEPSLEEP, msk);
+	} while (reg != DEEPSLEEP_COMPLETE_yes);
+
+	printk("\n");
+	printk("%s() step 12\n", __func__);
+	
+	return 0;
+}
+
+// 9.9.1.2 Exiting Deep Sleep Mode
+static int deepsleep_externally_exit(void) {
+	uint32_t reg, msk;
+
+	// 1. The external controller drives the nDEEPSLEEP pin high.
+
+	// 2. When the SLEEPCOUNT delay is complete, the Deep Sleep logic releases
+	// the clock to the device and sets the SLEEPCOMPLETE bit in the deep sleep
+	// register(DEEPSLEEP) in the System Configuration(SYSCFG) Module chapter.
+
+	// 3. Clear the SLEEPENABLE bit in the DEEPSLEEP to 0.
+	// This automatically clears the SLEEPCOMPLETE bit.
+	reg = SYSCFG1->DEEPSLEEP;
+	msk = DEEPSLEEP_ENABLE_MASK;
+	reg = FIELD_SET(reg, msk, DEEPSLEEP_ENABLE_no);
+	SYSCFG1->DEEPSLEEP = reg;
+
+	// 4. Initialize the PLL controllers as described in Section 7.2.2.2.
+	// Note that the state of the PLL controller registers is preserved
+	// during Deep Sleep mode.
+	// Therefore, it is not necessary to reprogram all the PLL controller
+	// registers unless a new setting is desired. At minimum, steps 3,4,
+	// and 7-10 of the PLL initialization procedure must be followed.
+
+	// 5. Enable the clocks to the DDR2/mDDR memory controller,
+	// reset the DDR PHY, and then take the DDR2/mDDR out of self-refresh mode
+	ddr_clock_on(DDR0);
+
+	// 6. Configure the desired states to the peripherals and enable as required.
+	printk("%s() step 6\n", __func__);
+	return 0;
+}
+
+
+// 9.9.1 Entering/Exiting Deep Sleep Mode Using Externally Controlled Wake-Up
+static int deepsleep_externally_test(void) {
+	// 1015643A_AM1808_Baseboard_BOM.pdf
+	// Set DEEPSLEEP_EN = H, DEEPSLEEP_nEN = L
+	// RSA_CTS control DEEPSLEEP pin of AM1808
+	tca6416_conf (0xFF22UL);
+	tca6416_write(0x0001UL);
+
+	deepsleep_externally_enter();
+	deepsleep_externally_exit();
+	return 0;
 }
 
 static int pmu_power_off_test(void) {
@@ -311,6 +440,8 @@ int main(int argc, char* argv[]) {
 	dvfs_test();
 
 	wfi_test();
+
+	deepsleep_externally_test();
 
 	// poweron_pin_test();
 
