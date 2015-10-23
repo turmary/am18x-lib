@@ -192,15 +192,21 @@ static int wfi_test(void) {
 }
 
 static int poweron_pin_test(void) {
+#define TPS65070_POWER_ON	GPIO_BANK2, GPIO_PIN_2
 	// tps65070 power_on pin don't work
 	psc_state_transition(PSC_GPIO, PSC_STATE_ENABLE);
-	gpio_set_mux(GPIO_BANK2, GPIO_PIN_2, GPIO_DIR_OUTPUT);
-	gpio_set_output1(GPIO_BANK2, GPIO_PIN_2, GPIO_LOW);
+	gpio_set_mux(TPS65070_POWER_ON, GPIO_DIR_OUTPUT);
+// differ from slvs950f.pdf
+// POWER_ON = LOW, then shutdown DCDC1(3.3V), system run well.
+// POWER_ON = HIGH and  shutdown DCDC1(3.3V), system will Reset.
+	gpio_set_output1(TPS65070_POWER_ON, GPIO_LOW);
+	// gpio_set_mux(TPS65070_POWER_ON, GPIO_DIR_INPUT);
+	printk("TPS65070_POWER_ON = %d\n", gpio_get_output1(TPS65070_POWER_ON));
 	return 0;
 }
 
 static int arm_clock_off_test(void) {
-	// arm clock off don't work
+	// arm clock off worked
 	arm_clock_off_and_on();
 	printk("%s() complete!\n", "arm_clock_off_and_on");
 	return 0;
@@ -443,7 +449,7 @@ int main(int argc, char* argv[]) {
 
 	deepsleep_externally_test();
 
-	// poweron_pin_test();
+	poweron_pin_test();
 
 	pmu_power_off_test();
 
