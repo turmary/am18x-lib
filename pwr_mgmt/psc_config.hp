@@ -98,15 +98,14 @@
 // *	Global Register Assignments	*
 // ***************************************
 
-.assign PscRegs, R4, *, pscRegs
-.assign PscCtlParams, R8, *, pscParams
-.assign Global, R1, *, global
+.assign Global,	 R16, *, global
+.assign PscRegs, R19, *, pscRegs
+.assign PscCtlParams, R23, *, pscParams
 
-#define DLY_CNT		R10
+#define OUTER_CNT	R9
+#define DLY_CNT		R8
 #define CHIPSIG_ADDR	0x01C14174
-#define CHIPSIG_R	R10
-#define CHIPSIG_V	R11
-#define WAKEUP		R12
-
+#define CHIPSIG_R	R0
+#define CHIPSIG_V	R1
 
 #endif // _PRU_PSC_CONFIG_HP_

@@ -29,6 +29,7 @@ static void chipsig0_isr(void) {
 	SYSCFG0->CHIPSIG_CLR = FIELD_SET(0, CHIPSIG_X_MASK(0), CHIPSIG_X_clear(0));
 	printk("%s()\n", __func__);
 	pru_dump_regs(PRU0);
+	printk("\n");
 	return;
 }
 
