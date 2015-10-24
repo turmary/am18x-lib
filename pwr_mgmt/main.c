@@ -193,15 +193,27 @@ static int wfi_test(void) {
 
 static int poweron_pin_test(void) {
 #define TPS65070_POWER_ON	GPIO_BANK2, GPIO_PIN_2
+#define TPS65070_PB_OUT		GPIO_BANK2, GPIO_PIN_5
 	// tps65070 power_on pin don't work
 	psc_state_transition(PSC_GPIO, PSC_STATE_ENABLE);
 	gpio_set_mux(TPS65070_POWER_ON, GPIO_DIR_OUTPUT);
+	gpio_set_mux(TPS65070_PB_OUT, GPIO_DIR_INPUT);
+
+	gpio_set_output1(TPS65070_POWER_ON, GPIO_HIGH);
+
+	printk("Set POWER_ON = HIGH\n");
+	printk("TPS65070_POWER_ON = %d\n", gpio_get_output1(TPS65070_POWER_ON));
+	printk("TPS65070_PB_OUT   = %d\n", gpio_get_output1(TPS65070_PB_OUT));
+
 // differ from slvs950f.pdf
 // POWER_ON = LOW, then shutdown DCDC1(3.3V), system run well.
 // POWER_ON = HIGH and  shutdown DCDC1(3.3V), system will Reset.
 	gpio_set_output1(TPS65070_POWER_ON, GPIO_LOW);
+
 	// gpio_set_mux(TPS65070_POWER_ON, GPIO_DIR_INPUT);
+	printk("Set POWER_ON = LOW\n");
 	printk("TPS65070_POWER_ON = %d\n", gpio_get_output1(TPS65070_POWER_ON));
+	printk("TPS65070_PB_OUT   = %d\n", gpio_get_output1(TPS65070_PB_OUT));
 	return 0;
 }
 
