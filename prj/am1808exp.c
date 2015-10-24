@@ -41,16 +41,16 @@ static const ddr_conf_t mt46h64m16_6 = {
 	.pasr = 0,
 };
 
-static int m25p64_buff_en_enable(am18x_bool on_noff) {
+static int sata_100m_clk_enable(am18x_bool on_noff) {
 	uint32_t v = on_noff? GPIO_LOW: GPIO_HIGH;
 
 	psc_state_transition(PSC_GPIO, PSC_STATE_ENABLE);
 
-	gpio_set_mux(M25P64_BUFF_OEn, GPIO_DIR_OUTPUT);
-	gpio_set_output1(M25P64_BUFF_OEn, v);
+	gpio_set_mux(SATA_100M_CLK_OEn, GPIO_DIR_OUTPUT);
+	gpio_set_output1(SATA_100M_CLK_OEn, v);
 
-	// gpio_set_mux(M25P64_BUFF_OEn, GPIO_DIR_INPUT);
-	// printk("M25P64_BUFF_OEn = %d\n", gpio_get_output1(M25P64_BUFF_OEn));
+	// gpio_set_mux(SATA_100M_CLK_OEn, GPIO_DIR_INPUT);
+	// printk("SATA_100M_CLK_OEn = %d\n", gpio_get_output1(SATA_100M_CLK_OEn));
 	return 0;
 }
 
@@ -81,7 +81,7 @@ int low_level_init(void) {
 	}
 */
 	// invalid operation ?
-	m25p64_buff_en_enable(AM18X_FALSE);
+	sata_100m_clk_enable(AM18X_FALSE);
 
 #ifdef _M_BOOT_DELAY
 	delay(284091 * 3);
