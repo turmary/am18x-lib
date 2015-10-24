@@ -347,7 +347,8 @@ static int deepsleep_externally_enter(void) {
 
 	// 11. Begin polling the SLEEPCOMPLETE bit until it is set to 1.
 	// This bit set once the device is woken up from Deep Sleep mode.
-	printk("%s() step 11\n", __func__);
+	printk("%s() drives nDEEPSLEEP pin (RSA_CTS of UART P1) low\n"
+		"and then drives it high\n", __func__);
 	msk = DEEPSLEEP_COMPLETE_MASK;
 	do {
 		delay(100000);
@@ -358,7 +359,7 @@ static int deepsleep_externally_enter(void) {
 	} while (reg != DEEPSLEEP_COMPLETE_yes);
 
 	printk("\n");
-	printk("%s() step 12\n", __func__);
+	printk("%s() Wakeup from Deep Sleep\n", __func__);
 	
 	return 0;
 }
@@ -392,7 +393,7 @@ static int deepsleep_externally_exit(void) {
 	ddr_clock_on(DDR0);
 
 	// 6. Configure the desired states to the peripherals and enable as required.
-	printk("%s() step 6\n", __func__);
+	printk("%s() all configurations recovering from Deep Sleep completed!\n", __func__);
 	return 0;
 }
 
@@ -428,6 +429,7 @@ static int pmu_power_off_test(void) {
 
 	// DCDC3 can't power off since it's am1808 core logic power supply
 
+	// LDO1 can't power off since it's I/O power supply
 	/*
 	printk("power off LDO1\n");
 	systick_sleep(100);
@@ -479,7 +481,7 @@ static int psc_pwr_test(void) {
 		psc_state_transition(kv_pscs[i].key, PSC_STATE_DISABLE);
 	};
 
-	printk("all psc power test complete!\n");
+	printk("%s() psc power test complete!\n", __func__);
 
 	return 0;
 }
