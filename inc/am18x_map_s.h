@@ -1118,6 +1118,7 @@
 #define COUNT0_EP0RXCOUNT_MASK		(0x7F << 0)
 #define RXCOUNT_EPRXCOUNT_MASK		(0x1FFF << 0)
 #define USB0_REVID			0x4EA10800
+#define USB0_EP_CNT			5
 #define MODE_MODE_TX_MASK(ep)		(0x3 << (((ep) - 1) << 2))
 #define MODE_MODE_RX_MASK(ep)		(0x30000 << (((ep) - 1) << 2))
 #define MODE_xMODE_Transparent		(0x0 << 0)

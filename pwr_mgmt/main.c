@@ -412,13 +412,19 @@ static int deepsleep_externally_test(void) {
 
 static int pmu_power_off_test(void) {
 	// DCDC1 power off will cause reboot failed!
-	/*
 	printk("power off DCDC1\n");
 	systick_sleep(100);
 	tps6507x_power_switch(PWR_TYPE_DCDC1, AM18X_FALSE);
-	*/
 
 	// DCDC2 can't power off since it's all I/O power supply
+	// power off DCDC2 will shutdown all voltage supply on Baseboard
+	printk("power off DCDC2\n");
+	systick_sleep(100);
+	tps6507x_power_switch(PWR_TYPE_DCDC2, AM18X_FALSE);
+	/*
+	systick_sleep(10 * 1000);
+	tps6507x_power_switch(PWR_TYPE_DCDC2, AM18X_TRUE);
+	*/
 
 	// DCDC3 can't power off since it's am1808 core logic power supply
 
