@@ -263,7 +263,7 @@ static int pmu_init(void) {
 
 // Page 201, 9.8 Dynamic Voltage and Frequency Scaling(DVFS)
 static int dvfs_test(void) {
-	int cnt = 0;
+	int cnt = -1;
 
 	while (cnt++ < 5 * 5 / 2) {
 		dvfs_set_opp(cnt % OPP_CNT);
@@ -276,13 +276,13 @@ static int dvfs_test(void) {
 		}
 		#endif
 		systick_sleep(200);
-		if (cnt <= 5) getchar();
 	}
 	while (cnt-- > 0) {
 		dvfs_set_opp(cnt % OPP_CNT);
 		printk("Current OPerating Point: %5d mV\n", dvfs_get_volt(dvfs_get_opp()));
 		printk("Current Frequency:   %9d Hz\n", dev_get_freq(DCLK_ID_ARM));
 		systick_sleep(200);
+		if (cnt <= 5) getchar();
 	}
 
 	return cnt;
@@ -411,9 +411,12 @@ static int deepsleep_externally_test(void) {
 }
 
 static int pmu_power_off_test(void) {
+	// DCDC1 power off will cause reboot failed!
+	/*
 	printk("power off DCDC1\n");
 	systick_sleep(100);
 	tps6507x_power_switch(PWR_TYPE_DCDC1, AM18X_FALSE);
+	*/
 
 	// DCDC2 can't power off since it's all I/O power supply
 
