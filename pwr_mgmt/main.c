@@ -276,6 +276,7 @@ static int dvfs_test(void) {
 		}
 		#endif
 		systick_sleep(200);
+		if (cnt <= 5) getchar();
 	}
 	while (cnt-- > 0) {
 		dvfs_set_opp(cnt % OPP_CNT);
@@ -416,15 +417,21 @@ static int pmu_power_off_test(void) {
 
 	// DCDC2 can't power off since it's all I/O power supply
 
+	// DCDC3 can't power off since it's am1808 core logic power supply
+
+	/*
 	printk("power off LDO1\n");
 	systick_sleep(100);
 	tps6507x_power_switch(PWR_TYPE_LDO1, AM18X_FALSE);
+	*/
 
 	// LDO2 can't power off since it's internal ram power supply
 
+	/*
 	printk("power off DCDC3\n");
 	systick_sleep(100);
 	tps6507x_power_switch(PWR_TYPE_DCDC3, AM18X_FALSE);
+	*/
 
 	#if 0
 	// power off worked
@@ -438,12 +445,46 @@ static int pmu_power_off_test(void) {
 	return 0;
 }
 
+kv_t kv_pscs[] = {
+	KV(PSC_PRU),
+	KV(PSC_RESERVED0),
+	KV(PSC_SCR0),
+	KV(PSC_SCR1),
+	KV(PSC_SCR2),
+	KV(PSC_SPI1),
+	KV(PSC_SCR_F0),
+	KV(PSC_SCR_F1),
+	KV(PSC_SCR_F2),
+	KV(PSC_SCR_F6),
+	KV(PSC_SCR_F7),
+	KV(PSC_SCR_F8),
+	KV(PSC_BR_F7),
+};
+
+static int psc_pwr_test(void) {
+	int i;
+
+	for (i = 0; i < countof(kv_pscs); i++) {
+		printk("%s clock off\n", kv_pscs[i].val);
+		getchar();
+		psc_state_transition(kv_pscs[i].key, PSC_STATE_DISABLE);
+	};
+
+	printk("all psc power test complete!\n");
+
+	return 0;
+}
+
 int main(int argc, char* argv[]) {
 	const char* title = "\nam18x library for power management!\n";
 	int i;
 
 	for (i = 0; i < countof(kv_powers); i++) {
 		kv_powers[i].val += get_exec_base();
+	}
+
+	for (i = 0; i < countof(kv_pscs); i++) {
+		kv_pscs[i].val += get_exec_base();
 	}
 
 	arm_intr_enable();
@@ -465,6 +506,8 @@ int main(int argc, char* argv[]) {
 	poweron_pin_test();
 
 	pmu_power_off_test();
+
+	psc_pwr_test();
 
 	return 0;
 }
