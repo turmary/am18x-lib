@@ -8,6 +8,7 @@
 #include "dvfs.h"
 #include "psc_config.h"
 #include "tca6416.h"
+#include "am1808exp.h"
 
 const uint32_t f_osc = F_OSCIN;
 
@@ -192,8 +193,6 @@ static int wfi_test(void) {
 }
 
 static int poweron_pin_test(void) {
-#define TPS65070_POWER_ON	GPIO_BANK2, GPIO_PIN_2
-#define TPS65070_PB_OUT		GPIO_BANK2, GPIO_PIN_5
 	// tps65070 power_on pin don't work
 	psc_state_transition(PSC_GPIO, PSC_STATE_ENABLE);
 	gpio_set_mux(TPS65070_POWER_ON, GPIO_DIR_OUTPUT);
