@@ -167,6 +167,11 @@ $arm_clock_off_and_on() complete!
 	one in the arm clock off interrupt,
 	the other after arm clock on, before PSC_Enable state.
 	*/
+	do {
+		psc_dump_regs(PSC0);
+		printk("\n");
+	} while ((r = pru_cmd(pru, PRU_CMD_IS_HALT, 0)) != AM18X_OK);
+	psc_state_transition(PSC_PRU, PSC_STATE_DISABLE);
 #endif
 
 	return 0;
@@ -441,7 +446,6 @@ static int pmu_power_off_test(void) {
 	printk("power off DCDC2\n");
 	systick_sleep(100);
 	tps6507x_power_switch(PWR_TYPE_DCDC2, AM18X_FALSE);
-	arm_clock_off_and_on();
 	/*
 	systick_sleep(10 * 1000);
 	tps6507x_power_switch(PWR_TYPE_DCDC2, AM18X_TRUE);
