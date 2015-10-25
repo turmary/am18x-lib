@@ -202,14 +202,14 @@ static int poweron_pin_test(void) {
 	gpio_set_output1(TPS65070_POWER_ONn, GPIO_HIGH);
 
 	printk("SET TPS65070 POWER_ON = LOW\n");
-	printk("TPS65070_POWER_ONn = %d\n", gpio_get_output1(TPS65070_POWER_ONn));
-	printk("TPS65070_PB_OUT   = %d\n", gpio_get_output1(TPS65070_PB_OUT));
+	printk("TPS65070_POWER_ONn = %d\n", gpio_get_input1(TPS65070_POWER_ONn));
+	printk("TPS65070_PB_OUT   = %d\n", gpio_get_input1(TPS65070_PB_OUT));
 
 	gpio_set_output1(TPS65070_POWER_ONn, GPIO_LOW);
 
 	printk("SET TPS65070 POWER_ON = HIGH\n");
-	printk("TPS65070_POWER_ONn = %d\n", gpio_get_output1(TPS65070_POWER_ONn));
-	printk("TPS65070_PB_OUT   = %d\n", gpio_get_output1(TPS65070_PB_OUT));
+	printk("TPS65070_POWER_ONn = %d\n", gpio_get_input1(TPS65070_POWER_ONn));
+	printk("TPS65070_PB_OUT   = %d\n", gpio_get_input1(TPS65070_PB_OUT));
 
 	return 0;
 }
