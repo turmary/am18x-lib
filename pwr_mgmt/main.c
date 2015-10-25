@@ -69,15 +69,20 @@ static void arm_clock_off_isr(void) {
 	aintc_sys_enable(AINTC_SYSCFG_CHIPINT0);
 
 	// 3. Execute the wait-for-interrupt (WFI) ARM instruction.
+	#if 1
+	arm_wfi();
+
+	#else
 	for (i = 0; i < 1000; i++) {
 		asm volatile("nop");
 	}
-	// arm_wfi();
+	
 	asm volatile(
 	"mov	r0, #0\n"
 	"mcr	p15, 0, r0, c7, c0, 4\n"	/* wait for interrupt */
 	::: "r0"
 	);
+	#endif
 
 	puts("&");
 
