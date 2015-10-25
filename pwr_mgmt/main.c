@@ -393,7 +393,7 @@ static int deepsleep_externally_exit(void) {
 	ddr_clock_on(DDR0);
 
 	// 6. Configure the desired states to the peripherals and enable as required.
-	printk("%s() all configurations recovering from Deep Sleep completed!\n", __func__);
+	printk("%s() all configurations recovered from Deep Sleep!\n", __func__);
 	return 0;
 }
 
