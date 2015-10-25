@@ -89,5 +89,7 @@ int low_level_init(void) {
 
 	tps6507x_conf();
 
+	printk("ARM CLK: %9d Hz\n", dev_get_freq(DCLK_ID_ARM));
+
 	return AM18X_OK;
 }

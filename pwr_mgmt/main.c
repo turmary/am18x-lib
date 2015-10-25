@@ -131,31 +131,41 @@ static uint32_t arm_clock_off_and_on(void) {
 	aintc_sys_enable(AINTC_SYSCFG_CHIPINT0);
 	*/
 
+	printk("Press any key to clock off arm\n");
+	getchar();
 	pru_cmd(pru, PRU_CMD_RUN, 0);
-	do {
-		static int pru_dbg = 0;
-
-		delay(100000);
-		if (pru_dbg++ < 3) {
-			pru_dump_regs(pru);
-			printk("\n");
-			psc_dump_regs(PSC0);
-			printk("\n");
-		} else {
-			break;
-		}
-		// puts("@");
-	} while ((r = pru_cmd(pru, PRU_CMD_IS_HALT, 0)) != AM18X_OK);
+	while (psc_get_state(PSC_ARM) != PSC_STATE_ENABLE) {
+		arm_wfi();
+		printk("$");
+	}
 	/*
-	one second counter
-	pll enabled counter = 172194
-	pll bypass  counter = 42964
-	one second counter
-	without wfi counter = 42887
-	chipsig0_isr()
-	with    wfi counter = 101
+##############################&chipsig0_isr()
+CONTROL       [0x01C37000] = 0x0000800B
+STATUS        [0x01C37004] = 0x00000029
+WAKEUP        [0x01C37008] = 0x00000000
+CYCLECNT      [0x01C3700C] = 0x039804F6
+STALLCNT      [0x01C37010] = 0x00006F95
+CONTABBLKIDX0 [0x01C37020] = 0x00000000
+CONTABPROPTR  [0x01C37028] = 0x00000000
+INTGPR        [0x01C37400] = 0x00000000
+INTCTER       [0x01C37480] = 0x00000000
 
-	***** PSC_ARM work normal after operations above ******
+##############################chipsig0_isr()
+CONTROL       [0x01C37000] = 0x00000009
+STATUS        [0x01C37004] = 0x0000003B
+WAKEUP        [0x01C37008] = 0x00000000
+CYCLECNT      [0x01C3700C] = 0x07280C7B
+STALLCNT      [0x01C37010] = 0x0000DEBD
+CONTABBLKIDX0 [0x01C37020] = 0x00000000
+CONTABPROPTR  [0x01C37028] = 0x00000000
+INTGPR        [0x01C37400] = 0x01C14174
+INTCTER       [0x01C37480] = 0x00004000
+
+$arm_clock_off_and_on() complete!
+
+	***** PSC_ARM work normal after twice wfi operations ******
+	one in the arm clock off interrupt,
+	the other after arm clock on, before PSC_Enable state.
 	*/
 #endif
 
@@ -216,8 +226,10 @@ static int poweron_pin_test(void) {
 
 static int arm_clock_off_test(void) {
 	// arm clock off worked
+	aintc_sys_disable(AINTC_T64P0_TINT12);
 	arm_clock_off_and_on();
 	printk("%s() complete!\n", "arm_clock_off_and_on");
+	aintc_sys_enable(AINTC_T64P0_TINT12);
 	return 0;
 }
 
@@ -303,7 +315,12 @@ static int deepsleep_externally_enter(void) {
 	// and gate the clocks to the DDR2/mDDR memory controller.
 	// You can use partial array self-refresh(PARS) for additional power
 	// savings for mDDR memory.
+	printk("Press any key to clock off ddr\n");
+	getchar();
 	ddr_clock_off(DDR0);
+
+	printk("Press any key to continue\n");
+	getchar();
 
 	// 2. The SATA PHY should be disabled.
 	// 3. The USB2.0(USB0) PHY should be disabled, if this interface is used and
@@ -424,6 +441,7 @@ static int pmu_power_off_test(void) {
 	printk("power off DCDC2\n");
 	systick_sleep(100);
 	tps6507x_power_switch(PWR_TYPE_DCDC2, AM18X_FALSE);
+	arm_clock_off_and_on();
 	/*
 	systick_sleep(10 * 1000);
 	tps6507x_power_switch(PWR_TYPE_DCDC2, AM18X_TRUE);
@@ -447,7 +465,7 @@ static int pmu_power_off_test(void) {
 	*/
 
 	#if 0
-	// power off worked
+	// power off worked, will reset the system.
 	printk("power off usb\n");
 	tps6507x_power_switch(PWR_TYPE_USB, AM18X_FALSE);
 	printk("power off ac\n");

@@ -40,7 +40,7 @@ am18x_rt ddr_initialize(DDR_con_t* dcon, const ddr_conf_t* conf) {
 	_2x_clk = dev_get_freq(DCLK_ID_DDR2_MDDR_PHY);
 
 	mclk = _2x_clk / 2;
-	printk("MCLK = %d Hz\n", mclk);
+	printk("DDR CLK: %9d Hz\n", mclk);
 
 	// 2. Program PSC to enable the DDR2/mDDR memory controller clock
 	psc_state_transition(PSC_DDR2, PSC_STATE_ENABLE);
