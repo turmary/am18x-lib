@@ -48,7 +48,6 @@ static void psc0_isr(void) {
 // The following sequence should be executed by the ARM within
 // the ARM Clock Stop Request interrupt ISR
 static void arm_clock_off_isr(void) {
-	int i;
 	/*
 	printk("%s()\n", __func__);
 	psc_dump_regs(PSC0);
@@ -73,8 +72,12 @@ static void arm_clock_off_isr(void) {
 	arm_wfi();
 
 	#else
+	{
+	int i;
+
 	for (i = 0; i < 1000; i++) {
 		asm volatile("nop");
+	}
 	}
 	
 	asm volatile(
@@ -194,6 +197,8 @@ kv_t kv_powers[] = {
 static int wfi_test(void) {
 	pll_conf_t pllconf[1];
 
+	printk("\n******************** %s() ********************\n", __func__);
+
 	printk("one second counter\n");
 	pll_get_conf(PLL0, pllconf);
 	// pllconf->cflag |= PLL_CFLAG_FROM_POWERON;
@@ -213,6 +218,8 @@ static int wfi_test(void) {
 }
 
 static int poweron_pin_test(void) {
+	printk("\n******************** %s() ********************\n", __func__);
+
 	// tps65070 power_on pin don't work
 	psc_state_transition(PSC_GPIO, PSC_STATE_ENABLE);
 	gpio_set_mux(TPS65070_POWER_ONn, GPIO_DIR_OUTPUT);
@@ -235,6 +242,8 @@ static int poweron_pin_test(void) {
 }
 
 static int arm_clock_off_test(void) {
+	printk("\n******************** %s() ********************\n", __func__);
+
 	// arm clock off worked
 	aintc_sys_disable(AINTC_T64P0_TINT12);
 	arm_clock_off_and_on();
@@ -287,6 +296,7 @@ static int pmu_init(void) {
 static int dvfs_test(void) {
 	int cnt = -1;
 
+	printk("\n******************** %s() ********************\n", __func__);
 	while (cnt++ < 5 * 5 / 2) {
 		dvfs_set_opp(cnt % OPP_CNT);
 		printk("Current OPerating Point: %5d mV\n", dvfs_get_volt(dvfs_get_opp()));
@@ -374,8 +384,8 @@ static int deepsleep_externally_enter(void) {
 
 	// 11. Begin polling the SLEEPCOMPLETE bit until it is set to 1.
 	// This bit set once the device is woken up from Deep Sleep mode.
-	printk("%s() drives nDEEPSLEEP pin (RSA_CTS of UART P1) low\n"
-		"and then drives it high\n", __func__);
+	printk("Drives nDEEPSLEEP pin (RSA_CTS of UART P1) low to enter Deep Sleep\n"
+		"And then drives it high to exit\n", __func__);
 	msk = DEEPSLEEP_COMPLETE_MASK;
 	do {
 		delay(100000);
@@ -427,6 +437,7 @@ static int deepsleep_externally_exit(void) {
 
 // 9.9.1 Entering/Exiting Deep Sleep Mode Using Externally Controlled Wake-Up
 static int deepsleep_externally_test(void) {
+	printk("\n******************** %s() ********************\n", __func__);
 	// 1015643A_AM1808_Baseboard_BOM.pdf
 	// Set DEEPSLEEP_EN = H, DEEPSLEEP_nEN = L
 	// RSA_CTS control DEEPSLEEP pin of AM1808
@@ -439,6 +450,8 @@ static int deepsleep_externally_test(void) {
 }
 
 static int pmu_power_off_test(void) {
+	printk("\n******************** %s() ********************\n", __func__);
+
 	// DCDC1 power off will cause reboot failed!
 	printk("power off DCDC1\n");
 	systick_sleep(100);
@@ -503,6 +516,8 @@ kv_t kv_pscs[] = {
 
 static int psc_pwr_test(void) {
 	int i;
+
+	printk("\n******************** %s() ********************\n", __func__);
 
 	for (i = 0; i < countof(kv_pscs); i++) {
 		printk("%s clock off\n", kv_pscs[i].val);
