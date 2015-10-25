@@ -31,7 +31,7 @@ typedef enum {
 	PRCV_SYS_DUMMY		=	PWR_TYPE_SYS * MAX_RECEIVER_CNT,
 
 
-	// 3.3V (power up step 2)
+	// 3.3V (power up step 5)
 	PRCV_DCDC1_DUMMY	=	PWR_TYPE_DCDC1 * MAX_RECEIVER_CNT,
 	PRCV_CPU_USB0_VDDA33,		// USB0 PHY 3.3-V supply
 	PRCV_CPU_USB1_VDDA33,		// USB1 PHY 3.3-V supply
@@ -42,7 +42,7 @@ typedef enum {
 	PRCV_LAN8710A_VDDxA,
 
 
-	// 3.3V_or_1.8V (power up step 1)
+	// 3.3V_or_1.8V (power up step 4 or 5)
 	PRCV_DCDC2_DUMMY	=	PWR_TYPE_DCDC2 * MAX_RECEIVER_CNT,
 	PRCV_CPU_DVDD3318_A,		// 1.8V or 3.3-V dual-voltage LVCMOS I/O supply voltage pins, Group A
 	PRCV_CPU_DVDD3318_B,		// 1.8V or 3.3-V dual-voltage LVCMOS I/O supply voltage pins, Group B
@@ -53,12 +53,12 @@ typedef enum {
 	PRCV_LAN8710A_VDDIO,
 
 
-	// 1.2V (power up step 1)
+	// 1.2V (power up step 2)
 	PRCV_DCDC3_DUMMY	=	PWR_TYPE_DCDC3 * MAX_RECEIVER_CNT,
 	PRCV_CPU_CVDD,			// Variable (1.2V - 1.0V) core supply voltage pins
 
 
-	// 1.8V_LDO (power up step 2)
+	// 1.8V_LDO (power up step 4)
 	PRCV_LDO1_DUMMY		=	PWR_TYPE_LDO1 * MAX_RECEIVER_CNT,
 	PRCV_CPU_SATA_VDDR,		// SATA PHY 1.8V internal regulator supply
 	PRCV_CPU_USB0_VDDA18,		// USB0 PHY 1.8-V supply input
@@ -71,7 +71,7 @@ typedef enum {
 	PRCV_mDDR_VDDQ,
 
 
-	// 1.2V_LDO
+	// 1.2V_LDO (power up step 3)
 	PRCV_LDO2_DUMMY		=	PWR_TYPE_LDO2 * MAX_RECEIVER_CNT,
 	PRCV_CPU_PLL0_VDDA,		// PLL analog Vdd(1.2-V filtered supply)
 	PRCV_CPU_PLL1_VDDA,		// PLL analog Vdd(1.2-V filtered supply)

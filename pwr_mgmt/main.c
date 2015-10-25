@@ -419,6 +419,8 @@ static int pmu_power_off_test(void) {
 
 	// DCDC2 can't power off since it's all I/O power supply
 	// power off DCDC2 will shutdown all voltage supply on Baseboard
+	// and 1.8V_LDO (shadow of LDO1, by gate off PMOS Q1)
+	// and DCDC1 (by shutdown TPS3805H33,U23)
 	printk("power off DCDC2\n");
 	systick_sleep(100);
 	tps6507x_power_switch(PWR_TYPE_DCDC2, AM18X_FALSE);
