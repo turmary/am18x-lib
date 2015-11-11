@@ -339,14 +339,17 @@ static int deepsleep_externally_enter(void) {
 	getchar();
 	ddr_clock_off(DDR0);
 
-	printk("Press any key to continue\n");
-	getchar();
-
 	// 2. The SATA PHY should be disabled.
 	// 3. The USB2.0(USB0) PHY should be disabled, if this interface is used and
 	// internal clocks are selected.
 	// 4. The USB1.1(USB1) PHY should be disabled, if this interface is used and
 	// internal clocks are selected.
+	printk("Press any key to adjust dcdc2 output with 2.4V\n");
+	getchar();
+	tps6507x_set_output(PWR_TYPE_DCDC2, 2400);
+
+	printk("Press any key to continue\n");
+	getchar();
 
 	// 5. PLL/PLLC0 and PLL/PLLC1 should be placed in bypass mode(clear the PLLEN
 	// bit in the PLL control register(PLLCTL) of each PLLC to 0).
@@ -450,6 +453,8 @@ static int deepsleep_externally_test(void) {
 }
 
 static int pmu_power_off_test(void) {
+	int i;
+
 	printk("\n******************** %s() ********************\n", __func__);
 
 	// DCDC1 power off will cause reboot failed!
@@ -461,6 +466,14 @@ static int pmu_power_off_test(void) {
 	// power off DCDC2 will shutdown all voltage supply on Baseboard
 	// and 1.8V_LDO (shadow of LDO1, by gate off PMOS Q1)
 	// and DCDC1 (by shutdown TPS3805H33,U23)
+	for (i = 3300; i > 500; i -= 100) {
+		int r;
+
+		tps6507x_set_output(PWR_TYPE_DCDC2, i);
+		r = tps6507x_get_output(PWR_TYPE_DCDC2);
+		printk("%-5s voltage: %.4d mV\n", "DCDC2", r);
+		systick_sleep(3000);
+	}
 	printk("power off DCDC2\n");
 	systick_sleep(100);
 	tps6507x_power_switch(PWR_TYPE_DCDC2, AM18X_FALSE);
