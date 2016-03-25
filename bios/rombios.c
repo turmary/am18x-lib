@@ -8,6 +8,8 @@
 
 asm (
 "	.section .init, \"ax\"	\n"
+"	.global __got_start	\n"
+"	.global __got_end	\n"
 "	.global	_start		\n"
 "_start:			\n"
 "	.org	0x10		\n"
