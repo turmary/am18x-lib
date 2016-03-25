@@ -107,7 +107,7 @@ $(COBJ) : %.o : %.c $(MAKEFILE_LIST)
 	@echo ""
 
 %.i : %.c $(MAKEFILE_LIST)
-	$(CC) -E $(ALL_CFLAGS) $< -o $@
+	$(CC) -E -CC $(ALL_CFLAGS) $< -o $@
 	@echo ""
 
 $(AOBJ) : %.o : %.S $(MAKEFILE_LIST)

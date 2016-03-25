@@ -2,21 +2,33 @@
 #include "rombios.h"
 
 // This is for compiling with gcc
-#define ASM_START	asm (
-#define ASM_END		);
+// #define ASM_START	asm (
+// #define ASM_END		);
 
 
-asm (
-"	.section .init, \"ax\"	\n"
-"	.global __got_start	\n"
-"	.global __got_end	\n"
-"	.global	_start		\n"
-"_start:			\n"
-"	.org	0x10		\n"
-"	nop			\n"
-"	mov	r0, r0		\n"
-"	.global get_exec_base	\n"
-"get_exec_base:			\n"
-"	MOV	R0, SL		\n"
-"	MOV	PC, LR		\n"
-);
+ASM_START
+	.global __got_start
+	.global __got_end
+
+	.section .init, \"ax\"
+	.global	_start
+_start:
+	b	__entry
+
+	.global get_exec_base
+get_exec_base:
+	MOV	R0, SL
+	MOV	PC, LR
+
+@--------
+@- POST -
+@--------
+	.org	0xe05b		@ POST Entry Point
+	.byte	0x0
+post:
+	MOV	R0, #R0_INIT
+
+	.org	0xfff0		@ Power-up Entry Point
+__entry:
+	b	post
+ASM_END
