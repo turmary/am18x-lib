@@ -10,7 +10,7 @@ endif
 
 CINS = ../include
 
-LINK_SCRIPT = ../prj/am18x.ld
+LINK_SCRIPT ?= ../prj/am18x.ld
 
 DEBUG += -gdwarf-2
 
