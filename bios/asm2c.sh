@@ -3,7 +3,10 @@
 
 cat $1 |	\
 sed -e 's/\r\n/\n/g' |	\
-awk -F' ' -v in_asm=0 '
+awk -F' ' '
+BEGIN {
+	in_asm = 0;
+};
 {
 	if ($1 == "ASM_START") {
 		in_asm = 1;
