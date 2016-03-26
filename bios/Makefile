@@ -18,7 +18,7 @@ $(BSRC).S : $(BSRC)_.i $(MAKEFILE_LIST)
 	$(CC) -S $(ALL_CFLAGS) $< -o $@
 	@echo ""
 
-$(BSRC)_.i : $(BSRC).i $(MAKEFILE_LIST)
+$(BSRC)_.i : $(BSRC).i ./asm2c.sh $(MAKEFILE_LIST)
 	./asm2c.sh $< > $@
 
 clean: local_clean

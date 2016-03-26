@@ -11,8 +11,17 @@ awk -F' ' -v in_asm=0 '
 	} else if ($1 == "ASM_END") {
 		in_asm = 0;
 		printf ");\n";
-	} else if (in_asm == "1") {
-		printf "\"%s\\n\"\n", $0;
+	} else if (in_asm == 1) {
+		n = 0;
+		tabline = "";
+		for (i = 1; i <= length($0); i++) {
+			c = substr($0, i, 1);
+			if (c == " " && n++ < 2) {
+				c = "\t";
+			}
+			tabline = (tabline c);
+		}
+		printf "\"%s\\n\"\n", tabline;
 	} else {
 		printf "%s\n", $0
 	}
