@@ -10,10 +10,10 @@ BEGIN {
 {
 	if ($1 == "ASM_START") {
 		in_asm = 1;
-		printf "asm (\n";
+		printf("asm (\n");
 	} else if ($1 == "ASM_END") {
 		in_asm = 0;
-		printf ");\n";
+		printf(");\n");
 	} else if (in_asm == 1) {
 		n = 0;
 		tabline = "";
@@ -24,9 +24,9 @@ BEGIN {
 			}
 			tabline = (tabline c);
 		}
-		printf "\"%s\\n\"\n", tabline;
+		printf("\"%s\\n\"\n", tabline);
 	} else {
-		printf "%s\n", $0
+		printf("%s\n", $0);
 	}
 }'
 
