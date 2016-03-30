@@ -5,12 +5,20 @@
 // #define ASM_START	asm (
 // #define ASM_END		);
 
+int function(int in) {
+	return in * in;
+}
 
+void rombios(void) {
 ASM_START
 	.global __got_start
 	.global __got_end
 
 	.section .init, \"ax\"
+	nop
+	nop
+
+	.section .text, \"ax\"
 	.global	_start
 _start:
 	b	__entry
@@ -32,3 +40,4 @@ post:
 __entry:
 	b	post
 ASM_END
+}
