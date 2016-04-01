@@ -1880,6 +1880,62 @@ enum {
 };
 
 typedef struct {
+	vuint32_t	SECOND;
+	vuint32_t	MINUTE;
+	vuint32_t	HOUR;
+	vuint32_t	DAY;
+	vuint32_t	MONTH;
+	vuint32_t	YEAR;
+	vuint32_t	DOTW;
+	uint32_t	RESERVED0[1];
+	vuint32_t	ALARMSECOND;
+	vuint32_t	ALARMMINUTE;
+	vuint32_t	ALARMHOUR;
+	vuint32_t	ALARMDAY;
+	vuint32_t	ALARMMONTH;
+	vuint32_t	ALARMYEAR;
+	uint32_t	RESERVED1[2];
+	vuint32_t	CTRL;
+	vcuint32_t	STATUS;
+#define INTERRUPT_EVERY_MASK		(0x3UL << 0)
+#define INTERRUPT_EVERY_Second		(0x0UL << 0)
+#define INTERRUPT_EVERY_Minute		(0x1UL << 0)
+#define INTERRUPT_EVERY_Hour		(0x2UL << 0)
+#define INTERRUPT_EVERY_Day		(0x3UL << 0)
+	vuint32_t	INTERRUPT;
+#define COMPxSB_MASK			(0xFFUL << 0)
+	vuint32_t	COMPLSB;
+	vuint32_t	COMPMSB;
+	vuint32_t	OSC;
+	uint32_t	RESERVED2[2];
+	vuint32_t	SCRATCH[3];
+#define RTC_KICK0R_VAL			(0x83E70B13UL)
+#define RTC_KICK1R_VAL			(0x95A4F1E0UL)
+	vuint32_t	KICKnR[2];
+} RTC_con_t;
+
+enum {
+	BIT_DEF(HOUR,7,MERIDIEM,AM,PM),
+	BIT_DEF(CTRL,7,SPLITPOWER,disabled,enabled),
+	BIT_DEF(CTRL,6,DISABLE,no,yes),
+	BIT_DEF(CTRL,5,SET32COUNTER,none,enabled),
+	BIT_DEF(CTRL,3,HOURMODE,24,12),
+	BIT_DEF(CTRL,2,AUTOCOMP,disabled,enabled),
+	BIT_DEF(CTRL,1,ROUNDMIN,disabled,enabled),
+	BIT_DEF(CTRL,0,RUN,no,yes),
+	BIT_DEF(STATUS,6,ALARM,no,yes),
+	BIT_DEF(STATUS,5,DAYEVT,no,yes),
+	BIT_DEF(STATUS,4,HREVT,no,yes),
+	BIT_DEF(STATUS,3,MINEVT,no,yes),
+	BIT_DEF(STATUS,2,SECEVT,no,yes),
+	BIT_DEF(STATUS,1,RUN,no,yes),
+	BIT_DEF(STATUS,0,BUSY,no,yes),
+	BIT_DEF(INTERRUPT,3,ALARM,disabled,enabled),
+	BIT_DEF(INTERRUPT,2,TIMER,disabled,enabled),
+	BIT_DEF(OSC,5,SWRESET,none,reset),
+};
+
+typedef struct {
 	vcuint32_t	REVID;
 #define EMUMGT_SOFT_MASK		(0x1UL << 1)
 #define EMUMGT_SOFT_stop		(0x0UL << 1)
@@ -2468,6 +2524,7 @@ enum {
 #define TIMER0_BASE			0x01C20000UL
 #define TIMER1_BASE			0x01C21000UL
 #define I2C0_BASE			0x01C22000UL
+#define RTC_BASE			0x01C23000UL
 #define PRU_DataRAM0_BASE		0x01C30000UL
 #define PRU_DataRAM0_SIZE		0x00000200UL
 #define PRU_DataRAM1_BASE		0x01C32000UL
@@ -2571,6 +2628,9 @@ enum {
 #ifdef _MMCSD1
 	#define MMCSD1			((MMCSD_con_t*)MMCSD1_BASE)
 #endif
+#ifdef _RTC
+	#define RTC			((RTC_con_t*)RTC_BASE)
+#endif
 #ifdef _TIMER0
 	#define TIMER0			((TIMER_con_t*)TIMER0_BASE)
 #endif
@@ -2656,6 +2716,9 @@ enum {
 #endif
 #ifdef _MMCSD1
 	_EXTERN MMCSD_con_t		*MMCSD1;
+#endif
+#ifdef _RTC
+	_EXTERN RTC_con_t		*RTC;
 #endif
 #ifdef _TIMER0
 	_EXTERN TIMER_con_t		*TIMER0
