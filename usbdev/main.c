@@ -39,7 +39,7 @@ static kv_t intrs_kv[] = {
 uint32_t queue[QUEUE_SIZE];
 vuint32_t queue_front = 0, queue_rear = 0;
 
-int queue_push(uint32_t data) {
+int queue_in(uint32_t data) {
 	uint32_t front;
 
 	front = (queue_front + 1) % QUEUE_SIZE;
@@ -57,7 +57,7 @@ int queue_push(uint32_t data) {
 	return 0;
 }
 
-int queue_pop(uint32_t* pdata) {
+int queue_out(uint32_t* pdata) {
 	uint32_t data;
 
 	if (queue_rear == queue_front) {
@@ -101,7 +101,7 @@ static void usb0_isr(void) {
 	usb0_intr_clear();
 
 	// printk("intr =    0x%.8X\n", intr);
-	queue_push(intr);
+	queue_in(intr);
 	/*
 	printk("INTRTX =  0x%.8X\n", USB0->INTRTX);
 	printk("INTRRX =  0x%.8X\n", USB0->INTRRX);
@@ -133,7 +133,7 @@ int main(int argc, char* argv[]) {
 	for(;;) {
 		uint32_t intr;
 
-		if (queue_pop(&intr) == 0) {
+		if (queue_out(&intr) == 0) {
 			print_intrs(intr);
 		}
 	}

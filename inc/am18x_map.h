@@ -1897,11 +1897,11 @@ typedef struct {
 	uint32_t	RESERVED1[2];
 	vuint32_t	CTRL;
 	vcuint32_t	STATUS;
-#define INTERRUPT_EVERY_MASK		(0x3UL << 0)
-#define INTERRUPT_EVERY_Second		(0x0UL << 0)
-#define INTERRUPT_EVERY_Minute		(0x1UL << 0)
-#define INTERRUPT_EVERY_Hour		(0x2UL << 0)
-#define INTERRUPT_EVERY_Day		(0x3UL << 0)
+#define RTCINT_EVERY_MASK		(0x3UL << 0)
+#define RTCINT_EVERY_Second		(0x0UL << 0)
+#define RTCINT_EVERY_Minute		(0x1UL << 0)
+#define RTCINT_EVERY_Hour		(0x2UL << 0)
+#define RTCINT_EVERY_Day		(0x3UL << 0)
 	vuint32_t	INTERRUPT;
 #define COMPxSB_MASK			(0xFFUL << 0)
 	vuint32_t	COMPLSB;
@@ -1916,22 +1916,22 @@ typedef struct {
 
 enum {
 	BIT_DEF(HOUR,7,MERIDIEM,AM,PM),
-	BIT_DEF(CTRL,7,SPLITPOWER,disabled,enabled),
-	BIT_DEF(CTRL,6,DISABLE,no,yes),
-	BIT_DEF(CTRL,5,SET32COUNTER,none,enabled),
-	BIT_DEF(CTRL,3,HOURMODE,24,12),
-	BIT_DEF(CTRL,2,AUTOCOMP,disabled,enabled),
-	BIT_DEF(CTRL,1,ROUNDMIN,disabled,enabled),
-	BIT_DEF(CTRL,0,RUN,no,yes),
-	BIT_DEF(STATUS,6,ALARM,no,yes),
-	BIT_DEF(STATUS,5,DAYEVT,no,yes),
-	BIT_DEF(STATUS,4,HREVT,no,yes),
-	BIT_DEF(STATUS,3,MINEVT,no,yes),
-	BIT_DEF(STATUS,2,SECEVT,no,yes),
-	BIT_DEF(STATUS,1,RUN,no,yes),
-	BIT_DEF(STATUS,0,BUSY,no,yes),
-	BIT_DEF(INTERRUPT,3,ALARM,disabled,enabled),
-	BIT_DEF(INTERRUPT,2,TIMER,disabled,enabled),
+	BIT_DEF(RTCTL,7,SPLITPOWER,disabled,enabled),
+	BIT_DEF(RTCTL,6,DISABLE,no,yes),
+	BIT_DEF(RTCTL,5,SET32COUNTER,none,enabled),
+	BIT_DEF(RTCTL,3,HOURMODE,24,12),
+	BIT_DEF(RTCTL,2,AUTOCOMP,disabled,enabled),
+	BIT_DEF(RTCTL,1,ROUNDMIN,disabled,enabled),
+	BIT_DEF(RTCTL,0,RUN,no,yes),
+	BIT_DEF(RTCSTAT,6,ALARM,no,yes),
+	BIT_DEF(RTCSTAT,5,DAYEVT,no,yes),
+	BIT_DEF(RTCSTAT,4,HREVT,no,yes),
+	BIT_DEF(RTCSTAT,3,MINEVT,no,yes),
+	BIT_DEF(RTCSTAT,2,SECEVT,no,yes),
+	BIT_DEF(RTCSTAT,1,RUN,no,yes),
+	BIT_DEF(RTCSTAT,0,BUSY,no,yes),
+	BIT_DEF(RTCINT,3,ALARM,disabled,enabled),
+	BIT_DEF(RTCINT,2,TIMER,disabled,enabled),
 	BIT_DEF(OSC,5,SWRESET,none,reset),
 };
 

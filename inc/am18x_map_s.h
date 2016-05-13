@@ -846,6 +846,14 @@
 #define MMCFIFOCTL_ACCWD_3bytes		(0x1 << 3)
 #define MMCFIFOCTL_ACCWD_2bytes		(0x2 << 3)
 #define MMCFIFOCTL_ACCWD_1bytes		(0x3 << 3)
+#define RTCINT_EVERY_MASK		(0x3 << 0)
+#define RTCINT_EVERY_Second		(0x0 << 0)
+#define RTCINT_EVERY_Minute		(0x1 << 0)
+#define RTCINT_EVERY_Hour		(0x2 << 0)
+#define RTCINT_EVERY_Day		(0x3 << 0)
+#define COMPxSB_MASK			(0xFF << 0)
+#define RTC_KICK0R_VAL			(0x83E70B13)
+#define RTC_KICK1R_VAL			(0x95A4F1E0)
 #define EMUMGT_SOFT_MASK		(0x1 << 1)
 #define EMUMGT_SOFT_stop		(0x0 << 1)
 #define EMUMGT_SOFT_reach		(0x1 << 1)
@@ -1193,6 +1201,7 @@
 #define TIMER0_BASE			0x01C20000
 #define TIMER1_BASE			0x01C21000
 #define I2C0_BASE			0x01C22000
+#define RTC_BASE			0x01C23000
 #define PRU_DataRAM0_BASE		0x01C30000
 #define PRU_DataRAM0_SIZE		0x00000200
 #define PRU_DataRAM1_BASE		0x01C32000
