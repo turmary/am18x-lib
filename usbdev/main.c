@@ -112,7 +112,6 @@ static void usb0_isr(void) {
 
 int main(int argc, char* argv[]) {
 	const char* title = "\nam18x library for am1808 usb device!\n";
-	int i;
 
 	arm_intr_enable();
 	systick_start();
@@ -124,9 +123,6 @@ int main(int argc, char* argv[]) {
 
 	printk("usb0 session started\n");
 
-	for (i = 0; i < countof(intrs_kv); i++) {
-		intrs_kv[i].val += get_exec_base();
-	}
 	isr_set_handler(AINTC_USB0_INT, usb0_isr);
 	aintc_sys_enable(AINTC_USB0_INT);
 

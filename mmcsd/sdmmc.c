@@ -63,7 +63,6 @@ const char* sdmmc_err_string(int rt) {
 static int sdmmc_inf_init(void) {
 	mmcsd_conf_t conf[1];
 	uint32_t freq;
-	int i;
 
 	syscfg_pinmux(MMCSD_CLK);
 	syscfg_pinmux(MMCSD_CMD);
@@ -83,10 +82,6 @@ static int sdmmc_inf_init(void) {
 
 	freq = mmcsd_xet_freq(MMCSDCON, LOW_CLK);
 	printk("SDMMC freq in %s(): %d Hz\n", __func__, freq);
-
-	for (i = 0; i < countof(sdmmc_estr); i++) {
-		sdmmc_estr[i].estr += get_exec_base();
-	}
 
 	return 0;
 }

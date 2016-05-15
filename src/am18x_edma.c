@@ -292,7 +292,7 @@ am18x_rt edma_status(const EDMA_con_t* econ, edma_stat_t* stat) {
 
 	for (i = 0; bit_nrs[i] != -1; i++) {
 		if (FIELD_GET(ccstat, BIT(bit_nrs[i])) != 0) {
-			stat->status[i] = inner_status[i] + get_exec_base();
+			stat->status[i] = inner_status[i];
 		} else {
 			stat->status[i] = "none";
 		}

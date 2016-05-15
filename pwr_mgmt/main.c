@@ -545,15 +545,6 @@ static int psc_pwr_test(void) {
 
 int main(int argc, char* argv[]) {
 	const char* title = "\nam18x library for power management!\n";
-	int i;
-
-	for (i = 0; i < countof(kv_powers); i++) {
-		kv_powers[i].val += get_exec_base();
-	}
-
-	for (i = 0; i < countof(kv_pscs); i++) {
-		kv_pscs[i].val += get_exec_base();
-	}
 
 	arm_intr_enable();
 	systick_start();

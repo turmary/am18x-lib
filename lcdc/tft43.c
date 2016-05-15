@@ -135,8 +135,6 @@ static void lcdc_isr(void) {
 }
 
 int lcd_intr_init(void) {
-	int i;
-
 	lcd_intr_enable(LCD0, LCD_INTR_AC);
 	lcd_intr_enable(LCD0, LCD_INTR_DONE);
 	lcd_intr_enable(LCD0, LCD_INTR_PL);
@@ -145,10 +143,6 @@ int lcd_intr_init(void) {
 	lcd_intr_enable(LCD0, LCD_INTR_EOF);
 
 	isr_set_handler(AINTC_LCDC_INT, lcdc_isr);
-
-	for (i = 0; i < countof(intrs_kv); i++) {
-		intrs_kv[i].val += get_exec_base();
-	}
 
 	aintc_sys_enable(AINTC_LCDC_INT);
 	return 0;

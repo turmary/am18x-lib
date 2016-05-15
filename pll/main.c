@@ -42,7 +42,6 @@ static int check_delay(void) {
 int main(int argc, char* argv[]) {
 	const char* title = "\nam18x library for pll!\n";
 	pll_reset_t reset;
-	int i;
 
 	arm_intr_enable();
 	systick_start();
@@ -50,9 +49,6 @@ int main(int argc, char* argv[]) {
 	printk(title);
 	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);
 
-	for (i = 0; i < countof(reset_sources); i++) {
-		reset_sources[i].val += get_exec_base();
-	}
 	reset = pll_get_reset();
 	printk("RSTYPE = 0x%.8X\n", PLL0->RSTYPE);
 	printk("Reset by %s\n", reset_sources[reset].val);

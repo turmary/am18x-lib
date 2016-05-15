@@ -119,17 +119,6 @@ static kvp_t card_state_name[] = {
 };
 
 const char* sdprot_stat_name(int stat) {
-	static int relocate_string = 0;
-
-	if (relocate_string == 0) {
-		int i;
-
-		relocate_string = 1;
-		for (i = 0; i < countof(card_state_name); i++) {
-			card_state_name[i].val += get_exec_base();
-		}
-	}
-
 	if (0 <= stat && stat < SDP_CNT) {
 		return card_state_name[stat].val;
 	}

@@ -78,16 +78,8 @@ static kv_t of_regs[] = {
 };
 
 am18x_rt pru_dump_regs(PRU_con_t* pcon) {
-	static am18x_bool string_reloc = AM18X_FALSE;
 	uint32_t* ptr;
 	int i;
-
-	if (!string_reloc) {
-		for (i = 0; i < countof(of_regs); i++) {
-			of_regs[i].val += get_exec_base();
-		}
-		string_reloc = AM18X_TRUE;
-	}
 
 	for (i = 0; i < countof(of_regs); i++) {
 		int of;

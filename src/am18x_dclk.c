@@ -353,13 +353,6 @@ am18x_rt clk_node_init(void) {
 	for (i = 0; i < countof(clk_nodes); i++) {
 		clk_node_t* cni = clk_nodes + i;
 
-		cni->name += get_exec_base();
-		if (cni->calc_freq) {
-			*(uint32_t*)&cni->calc_freq += get_exec_base();
-		}
-		if (cni->do_change) {
-			*(uint32_t*)&cni->do_change += get_exec_base();
-		}
 		cni->flag |= CN_FLAG_RECALC;
 	}
 	return AM18X_OK;

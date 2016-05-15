@@ -30,10 +30,6 @@ int main(int argc, char* argv[]) {
 	int i, mode;
 	const char* title = "\nam18x library for syscfg!\n";
 
-	for (i = 0; i < countof(kv_boot); i++) {
-		kv_boot[i].val += get_exec_base();
-	}
-
 	printk(title);
 	printk("tary, compiled date : %s %s\n", __DATE__, __TIME__);
 	printk("AM18XX Bootloader Revision=%s\n", (char*)ARMLocalROM_BASE + 8);

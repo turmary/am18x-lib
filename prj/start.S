@@ -83,14 +83,8 @@ HandleReset:
 
 		MSR	CPSR_c, #XPSR_Mode_System | XPSR_F_FIQ | XPSR_F_IRQ
 
-		@ Set the IVT to high memory, leave MMU & caches disabled
-		MRC	P15, #0, R0, C1, C0, #0
-		BIC	R0, R0, #0x00003300
-		BIC	R0, R0, #0x00000087
-		ORR	R0, R0, #0x00000002
-		ORR	R0, R0, #0x00002000
-		MCR	P15, #0, R0, C1, C0, #0
-		NOP
+		.extern	arm_intr_disable
+		BL	arm_intr_disable
 
 		@ fix vector jump address
 		MOV	R0, R9
@@ -104,29 +98,47 @@ HandleReset:
 		ldr_fix	R2, __vector_end
 		BL	__copy_mem
 
-		@ clear BSS area
-		.extern	__bss_start
-		.extern	__bss_end
-		MOV	R0, #0
-		ldr_fix R1, __bss_start
-		ldr_fix R2, __bss_end
-__bss_clear_loop:
-		STR	R0, [R1], #4
-		CMP	R1, R2
-		BLO	__bss_clear_loop
-
-		.extern	arm_intr_disable
-		BL	arm_intr_disable
+		@ Set the IVT to high memory, leave MMU & caches disabled
+		MRC	P15, #0, R0, C1, C0, #0
+		BIC	R0, R0, #0x00003300
+		BIC	R0, R0, #0x00000087
+		ORR	R0, R0, #0x00000002
+		ORR	R0, R0, #0x00002000
+		MCR	P15, #0, R0, C1, C0, #0
+		NOP
 
 		ldr_fix SL, __load_addr
 
-		@ relocation got to untranslated address
-		.global	__got_start
-		.global	__got_end
-		MOV	R0, R9
-		ldr_fix	R1, __got_start
-		ldr_fix R2, __got_end
+		#if 0
+		@ got relocation by __reloc_dyn() instead
+		@ relocation got to current address
+		.global	__lds_got_start
+		.global	__lds_got_end
+		MOV	R0, SL
+		ldr_fix	R1, __lds_got_start
+		ldr_fix	R2, __lds_got_end
 		BL	__reloc_got
+		#endif
+
+		@ relocation dyn to current address
+		.global	__lds_rel_start
+		.global	__lds_rel_end
+		MOV	R0, SL
+		ldr_fix	R1, __lds_rel_start
+		ldr_fix R2, __lds_rel_end
+		BL	__reloc_dyn
+
+		@ clear BSS area
+		.extern	__lds_bss_start
+		.extern	__lds_bss_end
+		MOV	R0, #0
+		@ do not use ldr_fix after __reloc_dyn()
+		LDR	R1, =__lds_bss_start
+		LDR	R2, =__lds_bss_end
+1:
+		STR	R0, [R1], #4
+		CMP	R1, R2
+		BLO	1b
 
 		.extern	low_level_init
 		BL	low_level_init
@@ -148,12 +160,30 @@ get_exec_base:
 __reloc_got:
 		CMP	R1, R2
 		MOVHS	PC, LR
-__reloc_got_1:
+1:
 		LDR	R4, [R1]
 		ADD	R4, R4, R0
 		STR	R4, [R1], #4
 		CMP	R1, R2
-		BLO	__reloc_got_1
+		BLO	1b
+		MOV	PC, LR
+
+		@ Add word pointed by odd element in [r1,r2) with r0
+		.global	__reloc_dyn
+__reloc_dyn:
+		CMP	R1, R2
+		MOVHS	PC, LR
+1:
+		LDM	R1!, {R3, R4}
+		CMP	R4, #0x17
+		BNE	2f
+		ADD	R3, R3, R0
+		LDR	R4, [R3]
+		ADD	R4, R4, R0
+		STR	R4, [R3]
+2:
+		CMP	R1, R2
+		BLO	1b
 		MOV	PC, LR
 
 		@ copy memory from [r1, r2) to [R0, r0 + r2 - r1)
@@ -161,18 +191,19 @@ __reloc_got_1:
 __copy_mem:
 		CMP	R1, R2
 		MOVHS	PC, LR
-__copy_mem_1:
+1:
 		LDR	R3, [R1], #4
 		STR	R3, [R0], #4
 		CMP	R1, R2
-		BLO	__copy_mem_1
+		BLO	1b
 		MOV	PC, LR
 
 
 __link_addr:
 		.long	__load_addr
-		.extern	__got_size
-		.long	__got_size
+		.extern	__lds_got_size
+		.func	__lds_got_size
+		.long	__lds_got_size
 		.ltorg
 
 		.section .stack, "w"
