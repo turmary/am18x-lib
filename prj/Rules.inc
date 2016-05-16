@@ -39,7 +39,7 @@ LDFLAGS += $(DEBUG)
 LDFLAGS += -static -nostdlib
 LDFLAGS += -Wl,-Map=$(TARGET).map
 LDFLAGS += -Wl,-T$(LINK_SCRIPT)
-# import for symbol __lds_xxx when option -pie used
+# important for symbols __lds_xxx when option -pie used
 LDFLAGS += -Wl,-Bsymbolic
 LDFLAGS += -pie
 

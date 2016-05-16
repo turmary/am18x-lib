@@ -111,7 +111,7 @@ HandleReset:
 
 		#if 0
 		@ got relocation by __reloc_dyn() instead
-		@ relocation got to current address
+		@ relocate got to current address
 		.global	__lds_got_start
 		.global	__lds_got_end
 		MOV	R0, SL
@@ -120,7 +120,7 @@ HandleReset:
 		BL	__reloc_got
 		#endif
 
-		@ relocation dyn to current address
+		@ relocate dyn to current address
 		.global	__lds_rel_start
 		.global	__lds_rel_end
 		MOV	R0, SL

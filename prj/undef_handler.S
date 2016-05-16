@@ -14,6 +14,7 @@
 	@	R13 = SP = SP_und
 	@	R14 = LR = LR_und
 	@	SPSR = SPSR_und = CPSR(saved)
+	.func	HandleUndef
 HandleUndef:
 	PUSH	{R0, R1, V1-V3, LR}
 
@@ -23,12 +24,12 @@ HandleUndef:
 	SUBEQ	V2, LR, #4
 	LDRNE	R1, =__thumb_mode_fmt
 	SUBNE	V2, LR, #2
-	LDR	R0, =__undef_fmt
+	ADR	R0, __undef_fmt
 	LDR	V1, =printk
 	MOV	LR, PC
 	BX	V1
 
-	LDR	R0, =__undef_pc_fmt
+	ADR	R0, __undef_pc_fmt
 	MOV	R1, V2
 	MOV	LR, PC
 	BX	V1
@@ -36,11 +37,11 @@ HandleUndef:
 	MOVS	V3, V3
 	BNE	1f
 0:
-	LDR	R0, =__undef_arm_instruction
+	ADR	R0, __undef_arm_instruction
 	LDR	R1, [V2, #0]
 	B	2f
 1:
-	LDR	R0, =__undef_thumb_instruction
+	ADR	R0, __undef_thumb_instruction
 	LDRH	R1, [V2, #0]
 	B	2f
 2:
@@ -69,4 +70,6 @@ __undef_thumb_instruction:
 	.string "\t[PC] = 0x%.4X\n"
 
 	.balign	4
+	.endfunc
+
 	.end

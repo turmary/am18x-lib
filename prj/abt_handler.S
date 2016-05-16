@@ -70,11 +70,11 @@ HandleDataAbort:
 
 	LDR	V1, =printk
 
-	LDR	R0, =__dabt_fmt
+	ADR	R0, __dabt_fmt
 	MOV	LR, PC
 	BX	V1
 
-	LDR	R0, =__abt_pc_fmt
+	ADR	R0, __abt_pc_fmt
 	MOV	R1, V2
 	MOV	LR, PC
 	BX	V1
@@ -82,11 +82,11 @@ HandleDataAbort:
 	MOVS	V3, V3
 	BNE	1f
 0:
-	LDR	R0, =__abt_arm_instruction
+	ADR	R0, __abt_arm_instruction
 	LDR	R1, [V2, #0]
 	B	2f
 1:
-	LDR	R0, =__abt_thumb_instruction
+	ADR	R0, __abt_thumb_instruction
 	LDRH	R1, [V2, #0]
 	B	2f
 2:
@@ -95,7 +95,7 @@ HandleDataAbort:
 
 	BL	arm_read_cp15_fault_address
 	MOV	R1, R0
-	LDR	R0, =__dabt_addr_fmt
+	ADR	R0, __dabt_addr_fmt
 	MOV	LR, PC
 	BX	V1
 
@@ -104,7 +104,6 @@ HandleDataAbort:
 	SUBS	PC, LR, #4
 __dabt_loop:
 	B	__dabt_loop
-	.endfunc
 
 	.align	4
 	.ltorg
@@ -129,4 +128,6 @@ __new_line__:
 	.string "\n"
 
 	.align	4
+	.endfunc
+
 	.end
