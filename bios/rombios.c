@@ -11,8 +11,10 @@ int function(int in) {
 
 void rombios(void) {
 ASM_START
-	.global __got_start
-	.global __got_end
+	.global __lds_got_start
+	.global __lds_got_end
+	.global __lds_rel_start
+	.global __lds_rel_end
 
 	.section .init, \"ax\"
 	nop

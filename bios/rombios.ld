@@ -17,15 +17,12 @@ SECTIONS {
 		*(.rodata .rodata.*);
 		. = ALIGN(0x10);
 
-		*(.data.rel .data.rel.*);
-		. = ALIGN(0x10);
-
-		PROVIDE(__got_start = .);
+		PROVIDE (__lds_got_start = .);
 		*(.got.plt);
 		*(.got);
 		. = ALIGN(0x10);
-		PROVIDE(__got_end = .);
-		PROVIDE(__got_size = __got_end - __got_start);
+		PROVIDE (__lds_got_end = .);
+		PROVIDE (__lds_got_size = __lds_got_end - __lds_got_start);
 		. = ALIGN(0x10);
 	} = 0
 	PROVIDE (__text_end = .);
@@ -34,16 +31,31 @@ SECTIONS {
 	.data : {
 		*(.data);
 		. = ALIGN(0x10);
+
+		*(.data.rel .data.rel.*);
+		. = ALIGN(0x10);
+
+		PROVIDE (__lds_rel_start = .);
+		*(.rel.*);
+		. = ALIGN(0x10);
+		PROVIDE (__lds_rel_end = .);
+		PROVIDE (__lds_rel_size = __lds_rel_end - __lds_rel_start);
 	} = 0
+	. = ALIGN(0x10);
 	PROVIDE (__data_end = .);
 
-	PROVIDE (__bss_start = .);
-	.bss : {
+	/*
+	.rel __data_end : {
+	} = 0
+	*/
+
+	.bss __lds_rel_start : {
+		PROVIDE (__lds_bss_start = .);
 		*(.bss)
 		*(COMMON)
 		. = ALIGN(0x10);
+		PROVIDE (__lds_bss_end = .);
 	} = 0
-	PROVIDE (__bss_end = .);
 
 	. = ALIGN(0x10);
 	.stack : {
@@ -59,6 +71,8 @@ SECTIONS {
 		/*(.debug*)*/
 		*(.ARM.attributes)
 		*(.comment)
-		*(.dynamic)
+		*(.interp)
+		*(.dyn*)
+		*(.hash)
 	}
 }
