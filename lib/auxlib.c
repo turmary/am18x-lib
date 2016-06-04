@@ -73,7 +73,7 @@ size_t strnlen(const char* s, size_t size) {
 
 int strcmp(const char* ss, const char* sd) {
 	while (*ss && *sd && *ss++ == *sd++);
-	return *ss - *sd;
+	return *--ss - *--sd;
 }
 
 const char* strchr(const char* s, char c) {
