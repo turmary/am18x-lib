@@ -57,6 +57,10 @@
 #include "am18x_mmcsd.h"
 #endif
 
+#ifdef _RTC
+#include "am18x_rtc.h"
+#endif
+
 #ifdef _DDR
 #include "am18x_ddr.h"
 #endif

@@ -67,6 +67,7 @@ extern const uint32_t f_osc;
 #define _USB
 #define _USB0
 
+#define _RTC
 
 #ifdef DEBUG
 #define assert(expr) ((expr) ? (void)0 : assert_failed((uint8_t *)__FILE__, __LINE__))
