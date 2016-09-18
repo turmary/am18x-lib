@@ -2,14 +2,17 @@ DDR CLK: 150000000 Hz
 ARM CLK:  24000000 Hz
 
 am18x library for power management!
-tary, compiled date : Oct 25 2015 23:47:20
+tary, compiled date : Sep 18 2016 21:34:30
+
+******************** arm_clock_off_test() ********************
 Press any key to clock off arm
+arm_clock_off_isr()
 ##############################&chipsig0_isr()
 CONTROL       [0x01C37000] = 0x0000800B
-STATUS        [0x01C37004] = 0x00000028
+STATUS        [0x01C37004] = 0x00000029
 WAKEUP        [0x01C37008] = 0x00000000
-CYCLECNT      [0x01C3700C] = 0x0398059D
-STALLCNT      [0x01C37010] = 0x00006F96
+CYCLECNT      [0x01C3700C] = 0x0398012F
+STALLCNT      [0x01C37010] = 0x00006F95
 CONTABBLKIDX0 [0x01C37020] = 0x00000000
 CONTABPROPTR  [0x01C37028] = 0x00000000
 INTGPR        [0x01C37400] = 0x00000000
@@ -19,14 +22,61 @@ INTCTER       [0x01C37480] = 0x00000000
 CONTROL       [0x01C37000] = 0x00000009
 STATUS        [0x01C37004] = 0x0000003B
 WAKEUP        [0x01C37008] = 0x00000000
-CYCLECNT      [0x01C3700C] = 0x07280C7C
-STALLCNT      [0x01C37010] = 0x0000DEBE
+CYCLECNT      [0x01C3700C] = 0x07280C7B
+STALLCNT      [0x01C37010] = 0x0000DEBD
 CONTABBLKIDX0 [0x01C37020] = 0x00000000
 CONTABPROPTR  [0x01C37028] = 0x00000000
 INTGPR        [0x01C37400] = 0x01C14174
 INTCTER       [0x01C37480] = 0x00004000
 
-$arm_clock_off_and_on() complete!
+$REVID   [0x01C10000] = 0x44825A00
+INTEVAL [0x01C10018] = 0x00000000
+MERRPR0 [0x01C10040] = 0x00000000
+MERRCR0 [0x01C10050] = 0x00000000
+PERRPR  [0x01C10060] = 0x00000000
+PERRCR  [0x01C10068] = 0x00000000
+PTCMD   [0x01C10120] = 0x00000000
+PTSTAT  [0x01C10128] = 0x00000000
+PDSTAT0 [0x01C10200] = 0x00000301
+PDSTAT1 [0x01C10204] = 0x00000301
+PDCTL0  [0x01C10300] = 0x001FF101
+PDCTL1  [0x01C10304] = 0x001FF101
+PDCFG0  [0x01C10400] = 0x0000000D
+PDCFG1  [0x01C10404] = 0x00000006
+MDSTAT0 [0x01C10800] = 0x00000A00
+MDSTAT1 [0x01C10804] = 0x00000A00
+MDSTAT2 [0x01C10808] = 0x00000A00
+MDSTAT3 [0x01C1080C] = 0x00000A00
+MDSTAT4 [0x01C10810] = 0x00000A00
+MDSTAT5 [0x01C10814] = 0x00000A00
+MDSTAT6 [0x01C10818] = 0x00001E03
+MDSTAT7 [0x01C1081C] = 0x00001E03
+MDSTAT8 [0x01C10820] = 0x00001E03
+MDSTAT9 [0x01C10824] = 0x00000A00
+MDSTAT10[0x01C10828] = 0x00001E03
+MDSTAT11[0x01C1082C] = 0x00001E03
+MDSTAT12[0x01C10830] = 0x00001E03
+MDSTAT13[0x01C10834] = 0x00001E03
+MDSTAT14[0x01C10838] = 0x00001F03
+MDSTAT15[0x01C1083C] = 0x00000A00
+MDCTL0  [0x01C10A00] = 0x00000000
+MDCTL1  [0x01C10A04] = 0x00000000
+MDCTL2  [0x01C10A08] = 0x00000000
+MDCTL3  [0x01C10A0C] = 0x00000000
+MDCTL4  [0x01C10A10] = 0x00000000
+MDCTL5  [0x01C10A14] = 0x00000000
+MDCTL6  [0x01C10A18] = 0x00000003
+MDCTL7  [0x01C10A1C] = 0x00000003
+MDCTL8  [0x01C10A20] = 0x00000003
+MDCTL9  [0x01C10A24] = 0x00000000
+MDCTL10 [0x01C10A28] = 0x00000003
+MDCTL11 [0x01C10A2C] = 0x00000003
+MDCTL12 [0x01C10A30] = 0x00000003
+MDCTL13 [0x01C10A34] = 0x00000003
+MDCTL14 [0x01C10A38] = 0x00000103
+MDCTL15 [0x01C10A3C] = 0x00000000
+
+arm_clock_off_and_on() complete!
 [0x01] = 0x4D
 [0x02] = 0x02
 [0x03] = 0x01
@@ -52,10 +102,10 @@ $arm_clock_off_and_on() complete!
 [0x17] = 0x13
 [0x18] = 0x10
 [0x19] = 0x1E
-power sys  voltage: 4599 mV
-power ac   voltage: 4423 mV
-power sys  voltage: 4611 mV
-power ac   voltage: 4423 mV
+power sys  voltage: 5050 mV
+power ac   voltage: 4851 mV
+power sys  voltage: 5050 mV
+power ac   voltage: 4851 mV
 DCDC1 voltage: 3300 mV
 DCDC2 voltage: 3300 mV
 DCDC3 voltage: 1200 mV
@@ -67,6 +117,8 @@ DCDC2 voltage: 3300 mV
 DCDC3 voltage: 1200 mV
 LDO1  voltage: 1800 mV
 LDO2  voltage: 1300 mV
+
+******************** dvfs_test() ********************
 Current OPerating Point:  1000 mV
 Current Frequency:    24000000 Hz
 Current OPerating Point:  1000 mV
@@ -119,28 +171,65 @@ Current OPerating Point:  1000 mV
 Current Frequency:    96000000 Hz
 Current OPerating Point:  1000 mV
 Current Frequency:    24000000 Hz
+
+******************** wfi_test() ********************
 one second counter
-pll enabled counter = 164196
-pll bypass  counter = 40752
+pll enabled counter = 187540
+pll bypass  counter = 46712
 one second counter
-without wfi counter = 40676
+without wfi counter = 46626
 with    wfi counter = 100
-[0x00] = 0x3990
-[0x02] = 0xAFFF
-[0x04] = 0xC660
-[0x06] = 0xFDEF
+
+******************** deepsleep_externally_test() ********************
+[0x00] = 0xFF21
+[0x02] = 0x0001
+[0x04] = 0x0000
+[0x06] = 0xFF22
 Press any key to clock off ddr
+Press any key to adjust dcdc2 output with 2.4V
 Press any key to continue
-deepsleep_externally_enter() drives nDEEPSLEEP pin (RSA_CTS of UART P1) low
-and then drives it high
-&&&&&&&
+Drives nDEEPSLEEP pin (RSA_CTS of UART P1) low to enter Deep Sleep
+And then drives it high to exit
+&
 deepsleep_externally_enter() Wakeup from Deep Sleep
 deepsleep_externally_exit() all configurations recovered from Deep Sleep!
+
+******************** poweron_pin_test() ********************
 SET TPS65070 POWER_ON = LOW
 TPS65070_POWER_ONn = 1
 TPS65070_PB_OUT   = 1
 SET TPS65070 POWER_ON = HIGH
 TPS65070_POWER_ONn = 0
 TPS65070_PB_OUT   = 1
+
+******************** pmu_power_off_test() ********************
 power off DCDC1
+DCDC2 voltage: 3300 mV
+DCDC2 voltage: 3200 mV
+DCDC2 voltage: 3100 mV
+DCDC2 voltage: 3000 mV
+DCDC2 voltage: 2900 mV
+DCDC2 voltage: 2800 mV
+DCDC2 voltage: 2700 mV
+DCDC2 voltage: 2600 mV
+DCDC2 voltage: 2500 mV
+DCDC2 voltage: 2400 mV
+DCDC2 voltage: 2300 mV
+DCDC2 voltage: 2200 mV
+DCDC2 voltage: 2100 mV
+DCDC2 voltage: 2000 mV
+DCDC2 voltage: 1900 mV
+DCDC2 voltage: 1800 mV
+DCDC2 voltage: 1700 mV
+DCDC2 voltage: 1600 mV
+DCDC2 voltage: 1500 mV
+DCDC2 voltage: 1400 mV
+DCDC2 voltage: 1300 mV
+DCDC2 voltage: 1200 mV
+DCDC2 voltage: 1100 mV
+DCDC2 voltage: 1000 mV
+DCDC2 voltage: 0900 mV
+DCDC2 voltage: 0800 mV
+DCDC2 voltage: 0725 mV
+DCDC2 voltage: 0725 mV
 power off DCDC2

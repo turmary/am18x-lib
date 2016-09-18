@@ -48,8 +48,9 @@ static void psc0_isr(void) {
 // The following sequence should be executed by the ARM within
 // the ARM Clock Stop Request interrupt ISR
 static void arm_clock_off_isr(void) {
-	/*
+
 	printk("%s()\n", __func__);
+	/*
 	psc_dump_regs(PSC0);
 	*/
 
