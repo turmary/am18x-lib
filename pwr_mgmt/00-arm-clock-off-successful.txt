@@ -173,6 +173,19 @@ Current OPerating Point:  1000 mV
 Current Frequency:    24000000 Hz
 
 ******************** wfi_test() ********************
+M  = 0  MMU             disabled
+A  = 1  AlignFault      enabled
+C  = 0  DCache          disabled
+B  = 0  Endianness      Little-endian
+S  = 0  SystemProtect
+R  = 0  ROMProtect
+I  = 0  ICache          disabled
+V  = 1  VectLocate      High(0xFFFF0000)
+RR = 0  CacheReplace    Random
+L4 = 0  LoadSetTbit
+one second counter
+ICache    on counter = 548647
+ICache   off counter = 188147
 one second counter
 pll enabled counter = 187540
 pll bypass  counter = 46712

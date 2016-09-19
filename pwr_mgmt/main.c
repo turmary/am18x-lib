@@ -197,15 +197,28 @@ kv_t kv_powers[] = {
 
 static int wfi_test(void) {
 	pll_conf_t pllconf[1];
+	cp15_control_t c1[1];
 
 	printk("\n******************** %s() ********************\n", __func__);
 
-	printk("one second counter\n");
 	pll_get_conf(PLL0, pllconf);
 	// pllconf->cflag |= PLL_CFLAG_FROM_POWERON;
 	pll_set_conf(PLL0, pllconf);
 	clk_node_recalc();
 	uart_init();
+
+	*c1 = arm_read_cp15_control();
+	arm_mmu_show_control(c1);
+
+	printk("one second counter\n");
+	c1->I = 1;
+	arm_write_cp15_control(*c1);
+	printk("ICache    on counter = %d\n", one_second_counter(AM18X_FALSE));
+	c1->I = 0;
+	arm_write_cp15_control(*c1);
+	printk("ICache   off counter = %d\n", one_second_counter(AM18X_FALSE));
+
+	printk("one second counter\n");
 	printk("pll enabled counter = %d\n", one_second_counter(AM18X_FALSE));
 	pll_cmd(PLL0, PLL_CMD_POWER_DOWN, 0);
 	clk_node_recalc();
@@ -215,6 +228,7 @@ static int wfi_test(void) {
 	printk("one second counter\n");
 	printk("without wfi counter = %d\n", one_second_counter(AM18X_FALSE));
 	printk("with    wfi counter = %d\n", one_second_counter(AM18X_TRUE));
+
 	return 0;
 }
 

@@ -113,7 +113,46 @@ int arm_mmu_show_cache_type(void);
 #define CP15_C0_S_MASK			(0x1 << 24)
 #define CP15_C0_ctype_MASK		(0xF << 25)
 
+#ifndef __ASSEMBLY__
 // c1, control register, read-write
+typedef struct {
+	unsigned M:			1; // 0
+	unsigned A:			1; // 1
+	unsigned C:			1; // 2
+	unsigned SBO0:			4; // 3
+	unsigned B:			1; // 7
+	unsigned S:			1; // 8
+	unsigned R:			1; // 9
+	unsigned SBZ0:			2; // 10
+	unsigned I:			1; // 12
+	unsigned V:			1; // 13
+	unsigned RR:			1; // 14
+	unsigned L4:			1; // 15
+	unsigned SBO1:			1; // 16
+	unsigned SBZ1:			1; // 17
+	unsigned SBO2:			1; // 18
+	unsigned RES0:			13;// 19
+} cp15_control_t;
+
+static inline cp15_control_t arm_read_cp15_control(void) {
+	cp15_control_t c1;
+
+	asm volatile(
+	"mrc	p15, 0, %0, c1, c0, 0\n"
+	: "=r" (c1)
+	);
+	return c1;
+}
+static inline cp15_control_t arm_write_cp15_control(cp15_control_t c1) {
+	asm volatile(
+	"mcr	p15, 0, %0, c1, c0, 0\n"
+	: "=r" (c1)
+	);
+	return c1;
+}
+int arm_mmu_show_control(const cp15_control_t* c1);
+#endif
+
 #define CP15_C1_ClockMode_MASK		(0x3 << 30)
 #define CP15_C1_ClockMode_FastBus	(0x0 << 30)
 #define CP15_C1_ClockMode_Sync		(0x1 << 30)

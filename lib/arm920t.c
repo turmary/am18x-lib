@@ -42,6 +42,21 @@ int arm_mmu_show_cache_type(void) {
 	return 0;
 }
 
+int arm_mmu_show_control(const cp15_control_t* c1) {
+	printk("M  = %d \tMMU         \t%s\n", c1->M, c1->M? "enabled": "disabled");
+	printk("A  = %d \tAlignFault  \t%s\n", c1->A, c1->A? "enabled": "disabled");
+	printk("C  = %d \tDCache      \t%s\n", c1->C, c1->C? "enabled": "disabled");
+	printk("B  = %d \tEndianness  \t%s-endian\n", c1->B, c1->B? "Big": "Little");
+	printk("S  = %d \tSystemProtect\n", c1->S);
+	printk("R  = %d \tROMProtect\n",    c1->R);
+	printk("I  = %d \tICache      \t%s\n", c1->I, c1->I? "enabled": "disabled");
+	printk("V  = %d \tVectLocate  \t%s\n", c1->V, c1->V? "High(0xFFFF0000)": "Normal(0x00000000)");
+	printk("RR = %d \tCacheReplace\t%s\n", c1->RR,c1->RR? "Round-robin": "Random");
+	printk("L4 = %d \tLoadSetTbit\n", c1->L4);
+
+	return 0;
+}
+
 unsigned arm_read_cp15_fault_address(void) {
 	unsigned fadr;
 
