@@ -416,7 +416,8 @@ uint32_t clk_node_get_freq(uint32_t id) {
 }
 
 am18x_rt clk_node_output(void) {
-	#define ONE_MEGA	1000000
+	#define ONE_MEGA	1000000UL
+	#define ONE_KILO	1000UL
 	int i;
 
 	clk_node_recalc();
@@ -427,6 +428,9 @@ am18x_rt clk_node_output(void) {
 		printk("[%12s] = ", clk_nodes[i].name);
 		if (f % ONE_MEGA == 0) {
 			printk("%10dMhz\n", f / ONE_MEGA);
+		} else if (f < ONE_MEGA) {
+			uint32_t frac = f % ONE_KILO;
+			printk("%6d.%3dKhz\n", f / ONE_KILO, frac);
 		} else {
 			uint32_t frac = f % ONE_MEGA / 1000;
 			printk("%6d.%3dMhz\n", f / ONE_MEGA, frac);
