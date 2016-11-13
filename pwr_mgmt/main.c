@@ -213,10 +213,10 @@ static int wfi_test(void) {
 	printk("one second counter\n");
 	c1->I = 1;
 	arm_write_cp15_control(*c1);
-	printk("ICache    on counter = %d\n", one_second_counter(AM18X_FALSE));
+	printk("ICache   on counter = %d\n", one_second_counter(AM18X_FALSE));
 	c1->I = 0;
 	arm_write_cp15_control(*c1);
-	printk("ICache   off counter = %d\n", one_second_counter(AM18X_FALSE));
+	printk("ICache  off counter = %d\n", one_second_counter(AM18X_FALSE));
 
 	printk("one second counter\n");
 	printk("pll enabled counter = %d\n", one_second_counter(AM18X_FALSE));
