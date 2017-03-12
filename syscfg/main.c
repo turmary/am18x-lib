@@ -23,7 +23,9 @@ kv_t kv_boot[] = {
 	KV_X(UART2),
 	KV_X(UART0),
 	KV_X(UART1),
+	KV_X(MMCSD0),
 	KV_X(EMU),
+	{0, "N/A"},
 };
 
 int main(int argc, char* argv[]) {
