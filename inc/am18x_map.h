@@ -1017,6 +1017,77 @@ enum {
 
 
 /*----------------------------------------------------------------------------*/
+// Enhanced Capture(eCAP) Module
+/*----------------------------------------------------------------------------*/
+enum {
+	CAPx_CAP1 = 0,
+	CAPx_CAP2 = 1,
+	CAPx_CAP3 = 2,
+	CAPx_CAP4 = 3,
+	CAPx_ECCTL1 = 0,
+	CAPx_ECCTL2,
+	CAPx_APRD_active = 0,
+	CAPx_ACMP_active,
+	CAPx_APRD,
+	CAPx_ACMP,
+	ECEINT_EVT1 = 1,
+	ECEINT_EVT2,
+	ECEINT_EVT3,
+	ECEINT_EVT4,
+	ECEINT_CTROVF,
+	ECEINT_CTR_EQU_PRD,
+	ECEINT_CTR_EQU_CMP,
+};
+
+typedef struct {
+	vuint32_t		TSCTR;
+	vuint32_t		CTRPHS;
+	vuint32_t		CAPx[4];
+	uint32_t		RESERVED0[_RS(0x28,0x14)];
+#define ECCTL1_FREESOFT_MASK		(0x3UL << 14)
+#define ECCTL1_FREESOFT_stop		(0x0UL << 14)
+#define ECCTL1_FREESOFT_runs		(0x1UL << 14)
+#define ECCTL1_FREESOFT_none		(0x3UL << 14)
+#define ECCTL1_PRESCALE_MASK		(0x1FUL << 9)
+#define ECCTL1_PRESCALE_VAL(x)		(((x) & 0x3EUL) << 8)
+#define ECCTL1_CTRRSTx_MASK(x)		(0x1UL << (((x) << 1) + 1))
+#define ECCTL1_CTRRSTx_none(x)		(0x0UL << (((x) << 1) + 1))
+#define ECCTL1_CTRRSTx_reset(x)		(0x1UL << (((x) << 1) + 1))
+#define ECCTL1_CTRPOLx_MASK(x)		(0x1UL << (((x) << 1) + 0))
+#define ECCTL1_CTRPOLx_rising(x)	(0x0UL << (((x) << 1) + 0))
+#define ECCTL1_CTRPOLx_falling(x)	(0x1UL << (((x) << 1) + 0))
+#define ECCTL2_SYNCO_SEL_MASK		(0x3UL << 6)
+#define ECCTL2_SYNCO_SEL_pass		(0x0UL << 6)
+#define ECCTL2_SYNCO_SEL_ctr_equ_prd	(0x1UL << 6)
+#define ECCTL2_SYNCO_SEL_disable	(0x2UL << 6)
+#define ECCTL2_STOP_WARP_MASK		(0x3UL << 1)
+#define ECCTL2_STOP_WARP_VAL(x)		((x) << 1)
+	vuint16_t		ECCTLx[2];
+#define ECINT_MASK(x)			(0x1UL << (x))
+#define ECINT_deassert(x)		(0x0UL << (x))
+#define ECINT_assert(x)			(0x1UL << (x))
+	vuint16_t		ECEINT;
+	vcuint16_t		ECFLG;
+	// writing 0 no effect, include ECCLR,ECFRC
+	vuint16_t		ECCLR;
+	vuint16_t		ECFRC;
+#define ECAP_REVID			0x44D22100UL
+	vcuint32_t		REVID;
+} ECAP_con_t;
+
+enum {
+	BIT_DEF(ECCTL1,8,CAPLDEN,no,yes),
+	BIT_DEF(ECCTL2,10,APWMPOL,high,low),
+	BIT_DEF(ECCTL2,9,operating,capture,APWM),
+	BIT_DEF(ECCTL2,8,SWSYNC,none,load),
+	BIT_DEF(ECCTL2,5,SYNCI_EN,no,yes),
+	BIT_DEF(ECCTL2,4,TSCTRSTOP,yes,no),
+	BIT_DEF(ECCTL2,3,RE_ARM,none,arm),
+	BIT_DEF(ECCTL2,0,CONT,continuous,one_shot),
+};
+
+
+/*----------------------------------------------------------------------------*/
 // Enhanced Direct Memory Access(EDMA3)
 /*----------------------------------------------------------------------------*/
 // am1808.pdf, Page 52
@@ -1437,77 +1508,6 @@ typedef struct {
 	uint32_t		RESERVED0[_RS(0x8000,0x4FFC)];
 	EDMA3TC_con_t		TC[2];
 } EDMA_con_t;
-
-
-/*----------------------------------------------------------------------------*/
-// Enhanced Capture(eCAP) Module
-/*----------------------------------------------------------------------------*/
-enum {
-	CAPx_CAP1 = 0,
-	CAPx_CAP2 = 1,
-	CAPx_CAP3 = 2,
-	CAPx_CAP4 = 3,
-	CAPx_ECCTL1 = 0,
-	CAPx_ECCTL2,
-	CAPx_APRD_active = 0,
-	CAPx_ACMP_active,
-	CAPx_APRD,
-	CAPx_ACMP,
-	ECEINT_EVT1 = 1,
-	ECEINT_EVT2,
-	ECEINT_EVT3,
-	ECEINT_EVT4,
-	ECEINT_CTROVF,
-	ECEINT_CTR_EQU_PRD,
-	ECEINT_CTR_EQU_CMP,
-};
-
-typedef struct {
-	vuint32_t		TSCTR;
-	vuint32_t		CTRPHS;
-	vuint32_t		CAPx[4];
-	uint32_t		RESERVED0[_RS(0x28,0x14)];
-#define ECCTL1_FREESOFT_MASK		(0x3UL << 14)
-#define ECCTL1_FREESOFT_stop		(0x0UL << 14)
-#define ECCTL1_FREESOFT_runs		(0x1UL << 14)
-#define ECCTL1_FREESOFT_none		(0x3UL << 14)
-#define ECCTL1_PRESCALE_MASK		(0x1FUL << 9)
-#define ECCTL1_PRESCALE_VAL(x)		(((x) & 0x3EUL) << 8)
-#define ECCTL1_CTRRSTx_MASK(x)		(0x1UL << (((x) << 1) + 1))
-#define ECCTL1_CTRRSTx_none(x)		(0x0UL << (((x) << 1) + 1))
-#define ECCTL1_CTRRSTx_reset(x)		(0x1UL << (((x) << 1) + 1))
-#define ECCTL1_CTRPOLx_MASK(x)		(0x1UL << (((x) << 1) + 0))
-#define ECCTL1_CTRPOLx_rising(x)	(0x0UL << (((x) << 1) + 0))
-#define ECCTL1_CTRPOLx_falling(x)	(0x1UL << (((x) << 1) + 0))
-#define ECCTL2_SYNCO_SEL_MASK		(0x3UL << 6)
-#define ECCTL2_SYNCO_SEL_pass		(0x0UL << 6)
-#define ECCTL2_SYNCO_SEL_ctr_equ_prd	(0x1UL << 6)
-#define ECCTL2_SYNCO_SEL_disable	(0x2UL << 6)
-#define ECCTL2_STOP_WARP_MASK		(0x3UL << 1)
-#define ECCTL2_STOP_WARP_VAL(x)		((x) << 1)
-	vuint16_t		ECCTLx[2];
-#define ECINT_MASK(x)			(0x1UL << (x))
-#define ECINT_deassert(x)		(0x0UL << (x))
-#define ECINT_assert(x)			(0x1UL << (x))
-	vuint16_t		ECEINT;
-	vcuint16_t		ECFLG;
-	// writing 0 no effect, include ECCLR,ECFRC
-	vuint16_t		ECCLR;
-	vuint16_t		ECFRC;
-#define ECAP_REVID			0x44D22100UL
-	vcuint32_t		REVID;
-} ECAP_con_t;
-
-enum {
-	BIT_DEF(ECCTL1,8,CAPLDEN,no,yes),
-	BIT_DEF(ECCTL2,10,APWMPOL,high,low),
-	BIT_DEF(ECCTL2,9,operating,capture,APWM),
-	BIT_DEF(ECCTL2,8,SWSYNC,none,load),
-	BIT_DEF(ECCTL2,5,SYNCI_EN,no,yes),
-	BIT_DEF(ECCTL2,4,TSCTRSTOP,yes,no),
-	BIT_DEF(ECCTL2,3,RE_ARM,none,arm),
-	BIT_DEF(ECCTL2,0,CONT,continuous,one_shot),
-};
 
 
 /*----------------------------------------------------------------------------*/
