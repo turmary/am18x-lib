@@ -16,6 +16,10 @@
 
 #define _RS(b,a)	(((b) - (a) - 0x4UL) >> 2)
 
+
+/*----------------------------------------------------------------------------*/
+// Memory Protection Unit(MPU)
+/*----------------------------------------------------------------------------*/
 typedef struct {
 #define MPU1_PROGxMPxAR_MASK		0xFFFFFC00UL
 #define MPU2_PROGxMPxAR_MASK		0xFFFF0000UL
@@ -81,6 +85,10 @@ enum {
 	BIT_DEF(FLTCLR,0,CLEAR,none,fault),
 };
 
+
+/*----------------------------------------------------------------------------*/
+// Phase-Locked Loop(PLL)
+/*----------------------------------------------------------------------------*/
 typedef struct {
 #define PLL0_REVID			0x44813C00UL
 #define PLL1_REVID			0x44814400UL
@@ -207,6 +215,10 @@ typedef struct {
 	vuint32_t	EMUCNTx[2];
 } PLL_con_t;
 
+
+/*----------------------------------------------------------------------------*/
+// Power and Sleep Controller(PSC)
+/*----------------------------------------------------------------------------*/
 #define MODULE_NR_PER_PSC	32
 typedef enum {
 	PSC_EDMA3_0_C0 = MODULE_NR_PER_PSC * 0,
@@ -377,6 +389,10 @@ typedef struct {
 	vuint32_t	MDCTLx[MODULE_NR_PER_PSC];
 } PSC_con_t;
 
+
+/*----------------------------------------------------------------------------*/
+// System Configuration(SYSCFG)
+/*----------------------------------------------------------------------------*/
 enum {
 	MSTPRI_ARM_I,
 	MSTPRI_ARM_D,
@@ -597,6 +613,10 @@ enum {
 	BIT_DEF(DEEPSLEEP,30,COMPLETE,no,yes),
 };
 
+
+/*----------------------------------------------------------------------------*/
+// ARM Interrupt Controller(AINTC)
+/*----------------------------------------------------------------------------*/
 typedef enum {
 	AINTC_COMMTX = 0,		// 0
 	AINTC_COMMRX,
@@ -810,6 +830,10 @@ typedef struct {
 	vcuint32_t	HIPVRx[2];
 } AINTC_con_t;
 
+
+/*----------------------------------------------------------------------------*/
+// Programmable Real-Time Unit Subsystem(PRUSS)
+/*----------------------------------------------------------------------------*/
 // refer to 
 // http://processors.wiki.ti.com/index.php/Programmable_Realtime_Unit
 typedef struct {
@@ -849,6 +873,10 @@ enum {
 	BIT_DEF(CONTROL,0,SOFTRESET,yes,no),
 };
 
+
+/*----------------------------------------------------------------------------*/
+// DDR2/mDDR Memory Controller(DDR)
+/*----------------------------------------------------------------------------*/
 typedef struct {
 #define DDR0_REVID			(0x40311B1FUL)
 	vcuint32_t	REVID;
@@ -987,6 +1015,10 @@ enum {
 	BIT_DEF(DRPYC1R,6,PWRDNEN,powerup,powerdown),
 };
 
+
+/*----------------------------------------------------------------------------*/
+// Enhanced Direct Memory Access(EDMA3)
+/*----------------------------------------------------------------------------*/
 // am1808.pdf, Page 52
 // 5.9.1 EDMA3 Channel Synchronization Events
 typedef enum {
@@ -1406,6 +1438,10 @@ typedef struct {
 	EDMA3TC_con_t		TC[2];
 } EDMA_con_t;
 
+
+/*----------------------------------------------------------------------------*/
+// General-Purpose Input/Output(GPIO)
+/*----------------------------------------------------------------------------*/
 typedef struct {
 #define XXX_GPkPj_MASK(j)		(0x1UL << (j))
 #define DIR_GPkPj_output(j)		(0x0UL << (j))
@@ -1457,6 +1493,10 @@ typedef struct {
 	GPIO_pair_t	BANKS[5];
 } GPIO_con_t;
 
+
+/*----------------------------------------------------------------------------*/
+// Inter-Integrated Circuit(I2C)
+/*----------------------------------------------------------------------------*/
 typedef struct {
 #define ICOAR_OADDR_MASK		(0x3FFUL << 0)
 #define ICOAR_OADDR_VAL(x)		((0x3FFUL & (x)) << 0)
@@ -1635,6 +1675,10 @@ typedef struct {
 	vuint32_t	ICPDCLR;
 } I2C_con_t;
 
+
+/*----------------------------------------------------------------------------*/
+// Liquid Crystal Display Controller(LCDC)
+/*----------------------------------------------------------------------------*/
 typedef struct {
 #define LCDC_REVID			0x4C100100UL
 	vcuint32_t	REVID;
@@ -1743,6 +1787,10 @@ enum {
 	BIT_DEF(LDMAC,0,FRAMEMODE,one,two),
 };
 
+
+/*----------------------------------------------------------------------------*/
+// Multimedia Card(MMC)/Secure Digital(SD) Card(MMCSD)
+/*----------------------------------------------------------------------------*/
 typedef struct {
 #define MMCCTL_DATEG_MASK		(0x3UL << 6)
 #define MMCCTL_DATEG_disabled		(0x0UL << 6)
@@ -1880,6 +1928,10 @@ enum {
 	BIT_DEF(MMCFIFOCTL,0,FIFORST,none,reset),
 };
 
+
+/*----------------------------------------------------------------------------*/
+// Real-Time Clock(RTC)
+/*----------------------------------------------------------------------------*/
 typedef struct {
 	vuint32_t	SECOND;
 	vuint32_t	MINUTE;
@@ -1936,6 +1988,10 @@ enum {
 	BIT_DEF(OSC,5,SWRESET,none,reset),
 };
 
+
+/*----------------------------------------------------------------------------*/
+// 64-Bit Timer Plus
+/*----------------------------------------------------------------------------*/
 typedef struct {
 	vcuint32_t	REVID;
 #define EMUMGT_SOFT_MASK		(0x1UL << 1)
@@ -2087,6 +2143,10 @@ typedef struct {
 	vuint32_t	CMPx[8];
 } TIMER_con_t;
 
+
+/*----------------------------------------------------------------------------*/
+// Universal Asynchronous Reiceiver/Transmitter(UART)
+/*----------------------------------------------------------------------------*/
 typedef struct {
 #define RBR_DATA_MASK			0xFFUL
 #define THRw				RBRr
@@ -2240,6 +2300,10 @@ typedef struct {
 	vuint32_t	MDR;
 } UART_con_t;
 
+
+/*----------------------------------------------------------------------------*/
+// Univeral Serial Bus 2.0(USB)
+/*----------------------------------------------------------------------------*/
 typedef struct {
 // TXMAXP, RXMAXP
 #define xXMAXP_MAXPAYLOAD_MASK		(0x7FFUL << 0)
