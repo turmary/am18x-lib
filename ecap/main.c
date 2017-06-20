@@ -22,13 +22,11 @@ const uint32_t f_osc = F_OSCIN;
 // AXR15/EPWM0TZ[0]/ECAP2_APWM2/GP0[7] as ECAP2_APWM2
 #define LCDC_BL_PWM_PINMUX	1,0,4
 
-ecap_conf_t ecap_conf[1] = {
-	{
-		1000,
-		50,
-		ECAP_ENABLE | ECAP_ACTIVE_HIGH,
-	}
-};
+static ecap_conf_t ecap_conf[1] = {{
+	.freq = 600,
+	.duty = 50,
+	.cflags = ECAP_ENABLE | ECAP_ACTIVE_HIGH,
+}};
 
 #define ECAP_HW		ECAP2
 

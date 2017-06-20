@@ -87,9 +87,10 @@ am18x_rt ecap_set_conf(ECAP_con_t* econ, const ecap_conf_t* conf) {
 	// econ->ECCTLx[CAPx_ECCTL2] = r;
 	// r = econ->ECCTLx[CAPx_ECCTL2];
 
-	// stop running ?
-	v = (conf->cflags & ECAP_ENABLE)? ECCTL2_TSCTRSTOP_no: ECCTL2_TSCTRSTOP_yes;
-	r = FIELD_SET(r, ECCTL2_TSCTRSTOP_MASK, v);
+	// start running ?
+	if (conf->cflags & ECAP_ENABLE) {
+		r = FIELD_SET(r, ECCTL2_TSCTRSTOP_MASK, ECCTL2_TSCTRSTOP_no);
+	}
 	econ->ECCTLx[CAPx_ECCTL2] = r;
 
 	return AM18X_OK;
