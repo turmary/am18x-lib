@@ -73,4 +73,8 @@
 #include "am18x_usb.h"
 #endif
 
+#ifdef _ECAP
+#include "am18x_ecap.h"
+#endif
+
 #endif//__AM18X_LIB_H__

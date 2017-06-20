@@ -69,6 +69,9 @@ extern const uint32_t f_osc;
 
 #define _RTC
 
+#define _ECAP
+#define _ECAP2
+
 #ifdef DEBUG
 #define assert(expr) ((expr) ? (void)0 : assert_failed((uint8_t *)__FILE__, __LINE__))
 void assert_failed(uint8_t* file, uint32_t line);
