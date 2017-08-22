@@ -32,7 +32,7 @@ uint32_t mmcsd_xet_freq(MMCSD_con_t* mcon, uint32_t freq) {
 	mcon->MMCCLK = FIELD_SET(reg, msk, MMCCLK_CLKRT_VAL(v));
 
 	if (mmcsd_get_freq(mcon) > freq) {
-		v--;
+		v++;
 		mcon->MMCCLK = FIELD_SET(reg, msk, MMCCLK_CLKRT_VAL(v));
 	}
 

@@ -317,7 +317,7 @@ uint32_t sdprot_trans_speed(const CSD_t* csd) {
 	}
 
 	idx = __field_xget(v, 0x78);
-	speed = base* muls[idx] / 10;
+	speed = base / 10 * muls[idx];
 
 	printk("SDPROT\tTRANS_SPEED = %d * (%d / 10) = %d Hz\n", base, muls[idx], speed);
 
