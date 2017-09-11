@@ -77,4 +77,8 @@
 #include "am18x_ecap.h"
 #endif
 
+#ifdef _EMAC
+#include "am18x_emac.h"
+#endif
+
 #endif//__AM18X_LIB_H__

@@ -1511,6 +1511,267 @@ typedef struct {
 
 
 /*----------------------------------------------------------------------------*/
+// EMAC/MDIO Module
+/*----------------------------------------------------------------------------*/
+typedef struct emac_desc {
+	struct emac_desc*	next;
+	vuint8_t*		buf_ptr;
+	vuint16_t		len;		/* valid data length */
+						/* not include offset bytes */
+	vuint16_t		offset;		/* valid if SOP set */
+						/* unused bytes from buf_ptr */
+						/* to start of valid data */
+	vuint16_t		pkt_len;	/* data bytes in entire packet */
+						/* not include offset bytes */
+						/* summary of all fragment lens */
+	vuint16_t		flags;
+} emac_desc_t;
+
+typedef enum {
+	BIT_DEF(EMACDF,15,SOP,none,start),	/* Start of Packet, set by SW */
+	BIT_DEF(EMACDF,14,EOP,none,end),	/* End of Packet, set by SW */
+	BIT_DEF(EMACDF,13,OWNER,sw,emac),	/* SOP:Ownership, set by SW, clear by EMAC */
+	BIT_DEF(EMACDF,12,EOQ,none,end),	/* EOP:End of Queue, clear by SW, set by EMAC */
+	BIT_DEF(EMACDF,11,TDOWNCMPLT,no,yes),	/* SOP:Teardown or aborted */
+						/* EMAC set this bit when abort transmission */
+	BIT_DEF(EMACDF,10,PASSCRC,no,yes),	/* SOP:Pass CRC */
+						/* when set, packet data contain 4 bytes Ethernet CRC */
+						/* when cleared, EMAC generates 4 bytes CRC */
+	BIT_DEF(EMACDF,9,JABBER,no,yes),	/* SOP:Jabber Flag */
+						/* EMAC set this bit when exceeding RXMAXLEN & errors */
+	BIT_DEF(EMACDF,8,OVERSIZE,no,yes),	/* SOP:Oversize Flag, set by EMAC */
+	BIT_DEF(EMACDF,7,FRAGMENT,no,yes),	/* SOP:Fragment Flag, set by EMAC */
+	BIT_DEF(EMACDF,6,UNDERSIZED,no,yes),	/* SOP:Undersized Flag, set by EMAC */
+	BIT_DEF(EMACDF,5,CONTROL,no,yes),	/* SOP:Control Flag, set by EMAC */
+	BIT_DEF(EMACDF,4,OVERRUN,no,yes),	/* SOP:Overrun Flag, set by EMAC */
+	BIT_DEF(EMACDF,3,CODEERROR,no,yes),	/* SOP:Code Error, set by EMAC */
+	BIT_DEF(EMACDF,2,ALIGNERROR,no,yes),	/* SOP:Alignment Error, set by EMAC */
+	BIT_DEF(EMACDF,1,CRCERROR,no,yes),	/* SOP:CRC Error, set by EMAC */
+	BIT_DEF(EMACDF,0,NOMATCH,no,yes),	/* SOP:No Match, set by EMAC */
+						/* if it did not pass any of */
+						/* the EMAC's address match criteria */
+} emac_desc_flags_t;
+
+typedef struct {
+#define EMACC_REVID			0x4EC80101UL
+	vcuint32_t		REVID;
+	vuint32_t		SOFTRESET;
+	uint32_t		RESERVED0[1];
+// n = 0..2
+#define EMACCINTCTL_CxTXPACEEN_MASK(n)	(0x1UL << (17 + ((n) << 1)))
+#define EMACCINTCTL_CxTXPACEEN_no(n)	(0x0UL << (17 + ((n) << 1)))
+#define EMACCINTCTL_CxTXPACEEN_yes(n)	(0x1UL << (17 + ((n) << 1)))
+#define EMACCINTCTL_CxRXPACEEN_MASK(n)	(0x1UL << (16 + ((n) << 1)))
+#define EMACCINTCTL_CxRXPACEEN_no(n)	(0x0UL << (16 + ((n) << 1)))
+#define EMACCINTCTL_CxRXPACEEN_yes(n)	(0x1UL << (16 + ((n) << 1)))
+#define EMACCINTCTL_PRESCALE_MASK	(0x7FFUL << 0)
+#define EMACCINTCTL_PRESCALE_VAL(x)	(((x) & 0x7FFUL) << 0)
+	vuint32_t		INTCONTROL;
+	struct {
+// n = 0..7
+// include CxRXTHRESHEN,CxRXTHRESHSTAT
+#define RXTHRESHXX_RXCHx_MASK(n)	(0x1UL << (n))
+#define RXTHRESHXX_RXCHx_no(n)		(0x0UL << (n))
+#define RXTHRESHXX_RXCHx_yes(n)		(0x1UL << (n))
+		vuint32_t		RXTHRESHEN;	// CnRXTHRESHPULSE
+// n = 0..7
+// include CnRXEN, CnRXSTAT
+#define CnRXXX_RXCHx_MASK(n)		(0x1UL << (n))
+#define CnRXXX_RXCHx_no(n)		(0x0UL << (n))
+#define CnRXXX_RXCHx_yes(n)		(0x1UL << (n))
+		vuint32_t		RXEN;		// CnRXPULSE
+// n = 0..7
+// include CnTXEN,CnTXSTAT
+#define CnTXXX_TXCHx_MASK(n)		(0x1UL << (n))
+#define CnTXXX_TXCHx_no(n)		(0x0UL << (n))
+#define CnTXXX_TXCHx_yes(n)		(0x1UL << (n))
+		vuint32_t		TXEN;		// CnTXPULSE
+		vuint32_t		MISCEN;
+	} CxINT[3];
+	struct {
+		vuint32_t		RXTHRESHSTAT;	// CnRXTHRESHPULSE
+		vuint32_t		RXSTAT;		// CnRXPULSE
+		vuint32_t		TXSTAT;		// CnTXPULSE
+		vuint32_t		MISCSTAT;
+	} CxSTAT[3];
+	struct {
+#define CnRXIMAX_RXIMAX_MASK		(0x3FUL << 0)
+#define CnRXIMAX_RXIMAX_VAL(x)		(((x) & 0x3FUL) << 0)
+		vuint32_t		RXIMAX;
+#define CnTXIMAX_TXIMAX_MASK		(0x3FUL << 0)
+#define CnTXIMAX_TXIMAX_VAL(x)		(((x) & 0x3FUL) << 0)
+		vuint32_t		TXIMAX;
+	} CxIMAX[3];
+} EMACC_con_t;
+
+enum {
+	BIT_DEF(EMACCSWRST,0,RESET,no,yes),
+	BIT_DEF(CnMISCEN,3,STATPENDEN,no,yes),
+	BIT_DEF(CnMISCEN,2,HOSTPENDEN,no,yes),
+	BIT_DEF(CnMISCEN,1,LINKINT0EN,no,yes),
+	BIT_DEF(CnMISCEN,0,USERINT0EN,no,yes),
+};
+
+typedef struct {
+#define MDIO_REVID			(0x00070104UL)
+	vcuint32_t		REVID;
+#define MDIOCTL_CLKDIV_MASK		(0xFFFFUL << 0)
+#define MDIOCTL_CLKDIV_VAL(x)		(((x) & 0xFFFFUL) << 0)
+#define MDIOCTL_HIGHCH_MASK		(0x1FUL << 24)
+#define MDIOCTL_HIGHCH_VAL(x)		(((x) & 0x1FUL) << 24)
+	vuint32_t		CONTROL;
+#define MDIO_ALIVE_MASK(n)		(0x1UL << (n))
+#define MDIO_ALIVE_no(n)		(0x0UL << (n))
+#define MDIO_ALIVE_ack(n)		(0x1UL << (n))
+	vcuint32_t		ALIVE;
+#define MDIO_LINK_MASK(n)		(0x1UL << (n))
+#define MDIO_LINK_no(n)			(0x0UL << (0))
+#define MDIO_LINK_yes(n)		(0x1UL << (0))
+	vcuint32_t		LINK;
+	vcuint32_t		LINKINTRAW;
+	vcuint32_t		LINKINTMASKED;
+	uint32_t		RESERVED0[2];
+	vcuint32_t		USEINTRAW;
+	vcuint32_t		USEINTMASKED;
+	vuint32_t		USEINTMASKSET;
+	vuint32_t		USEINTMASKCLEAR;
+	uint32_t		RESERVED1[_RS(0x80,0x2C)];
+	struct {
+#define USERACCESSx_REGADR_MASK		(0x1FUL << 21)
+#define USERACCESSx_REGADR_VAL(x)	(((x) & 0x1FUL) << 21)
+#define USERACCESSx_PHYADR_MASK		(0x1FUL << 16)
+#define USERACCESSx_PHYADR_VAL(x)	(((x) & 0x1FUL) << 16)
+#define USERACCESSx_DATA_MASK		(0xFFFFUL << 0)
+#define USERACCESSx_DATA_VAL(x)		(((x) & 0xFFFFUL) << 0)
+		vuint32_t		ACCESS;
+#define USERPHYSELx_PHYADRMON_MASK	(0x1FUL << 0)
+#define USERPHYSELx_PHYADRMON_VAL(x)	(((x) & 0x1FUL) << 0)
+		vuint32_t		PHYSEL;
+	} USER[2];
+} MDIO_con_t;
+
+enum {
+	BIT_DEF(MDIOCTL,31,IDLE,no,yes),
+	BIT_DEF(MDIOCTL,30,ENABLE,no,yes),
+	BIT_DEF(MDIOCTL,20,PREAMBLE,standard,none),
+	BIT_DEF(MDIOCTL,19,FAULT,no,phy),
+	BIT_DEF(MDIOCTL,18,FAULTENB,no,yes),
+
+	// include LINKINTRAW,LINKINTMASKED
+	BIT_DEF(LINKINTXX,1,USERPHY1,no,yes),
+	BIT_DEF(LINKINTXX,0,USERPHY0,no,yes),
+
+	// include USERINTRAW,USERINTMASKED,USERINTMASKSET,USERINTMASKCLEAR
+	BIT_DEF(USERINTXX,1,USERACCESS1,no,complete),
+	BIT_DEF(USERINTXX,0,USERACCESS0,no,complete),
+
+	BIT_DEF(USERACCESSx,31,GO,none,run),
+	BIT_DEF(USERACCESSx,30,WRITE,no,yes),
+	BIT_DEF(USERACCESSx,29,ACK,no,yes),
+	BIT_DEF(USERPHYSELx,7,LINKSEL,mdio,reserved),
+	BIT_DEF(USERPHYSELx,6,LINKINTENB,no,yes),
+};
+
+typedef struct {
+	vcuint32_t		RXGOODFRAMES;		// 0x00
+	vcuint32_t		RXBCASTFRAMES;
+	vcuint32_t		RXMCASTFRAMES;
+	vcuint32_t		RXPAUSEFRAMES;
+	vcuint32_t		RXCRCERRORS;		// 0x10
+	vcuint32_t		RXALIGNCODEERRORS;
+	vcuint32_t		RXOVERSIZED;
+	vcuint32_t		RXJABBER;
+	vcuint32_t		RXUNDERSIZED;		// 0x20
+	vcuint32_t		RXFRAGMENTS;
+	vcuint32_t		RXFILTERED;
+	vcuint32_t		RXQOSFILTERED;
+	vcuint32_t		RXOCTETS;		// 0x30
+	vcuint32_t		TXGOODFRAMES;
+	vcuint32_t		TXBCASTFRAMES;
+	vcuint32_t		TXMCASTFRAMES;
+	vcuint32_t		TXPAUSEFRAMES;		// 0x40
+	vcuint32_t		TXDEFERRED;
+	vcuint32_t		TXCOLLISION;
+	vcuint32_t		TXSINGLECOLL;
+	vcuint32_t		TXMULTICOLL;		// 0x50
+	vcuint32_t		TXEXCESSIVECOLL;
+	vcuint32_t		TXLATECOLL;
+	vcuint32_t		TXTXUNDERRUN;
+	vcuint32_t		TXCARRIERSENSE;		// 0x60
+	vcuint32_t		TXOCTETS;
+	vcuint32_t		FRAME64;
+	vcuint32_t		FRAME65T127;
+	vcuint32_t		FRAME128T255;		// 0x70
+	vcuint32_t		FRAME256T511;
+	vcuint32_t		FRAME512T1023;
+	vcuint32_t		FRAME1024TUP;
+	vcuint32_t		NETOCTETS;		// 0x80
+	vcuint32_t		RXSOFOVERRUNS;
+	vcuint32_t		RXMOFOVERRUNS;
+	vcuint32_t		RXDMAOVERRUNS;
+} EMAC_statis_t;
+
+typedef struct {
+	vcuint32_t		TXREVID;
+	vuint32_t		TXCONTROL;
+	vuint32_t		TXTEARDOWN;
+	uint32_t		RESERVED0[1];
+	vcuint32_t		RXREVID;
+	vuint32_t		RXCONTROL;
+	vuint32_t		RXTEARDOWN;
+	uint32_t		RESERVED1[1];
+	uint32_t		RESERVED2[_RS(0x80,0x1C)];
+	vcuint32_t		TXINTSTATRAW;
+	vcuint32_t		TXINTSTATMASKED;
+	vuint32_t		TXINTMASKSET;
+	vuint32_t		TXINTMASKCLEAR;
+	vuint32_t		MACINVECTOR;
+	vuint32_t		MACEOIVECTOR;
+	uint32_t		RESERVED3[_RS(0xA0,0x94)];
+	vcuint32_t		RXINTSTATRAW;
+	vcuint32_t		RXINTSTATMASKED;
+	vuint32_t		RXINTMASKSET;
+	vuint32_t		RXINTMASKCLEAR;
+	vcuint32_t		MACINTSTATRAW;
+	vcuint32_t		MACINTSTATMASKED;
+	vuint32_t		MACINTMASKSET;
+	vuint32_t		MACINTMASKCLEAR;
+	uint32_t		RESERVED4[_RS(0x100,0xBC)];
+	vuint32_t		RXMPBENABLE;
+	vuint32_t		RXUNICASTSET;
+	vuint32_t		RXUNICASTCLEAR;
+	vuint32_t		RXMAXLEN;
+	vuint32_t		RXBUFFEROFFSET;
+	vuint32_t		RXFILTERLOWTHRESH;
+	vuint32_t		RXxFLOWTHRESH[8];
+	vuint32_t		RXxFREEBUFFER[8];
+	vuint32_t		MACCONTROL;
+	vcuint32_t		MACSTATUS;
+	vuint32_t		EMCONTROL;
+	vuint32_t		FIFOCONTROL;
+	vuint32_t		MACCONFIG;
+	vuint32_t		SOFTRESET;
+	uint32_t		RESERVED5[_RS(0x1D0,0x174)];
+	vuint64_t		MACSRCADDR;
+	vuint64_t		MACHASH;
+	vuint32_t		BOFFTEST;
+	vuint32_t		TPACETEST;
+	vuint32_t		RXPAUSE;
+	vuint32_t		TXPAUSE;
+	uint32_t		RESERVED6[_RS(0x200,0x1EC)];
+	EMAC_statis_t		STATIS;
+	uint32_t		RESERVED7[_RS(0x500,0x28C)];
+	vuint64_t		MACADDR;
+	vuint32_t		MACINDEX;
+	uint32_t		RESERVED8[_RS(0x600,0x508)];
+	vuint32_t		TXxHDP[8];
+	vuint32_t		RXxHDP[8];
+	vuint32_t		TXxCP[8];
+	vuint32_t		RXxCP[8];
+} EMAC_con_t;
+
+
+/*----------------------------------------------------------------------------*/
 // General-Purpose Input/Output(GPIO)
 /*----------------------------------------------------------------------------*/
 typedef struct {
@@ -2682,6 +2943,11 @@ enum {
 #define MPU2_BASE			0x01E15000UL
 #define PLL1_BASE			0x01E1A000UL
 #define MMCSD1_BASE			0x01E1B000UL
+#define EMACCRAM_BASE			0x01E20000UL
+#define EMACCRAM_SIZE			0x00002000UL
+#define EMACC_BASE			0x01E22000UL
+#define EMAC_BASE			0x01E23000UL
+#define MDIO_BASE			0x01E24000UL
 #define GPIOCON_BASE			0x01E26000UL
 #define PSC1_BASE			0x01E27000UL
 #define I2C1_BASE			0x01E28000UL
@@ -2759,6 +3025,12 @@ enum {
 #endif
 #ifdef _EDMA1
 	#define EDMA1			((EDMA_con_t*)EDMA3_1CC0_BASE)
+#endif
+#ifdef _EMAC
+	#define EMACC_RAM		((uint8_t*)EMACCRAM_BASE)
+	#define EMACC			((EMACC_con_t*)EMACC_BASE)
+	#define EMAC			((EMAC_con_t*)EMAC_BASE)
+	#define MDIO			((MDIO_con_t*)MDIO_BASE)
 #endif
 #ifdef _GPIO
 	#define GPIOCON			((GPIO_con_t*)GPIOCON_BASE)
@@ -2857,6 +3129,12 @@ enum {
 #endif
 #ifdef _EDMA1
 	_EXTERN EDMA_con_t		*EDMA1;
+#endif
+#ifdef _EMAC
+	_EXTERN	uint8_t			*EMACC_RAM;
+	_EXTERN EMACC_con_t		*EMACC;
+	_EXTERN EMAC_con_t		*EMAC;
+	_EXTERN MDIO_con_t		*MDIO;
 #endif
 #ifdef _GPIO
 	_EXTERN GPIO_con_t		*GPIOCON;
