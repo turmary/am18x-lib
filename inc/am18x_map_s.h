@@ -219,6 +219,7 @@
 #define BOOTCFG_BOOTMODE_UART2		0x14
 #define BOOTCFG_BOOTMODE_UART0		0x16
 #define BOOTCFG_BOOTMODE_UART1		0x17
+#define BOOTCFG_BOOTMODE_MMCSD0		0x1C
 #define BOOTCFG_BOOTMODE_EMU		0x1E
 #define KICK0R_UNLOCK			0x83E70B13
 #define KICK0R_LOCK			0x00000000
@@ -450,6 +451,28 @@
 #define PCMRS_REGIONSEL1_register	(0x7 << 0)
 #define DRPYC1R_RL_MASK			(0x7 << 0)
 #define DRPYC1R_RL_VAL(x)		((x) << 0)
+#define ECCTL1_FREESOFT_MASK		(0x3 << 14)
+#define ECCTL1_FREESOFT_stop		(0x0 << 14)
+#define ECCTL1_FREESOFT_runs		(0x1 << 14)
+#define ECCTL1_FREESOFT_none		(0x3 << 14)
+#define ECCTL1_PRESCALE_MASK		(0x1F << 9)
+#define ECCTL1_PRESCALE_VAL(x)		(((x) & 0x3E) << 8)
+#define ECCTL1_CTRRSTx_MASK(x)		(0x1 << (((x) << 1) + 1))
+#define ECCTL1_CTRRSTx_none(x)		(0x0 << (((x) << 1) + 1))
+#define ECCTL1_CTRRSTx_reset(x)		(0x1 << (((x) << 1) + 1))
+#define ECCTL1_CTRPOLx_MASK(x)		(0x1 << (((x) << 1) + 0))
+#define ECCTL1_CTRPOLx_rising(x)	(0x0 << (((x) << 1) + 0))
+#define ECCTL1_CTRPOLx_falling(x)	(0x1 << (((x) << 1) + 0))
+#define ECCTL2_SYNCO_SEL_MASK		(0x3 << 6)
+#define ECCTL2_SYNCO_SEL_pass		(0x0 << 6)
+#define ECCTL2_SYNCO_SEL_ctr_equ_prd	(0x1 << 6)
+#define ECCTL2_SYNCO_SEL_disable	(0x2 << 6)
+#define ECCTL2_STOP_WARP_MASK		(0x3 << 1)
+#define ECCTL2_STOP_WARP_VAL(x)		((x) << 1)
+#define ECINT_MASK(x)			(0x1 << (x))
+#define ECINT_deassert(x)		(0x0 << (x))
+#define ECINT_assert(x)			(0x1 << (x))
+#define ECAP_REVID			0x44D22100
 #define OPT_PRIVID_MASK			(0xF << 24)
 #define OPT_PRIVID_X(x)			(((x) & 0xF) << 24)
 #define OPT_TCC_MASK			(0x3F << 12)
@@ -1229,8 +1252,13 @@
 #define SYSCFG1_BASE			0x01E2C000
 #define EDMA3_1CC0_BASE			0x01E30000
 #define EDMA3_1TC0_BASE			0x01E38000
+#define ECAP0_BASE			0x01F06000
+#define ECAP1_BASE			0x01F07000
+#define ECAP2_BASE			0x01F08000
 #define TIMER2_BASE			0x01F0C000
 #define TIMER3_BASE			0x01F0D000
+#define OnChipRAM_BASE			0x80000000
+#define OnChipRAM_SISE			0x00020000
 #define DDR0_BASE			0xB0000000
 #define ARMLocalROM_BASE		0xFFFD0000
 #define ARMLocalROM_SIZE		0x00010000

@@ -37,8 +37,13 @@ am18x_rt ddr_initialize(DDR_con_t* dcon, const ddr_conf_t* conf) {
 	pllconf->pllm = mclk * 2 * pllconf->postdiv / F_OSCIN;
 	pll_set_conf(PLL1, pllconf);
 	clk_node_recalc();
+
+	// 6.3.2 DDR2/mDDR Memory Controller Clocking
+	//   2X_CLK is sourced from PLL1_SYSCLK1
 	_2x_clk = dev_get_freq(DCLK_ID_DDR2_MDDR_PHY);
 
+	//   2X_CLK clock is again devided down by 2 in the DDR PHY controller
+	// to generate a clock called MCLK.
 	mclk = _2x_clk / 2;
 	printk("DDR CLK: %9d Hz\n", mclk);
 
@@ -135,6 +140,7 @@ am18x_rt ddr_initialize(DDR_con_t* dcon, const ddr_conf_t* conf) {
 	v = _TV2V(conf->trc);
 	reg = __field_xset(reg, SDTIMR1_TRC_MASK, v);
 	v = _TV2V(conf->trrd);
+	v += (conf->bank_cnt >= 8)? 1: 0;
 	reg = __field_xset(reg, SDTIMR1_TRRD_MASK, v);
 	v = _TV2V(conf->twtr);
 	reg = __field_xset(reg, SDTIMR1_TWTR_MASK, v);
@@ -187,7 +193,6 @@ am18x_rt ddr_initialize(DDR_con_t* dcon, const ddr_conf_t* conf) {
 	reg = FIELD_SET(reg, PBBPR_PROLDCOUNT_MASK, PBBPR_PROLDCOUNT_VAL(0x30));
 	dcon->PBBPR = reg;
 
-	
 	return AM18X_OK;
 }
 

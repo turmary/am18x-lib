@@ -175,14 +175,14 @@ typedef struct {
 // PLL0 x = 1..7
 // PLL1 x = 1..3
 #define ALNCTL_ALNx_MASK(x)		(0x1UL << ((x) - 1))
-#define ALNCTL_ALNx_no			(0x0UL << ((x) - 1))
-#define ALNCTL_ALNx_yes			(0x1UL << ((x) - 1))
+#define ALNCTL_ALNx_no(x)		(0x0UL << ((x) - 1))
+#define ALNCTL_ALNx_yes(x)		(0x1UL << ((x) - 1))
 	vuint32_t	ALNCTL;
 // PLL0 x = 1..7
 // PLL1 x = 1..3
 #define DCHANGE_SYSx_MASK(x)		(0x1UL << ((x) - 1))
-#define DCHANGE_SYSx_none		(0x0UL << ((x) - 1))
-#define DCHANGE_SYSx_modified		(0x1UL << ((x) - 1))
+#define DCHANGE_SYSx_none(x)		(0x0UL << ((x) - 1))
+#define DCHANGE_SYSx_modified(x)	(0x1UL << ((x) - 1))
 	vcuint32_t	DCHANGE;
 #define CKEN_OBSEN_MASK			(0x1UL << 1)
 #define CKEN_OBSEN_disable		(0x0UL << 1)
@@ -201,8 +201,8 @@ typedef struct {
 // PLL0 x = 1..7
 // PLL1 x = 1..3
 #define SYSTAT_SYSxON_MASK(X)		(0x1UL << ((x) - 1))
-#define SYSTAT_SYSxON_off		(0x0UL << ((x) - 1))
-#define SYSTAT_SYSxON_on		(0x1UL << ((x) - 1))
+#define SYSTAT_SYSxON_off(x)		(0x0UL << ((x) - 1))
+#define SYSTAT_SYSxON_on(x)		(0x1UL << ((x) - 1))
 	vcuint32_t	SYSTAT;
 	uint32_t	RESERVED4[_RS(0x160,0x150)];
 // PLLDIVxB_IDX include PLLDIV4, PLLDIV5, PLLDIV6, PLLDIV7
@@ -2745,6 +2745,15 @@ enum {
 #ifdef _DDR0
 	#define DDR0			((DDR_con_t*)DDR0_BASE)
 #endif
+#ifdef _ECAP0
+	#define ECAP0			((ECAP_con_t*)ECAP0_BASE)
+#endif
+#ifdef _ECAP1
+	#define ECAP1			((ECAP_con_t*)ECAP1_BASE)
+#endif
+#ifdef _ECAP2
+	#define ECAP2			((ECAP_con_t*)ECAP2_BASE)
+#endif
 #ifdef _EDMA0
 	#define EDMA0			((EDMA_con_t*)EDMA3_0CC0_BASE)
 #endif
@@ -2796,15 +2805,6 @@ enum {
 #ifdef _USB0
 	#define USB0			((USB0_con_t*)USB0_BASE)
 #endif
-#ifdef _ECAP0
-	#define ECAP0			((ECAP_con_t*)ECAP0_BASE)
-#endif
-#ifdef _ECAP1
-	#define ECAP1			((ECAP_con_t*)ECAP1_BASE)
-#endif
-#ifdef _ECAP2
-	#define ECAP2			((ECAP_con_t*)ECAP2_BASE)
-#endif
 
 #else//__MEM_REMAP
 #ifdef _MPU1
@@ -2842,6 +2842,15 @@ enum {
 #endif
 #ifdef _DDR0
 	_EXTERN DDR_con_t		*DDR0;
+#endif
+#ifdef _ECAP0
+	_EXTERN ECAP_con_t		*ECAP0;
+#endif
+#ifdef _ECAP1
+	_EXTERN ECAP_con_t		*ECAP1;
+#endif
+#ifdef _ECAP2
+	_EXTERN ECAP_con_t		*ECAP2;
 #endif
 #ifdef _EDMA0
 	_EXTERN EDMA_con_t		*EDMA0;
@@ -2893,15 +2902,6 @@ enum {
 #endif
 #ifdef _USB0
 	_EXTERN USB0_con_t		*USB0;
-#endif
-#ifdef _ECAP0
-	_EXTERN ECAP_con_t		*ECAP0;
-#endif
-#ifdef _ECAP1
-	_EXTERN ECAP_con_t		*ECAP1;
-#endif
-#ifdef _ECAP2
-	_EXTERN ECAP_con_t		*ECAP2;
 #endif
 #endif//__MEM_REMAP
 

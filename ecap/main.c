@@ -43,13 +43,14 @@ int main(int argc, char* argv[]) {
 	psc_state_transition(PSC_GPIO, PSC_STATE_ENABLE);
 	psc_state_transition(PSC_ECAP, PSC_STATE_ENABLE);
 
-	syscfg_pinmux(LCDC_BL_PWM_PINMUX);
-
 	gpio_set_mux(LCDC_BL_PWR, GPIO_DIR_OUTPUT);
 	gpio_set_output1(LCDC_BL_PWR, GPIO_HIGH);
+
 	#if 0
 	gpio_set_mux(LCDC_BL_PWM, GPIO_DIR_OUTPUT);
 	gpio_set_output1(LCDC_BL_PWM, GPIO_HIGH);
+	#else
+	syscfg_pinmux(LCDC_BL_PWM_PINMUX);
 	#endif
 
 	ecap_init(ECAP_HW);
