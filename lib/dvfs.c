@@ -80,21 +80,30 @@ int dvfs_set_opp(int opp) {
 	}
 
 	if (opp > l_opp) {
-		tps6507x_set_output(PWR_TYPE_DCDC3, opps[opp].volt);		
+		tps6507x_set_output(PWR_TYPE_DCDC3, opps[opp].volt);
 	}
 	pll_get_conf(PLL0, pcf);
-	pcf->pllm = opps[opp].freq * pcf->prediv * pcf->postdiv / F_OSCIN;
+
+	/* pll_freq = F_OSCIN / prediv * pllm / postdiv */
+	pcf->prediv = 1UL;
+	pcf->postdiv = 1UL;
+	pcf->pllm = opps[opp].freq * pcf->postdiv / F_OSCIN * pcf->prediv;
+
 	// am1808.pdf
 	// Page 79,
 	// The multiplier values must be chosen such that the PLL output
 	// frequency is between 300 and 600 MHz
-	if (F_OSCIN * pcf->pllm / pcf->prediv > 600 * _1M) {
-		pcf->pllm /= 2;
-		pcf->postdiv /= 2;
+	while (F_OSCIN * pcf->pllm / pcf->prediv < 300UL * _1M) {
+		pcf->pllm <<= 1;
+		pcf->postdiv <<= 1;
+	}
+	while (F_OSCIN * pcf->pllm / pcf->prediv > 600UL * _1M) {
+		pcf->pllm >>= 1;
+		pcf->postdiv >>= 1;
 	}
 	pll_set_conf(PLL0, pcf);
 	if (opp < l_opp) {
-		tps6507x_set_output(PWR_TYPE_DCDC3, opps[opp].volt);		
+		tps6507x_set_output(PWR_TYPE_DCDC3, opps[opp].volt);
 	}
 
 	clk_node_recalc();
