@@ -41,11 +41,11 @@ am18x_rt syscfg_pll(am18x_bool lock) {
 	return AM18X_OK;
 }
 
-am18x_rt syscfg_aync3(am18x_bool ispll0) {
+am18x_rt syscfg_aync3(am18x_bool src_y_pll0_n_pll1) {
 	uint32_t msk, v;
 
 	msk = CFGCHIP3_ASYNC3_CLKSRC_MASK;
-	v = ispll0? CFGCHIP3_ASYNC3_CLKSRC_pll0: CFGCHIP3_ASYNC3_CLKSRC_pll1;
+	v = src_y_pll0_n_pll1? CFGCHIP3_ASYNC3_CLKSRC_pll0: CFGCHIP3_ASYNC3_CLKSRC_pll1;
 	SYSCFG0->CFGCHIP3 = FIELD_SET(SYSCFG0->CFGCHIP3, msk, v);
 
 	return AM18X_OK;
@@ -116,40 +116,48 @@ am18x_rt syscfg_ddr_slew(am18x_bool ddr2_not_mddr) {
 	uint32_t reg, v;
 
 	reg = SYSCFG1->DDR_SLEW;
-	if (ddr2_not_mddr) {
-		v = DDR_SLEW_CMOSEN_SSTL;
-	} else {
-		v = DDR_SLEW_CMOSEN_LVCMOS;
-	}
+	v = (ddr2_not_mddr)? DDR_SLEW_CMOSEN_SSTL: DDR_SLEW_CMOSEN_LVCMOS;
 	SYSCFG1->DDR_SLEW = FIELD_SET(reg, DDR_SLEW_CMOSEN_MASK, v);
 	return AM18X_OK;
 }
 
 static uint32_t freq_table[][2] = {
-CFGCHIP2_USB0REFFREQ_12MHz,	12000000,
-CFGCHIP2_USB0REFFREQ_24MHz,	24000000,
-CFGCHIP2_USB0REFFREQ_48MHz,	48000000,
-CFGCHIP2_USB0REFFREQ_19_2MHz,	19200000,
-CFGCHIP2_USB0REFFREQ_38_4MHz,	38400000,
-CFGCHIP2_USB0REFFREQ_13MHz,	13000000,
-CFGCHIP2_USB0REFFREQ_26MHz,	26000000,
-CFGCHIP2_USB0REFFREQ_20MHz,	20000000,
-CFGCHIP2_USB0REFFREQ_40MHz,	40000000,
+	{CFGCHIP2_USB0REFFREQ_12MHz,	12000000},
+	{CFGCHIP2_USB0REFFREQ_24MHz,	24000000},
+	{CFGCHIP2_USB0REFFREQ_48MHz,	48000000},
+	{CFGCHIP2_USB0REFFREQ_19_2MHz,	19200000},
+	{CFGCHIP2_USB0REFFREQ_38_4MHz,	38400000},
+	{CFGCHIP2_USB0REFFREQ_13MHz,	13000000},
+	{CFGCHIP2_USB0REFFREQ_26MHz,	26000000},
+	{CFGCHIP2_USB0REFFREQ_20MHz,	20000000},
+	{CFGCHIP2_USB0REFFREQ_40MHz,	40000000},
 };
 
-am18x_rt syscfg_init_usb0phy(uint32_t freq) {
+// USB#0 (USB2.0 subsystem)
+am18x_rt syscfg_set_usb0phy(am18x_bool y_on_n_off, uint32_t freq) {
 	uint32_t reg, msk, v;
 	int i;
-	
+
 	reg = SYSCFG0->CFGCHIP2;
 
+	v = CFGCHIP2_RESET_yes;
+	if (!y_on_n_off) {
+		v |= CFGCHIP2_USB0PHYPWDN_down;
+		v |= CFGCHIP2_USB0OTGPWRDN_down;
+	}
+
 	// RESET: Hold PHY in Reset
-	reg = FIELD_SET(reg, CFGCHIP2_RESET_MASK, CFGCHIP2_RESET_yes);
+	reg = FIELD_SET(reg, CFGCHIP2_RESET_MASK, v);
 	SYSCFG0->CFGCHIP2 = reg;
 	// Drive Reset for few clock cycles
 	for (v = 0; v < 50; v++) {
 		asm volatile ("nop");
 	}
+
+	if (!y_on_n_off) {
+		return AM18X_OK;
+	}
+
 	// RESET: Release PHY from Reset
 	reg = FIELD_SET(reg, CFGCHIP2_RESET_MASK, CFGCHIP2_RESET_no);
 	SYSCFG0->CFGCHIP2 = reg;
@@ -187,6 +195,23 @@ am18x_rt syscfg_init_usb0phy(uint32_t freq) {
 	// Wait Until PHY Clock is Good
 	msk = CFGCHIP2_USB0PHYCLKGD_MASK;
 	while (FIELD_GET(SYSCFG0->CFGCHIP2, msk) == CFGCHIP2_USB0PHYCLKGD_no);
+
+	return AM18X_OK;
+}
+
+// USB#1 (USB1.1 subsystem)
+am18x_rt syscfg_set_usb1phy(am18x_bool y_on_n_off, am18x_bool phy_clk_y_usb0_n_refin) {
+	uint32_t reg, v;
+
+	reg = SYSCFG0->CFGCHIP2;
+
+	v = phy_clk_y_usb0_n_refin? CFGCHIP2_USB1PHYCLKMUX_USB0PHY: CFGCHIP2_USB1PHYCLKMUX_REFCLKIN;
+	reg = FIELD_SET(reg, CFGCHIP2_USB1PHYCLKMUX_MASK, v);
+
+	v = y_on_n_off? CFGCHIP2_USB1SUSPENDM_no: CFGCHIP2_USB1SUSPENDM_yes;
+	reg = FIELD_SET(reg, CFGCHIP2_USB1SUSPENDM_MASK, v);
+
+	SYSCFG0->CFGCHIP2 = reg;
 
 	return AM18X_OK;
 }

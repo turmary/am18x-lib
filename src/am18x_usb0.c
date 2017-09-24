@@ -28,7 +28,7 @@ am18x_rt usb0_conf(const usb0_conf_t* conf) {
 	printk("USB0 PHY CLK = %d Hz\n", freq);
 
 	// Configure PHY with the Desired Operation
-	syscfg_init_usb0phy(freq);
+	syscfg_set_usb0phy(AM18X_TRUE, freq);
 
 	reg = ucon->POWER;
 	v = (conf->highspeed)? POWER_HSEN_high: POWER_HSEN_full;
