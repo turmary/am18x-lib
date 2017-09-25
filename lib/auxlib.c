@@ -133,3 +133,75 @@ int dump_regs_word(const char* head, unsigned base, size_t size) {
 	}
 	return 0;
 }
+
+// read a unsigned value from bytes [buf, buf + size)
+unsigned get_byte_uint(char* buf, int size, int bigend) {
+	int i;
+	unsigned r = 0;
+	unsigned char* ubuf = (unsigned char*)buf;
+
+	if (size > sizeof(unsigned)) size = sizeof(unsigned);
+
+	if (! bigend) {
+		memcpy(&r, &buf[0], size);
+		return r;
+	}
+		
+	for(i = 0; i < size; i++) {
+		r = (r << 8) + ubuf[i];
+	}
+	return r;
+}
+
+// write a unsigned value to bytes [buf, buf + size)
+int set_byte_uint(char* buf, int size, unsigned value, int bigend) {
+	int i;
+	unsigned r;
+
+	r = value;
+	if (size > sizeof(unsigned)) size = sizeof(unsigned);
+
+	if (! bigend) {
+		memcpy(&buf[0], &r, size);
+		return r;
+	}
+
+	for (i = size - 1; i >= 0; i--) {
+		buf[i] = value & 0xFF;
+		value >>= 8;
+	}
+	return r;
+}
+
+int make_argv(char* s, int size, char *argv[], int av_max) {
+	char* se;
+	int n;
+
+	n = 0;
+	se = s + size - 1;
+	while (s < se && *s && isspace(*s)) {
+		s++;
+	}
+
+	while (s < se && *s && n < av_max - 1) {
+		if (*s) {
+			argv[n++] = s;
+		}
+
+		while (s < se && *s && ! isspace(*s)) {
+			s++;
+		}
+
+		if (s < se && *s) {
+			*s++ = '\0';
+		}
+
+		while (s < se && *s && isspace(*s)) {
+			s++;
+		}
+	}
+
+	argv[n] = NULL;
+
+	return n;
+}

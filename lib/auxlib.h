@@ -42,6 +42,9 @@ int memcpy(char* dst, const char* src, size_t size);
 int debug_buf(const char* head, char* buf, int len);
 int debug_line(const char* file, int lin, int nr, ...);
 int dump_regs_word(const char* head, unsigned base, size_t size);
+unsigned get_byte_uint(char* buf, int size, int bigend);
+int set_byte_uint(char* buf, int size, unsigned value, int bigend);
+int make_argv(char* s, int size, char *argv[], int av_max);
 
 unsigned get_exec_base(void);
 
