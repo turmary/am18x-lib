@@ -7,10 +7,10 @@
 #include "arm920t.h"
 #include "am18x_map_s.h"
 
-.equ		usr_stack_size, 0x00002000
-.equ		isr_stack_size, 0x00002000
-.equ		und_stack_size, 0x00002000
-.equ		und_stack_size, 0x00002000
+.equ		usr_stack_size, 0x00001000
+.equ		isr_stack_size, 0x00000200
+.equ		und_stack_size, 0x00000200
+.equ		und_stack_size, 0x00000200
 
 		.section .init, "ax"
 		.arm
