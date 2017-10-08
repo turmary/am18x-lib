@@ -1,5 +1,6 @@
 // tary 22:35 2011/6/19
 #include <stdarg.h>
+#include "ctype.h"
 #include "auxlib.h"
 #include "uart.h"
 
@@ -76,6 +77,12 @@ int strcmp(const char* ss, const char* sd) {
 	return *ss - *sd;
 }
 
+int strncmp(const char* ss, const char* sd, size_t size) {
+	size_t i;
+	for (i = 0; i < size && *ss == *sd && *ss; ss++, sd++, i++);
+	return *ss - *sd;
+}
+
 const char* strchr(const char* s, char c) {
 	for (; *s && *s != c; s++);
 	if (*s == c) {
@@ -143,7 +150,7 @@ unsigned get_byte_uint(char* buf, int size, int bigend) {
 	if (size > sizeof(unsigned)) size = sizeof(unsigned);
 
 	if (! bigend) {
-		memcpy(&r, &buf[0], size);
+		memcpy((char*)&r, &buf[0], size);
 		return r;
 	}
 		
@@ -162,7 +169,7 @@ int set_byte_uint(char* buf, int size, unsigned value, int bigend) {
 	if (size > sizeof(unsigned)) size = sizeof(unsigned);
 
 	if (! bigend) {
-		memcpy(&buf[0], &r, size);
+		memcpy(&buf[0], (char*)&r, size);
 		return r;
 	}
 
