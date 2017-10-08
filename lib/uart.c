@@ -5,6 +5,10 @@
 // AM1808 UART2 pins
 #define UART2_TXD		4,20,2
 #define UART2_RXD		4,16,2
+#define UART_DEL        	0x7F
+#define UART_BACKSPACE		0x08
+#define UART_CR			0x0D
+#define UART_LF			0x0A
 
 int uart_init(void) {
 	uart_conf_t conf;
@@ -28,8 +32,8 @@ int __putchar(int c) {
 }
 
 int putchar(int c) {
-	if (c == '\n') {
-		__putchar('\r');
+	if (c == UART_LF) {
+		__putchar(UART_CR);
 	}
 	__putchar(c);
 	return c;
@@ -45,4 +49,31 @@ int peekchar(void) {
 		return -1;
 	}
 	return uart_read_byte(UART2);
+}
+
+int uart_gets(char *line, int n) {
+	int cnt = 0;
+	char c;
+
+	do {
+		if ((c = getchar()) == UART_CR) {
+			c = UART_LF;				/* read character */
+		}
+
+		if (c != UART_BACKSPACE	&& c != UART_DEL) {	/* process backspace */
+			cnt++;
+			*line++ = c;
+			if (c != UART_LF) {			/* echo and store character */
+				putchar(c);
+			}
+		} else if (cnt != 0) {
+			cnt--;
+			line--;
+			putchar(UART_BACKSPACE);		/* echo backspace */
+			putchar(' ');
+			putchar(UART_BACKSPACE);
+		}
+	} while (cnt < n - 1 &&	c != UART_LF);			/* check limit and line feed */
+	*line = 0;						/* mark end of string */
+	return cnt;
 }
