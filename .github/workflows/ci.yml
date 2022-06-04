@@ -1,0 +1,41 @@
+name: Makefile CI
+
+on:
+  push:
+    branches: [ "master" ]
+
+  pull_request:
+    branches: [ "master" ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+    - name: Install msys2 environment
+      uses: msys2/setup-msys2@v2
+      with:
+        update: true
+        msystem: MINGW64
+        install: >-
+          base-devel
+          git
+          mingw-w64-x86_64-arm-none-eabi-toolchain
+          mingw-w64-x86_64-libwinpthread
+          mingw-w64-x86_64-toolchain
+
+    #- run: git config --global core.autocrlf input
+    #  shell: bash
+    - name: Checkout the code
+      uses: actions/checkout@v2
+    # - uses: actions/checkout@v3
+    # - run: git describe --dirty
+
+    - name: Build all examples
+      run: make
