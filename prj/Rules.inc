@@ -42,6 +42,7 @@ LDFLAGS += -Wl,-T$(LINK_SCRIPT)
 # important for symbols __lds_xxx when option -pie used
 LDFLAGS += -Wl,-Bsymbolic
 LDFLAGS += -pie
+LDFLAGS += -Wl,--no-check-sections
 
 COBJ = $(CSRC:.c=.o)
 AOBJ = $(ASRC:.S=.o)

@@ -49,7 +49,7 @@ SECTIONS {
 	} = 0
 	*/
 
-	.bss __lds_rel_start : {
+	.bss __lds_rel_start (NOLOAD): {
 		PROVIDE (__lds_bss_start = .);
 		*(.bss)
 		*(COMMON)
